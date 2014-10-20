@@ -8,8 +8,9 @@ using thx.format.DateTimeFormat;
 class TestDateTimeFormat {
   static var it : Culture = Embed.culture('it-it');
   static var us : Culture = Embed.culture('en-us');
-  static var ru : Culture = Embed.culture('ru-RU');
+  static var ru : Culture = Embed.culture('ru-ru');
   static var fr : Culture = Embed.culture('fr-fr');
+  static var jp : Culture = Embed.culture('ja-jp');
   static var d1 : Date = Date.fromString('2009-06-01 13:45:30');
   static var d2 : Date = Date.fromString('2009-06-15 13:45:30');
   public function new() {}
@@ -84,5 +85,29 @@ class TestDateTimeFormat {
     Assert.equals("juin",   d1.formatTerm('MMMM', fr));
     Assert.equals("Giugno", d1.formatTerm('MMMM', it));
     Assert.equals("Июнь",   d1.formatTerm('MMMM', ru));
+  }
+
+  public function tests() {
+    Assert.equals("30", d1.formatTerm('s'));
+    Assert.equals("3", Date.fromString('2009-06-15 13:05:03').formatTerm('s'));
+  }
+
+  public function testss() {
+    Assert.equals("30", d1.formatTerm('ss'));
+    Assert.equals("03", Date.fromString('2009-06-15 13:05:03').formatTerm('ss'));
+  }
+
+  public function testt() {
+    Assert.equals("P",  d1.formatTerm('t'));
+    Assert.equals("P",  d1.formatTerm('t', fr));
+    Assert.equals("P",  d1.formatTerm('t', it));
+    Assert.equals("午", d1.formatTerm('t', jp));
+  }
+
+  public function testtt() {
+    Assert.equals("PM", d1.formatTerm('tt'));
+    Assert.equals("PM", d1.formatTerm('tt', fr));
+    Assert.equals("PM", d1.formatTerm('tt', it));
+    Assert.equals("午後",  d1.formatTerm('tt', jp));
   }
 }

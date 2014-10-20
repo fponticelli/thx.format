@@ -1,5 +1,6 @@
 package thx.format;
 
+import haxe.Utf8;
 import thx.core.Error;
 import thx.culture.Culture;
 import thx.culture.DateTimeFormatInfo;
@@ -82,7 +83,13 @@ class DateTimeFormat {
       case "MM":    '${d.getMonth()+1}'.lpad('0', 2);
       case "MMM":   dt.nameMonthsAbbreviated[d.getMonth()];
       case "MMMM":  dt.nameMonths[d.getMonth()];
-      case _:       throw new Error('invalid DateTime format $format');
+      case "s":     '${d.getSeconds()}';
+      case "ss":    '${d.getSeconds()}'.lpad('0', 2);
+      case "t":     Utf8.sub(d.getHours() < 12 ? dt.designatorAm : dt.designatorPm, 0, 1);
+      case "tt":    d.getHours() < 12 ? dt.designatorAm : dt.designatorPm;
+      case "y":     '${d.getFullYear()%100}';
+      case "yy":    '${d.getFullYear()%100}'.lpad('0', 2);
+      case rest:    rest;
     };
   }
 }
