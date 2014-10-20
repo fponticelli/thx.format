@@ -7,6 +7,7 @@ using thx.format.DateTimeFormat;
 
 class TestDateTimeFormat {
   static var it : Culture = Embed.culture('it-it');
+  static var ch : Culture = Embed.culture('it-ch');
   static var us : Culture = Embed.culture('en-us');
   static var ru : Culture = Embed.culture('ru-ru');
   static var fr : Culture = Embed.culture('fr-fr');
@@ -105,9 +106,38 @@ class TestDateTimeFormat {
   }
 
   public function testtt() {
-    Assert.equals("PM", d1.formatTerm('tt'));
-    Assert.equals("PM", d1.formatTerm('tt', fr));
-    Assert.equals("PM", d1.formatTerm('tt', it));
+    Assert.equals("PM",   d1.formatTerm('tt'));
+    Assert.equals("PM",   d1.formatTerm('tt', fr));
+    Assert.equals("PM",   d1.formatTerm('tt', it));
     Assert.equals("午後",  d1.formatTerm('tt', jp));
+  }
+
+  public function testy() {
+    Assert.equals("9", d1.formatTerm('y'));
+    Assert.equals("72", Date.fromString('1972-06-15 13:05:03').formatTerm('y'));
+  }
+
+  public function testyy() {
+    Assert.equals("09", d1.formatTerm('yy'));
+    Assert.equals("72", Date.fromString('1972-06-15 13:05:03').formatTerm('yy'));
+  }
+
+  public function testyyyy() {
+    Assert.equals("1980", Date.fromString('1980-06-15 13:05:03').formatTerm('yyyy'));
+    Assert.equals("2019", Date.fromString('2019-06-15 13:05:03').formatTerm('yyyy'));
+  }
+
+  public function testTimeSeprator() {
+    Assert.equals(":", d1.formatTerm(':'));
+    Assert.equals(":", d1.formatTerm(':', fr));
+    Assert.equals(":", d1.formatTerm(':', it));
+    Assert.equals(":", d1.formatTerm(':', jp));
+  }
+
+  public function testDateSeprator() {
+    Assert.equals("/", d1.formatTerm('/'));
+    Assert.equals(".", d1.formatTerm('/', ch));
+    Assert.equals("/", d1.formatTerm('/', it));
+    Assert.equals("/", d1.formatTerm('/', jp));
   }
 }

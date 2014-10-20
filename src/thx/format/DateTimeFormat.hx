@@ -61,7 +61,7 @@ class DateTimeFormat {
   }
 
   // NOT SUPPORTED
-  // f, ff, fff, ffff, fffff, ffffff, fffffff, F, FF, FFF, FFFF, FFFFF, FFFFFF, FFFFFFF, g, gg, K
+  // f, ff, fff, ffff, fffff, ffffff, fffffff, F, FF, FFF, FFFF, FFFFF, FFFFFF, FFFFFFF, g, gg, K, yyyyy, z, zz, zzz
   public static function formatTerm(d : Date, format : String, ?culture : Culture) : String {
     var dt = dateTime(culture);
     return switch format {
@@ -89,6 +89,10 @@ class DateTimeFormat {
       case "tt":    d.getHours() < 12 ? dt.designatorAm : dt.designatorPm;
       case "y":     '${d.getFullYear()%100}';
       case "yy":    '${d.getFullYear()%100}'.lpad('0', 2);
+      case "yyy":   '${d.getFullYear()}'.lpad('0', 3);
+      case "yyyy":  '${d.getFullYear()}'.lpad('0', 4);
+      case ":":     dt.separatorTime;
+      case "/":     dt.separatorDate;
       case rest:    rest;
     };
   }
