@@ -8,11 +8,14 @@ using thx.core.Ints;
 using StringTools;
 
 class NumberFormat {
+  public static function format(f : Float, ?format : NFormat, ?culture : Culture)
+    return switch format {
+      case Decimal(decimals): decimal(f, decimals, culture);
+      case Integer: integer(f, culture);
+    }
 /*
   public static function format(num : Float, ?format : NFormat, ?culture : Culture)
     return switch format {
-      case 'D': FormatNumber.decimal(v, decimals, culture);
-      case 'I': FormatNumber.int(v, culture);
       case 'C':
         var s = params.length > 1 ? params[1] : null;
         return function(v) return FormatNumber.currency(v, s, decimals, culture);
@@ -22,12 +25,16 @@ class NumberFormat {
         return function(v) return FormatNumber.permille(v, decimals, culture);
     };
 */
+
   public static function decimal(f : Float, ?decimals : Int, ?culture : Culture) {
     var nf        = (culture).or(Culture.invariant).number,
         pattern   = f < 0 ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
         formatted = value(f, (decimals).or(nf.decimalDigitsNumber), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
+
+  public static function integer(f : Float, ?culture : Culture)
+    return decimal(f, 0, culture);
 
   public static function value(f : Float, decimals : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
     if(Math.isNaN(f))
@@ -92,7 +99,9 @@ class NumberFormat {
 enum NFormat {
   Decimal(?decimals : Int);
   Integer;
+  /*
   Currency;
   Percent(decimals : Int);
   Permille(decimals : Int);
+  */
 }

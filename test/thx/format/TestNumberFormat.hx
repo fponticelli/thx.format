@@ -26,4 +26,9 @@ class TestNumberFormat {
     var exp = Math.pow(2, -18);
     Assert.equals('0.00000381469', exp.decimal(11));
   }
+
+  public function testInteger() {
+    Assert.equals('12,345',  12345.6789.integer());
+    Assert.equals('1,125,899,906,842,620', Math.pow(2, 50).integer());
+  }
 }
