@@ -1,0 +1,15 @@
+{
+  "name": "thx.format",
+  "url": "https://github.com/fponticelli/thx.format",
+  "license": "MIT",
+  "classPath": "src",
+  "tags": ["format", "localization", "thx", "cross"],
+  "description": "Formatting library.",
+  "releasenote": "first release",
+  "version": "0.1.0",
+  "contributors": ["fponticelli"],
+  "dependencies": {
+    "thx.core": "",
+    "thx.culture": ""
+  }
+}

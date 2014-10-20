@@ -1,0 +1,10 @@
+-cp src
+-cp test
+-lib utest
+-lib thx.core
+-lib thx.culture
+-swf bin/flash.swf
+-main TestAll
+-debug
+-D thx-format
+-D fdb

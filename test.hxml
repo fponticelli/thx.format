@@ -1,0 +1,9 @@
+-neko bin/thx.format.n
+-cp src
+-cp test
+-lib utest
+-lib thx.core
+-lib thx.culture
+-main TestAll
+#-cmd clear
+-cmd neko bin/thx.format.n
