@@ -13,21 +13,15 @@ class NumberFormat {
       case Decimal(decimals): decimal(f, decimals, culture);
       case Integer: integer(f, culture);
       case Currency(decimals, symbol): currency(f, decimals, symbol, culture);
+      case Percent(decimals): percent(f, decimals, culture);
+      case Permille(decimals): permille(f, decimals, culture);
+      case Unit(decimals, symbol): unit(f, decimals, symbol, culture);
     };
-/*
-  public static function format(num : Float, ?format : NFormat, ?culture : Culture)
-    return switch format {
-      case 'P':
-        return function(v) return FormatNumber.percent(v, decimals, culture);
-      case 'M':
-        return function(v) return FormatNumber.permille(v, decimals, culture);
-    };
-*/
 
   public static function currency(f : Float, ?decimals : Int, ?symbol : String, ?culture : Culture) {
     var nf        = (culture).or(Culture.invariant).number,
         pattern   = f < 0 ? Pattern.currencyNegatives[nf.patternNegativeCurrency] : Pattern.currencyPositives[nf.patternPositiveCurrency],
-        formatted = value(f, (decimals).or(nf.decimalDigitsCurrency), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalCurrency);
+        formatted = value(f, (decimals).or(nf.decimalDigitsCurrency), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesCurrency, nf.separatorGroupCurrency, nf.separatorDecimalCurrency);
     return pattern.replace('n', formatted).replace('$', (symbol).or(nf.symbolCurrency));
   }
 
@@ -40,6 +34,23 @@ class NumberFormat {
 
   public static function integer(f : Float, ?culture : Culture)
     return decimal(f, 0, culture);
+
+  public static function percent(f : Float, ?decimals : Int, ?culture : Culture) {
+    var nf = (culture).or(Culture.invariant).number;
+    return unit(f * 100, (decimals).or(nf.decimalDigitsPercent), nf.symbolPercent, culture);
+  }
+
+  public static function permille(f : Float, ?decimals : Int, ?culture : Culture) {
+    var nf = (culture).or(Culture.invariant).number;
+    return unit(f * 1000, (decimals).or(nf.decimalDigitsPercent), nf.symbolPermille, culture);
+  }
+
+  public static function unit(f : Float, decimals : Int, symbol : String, ?culture : Culture) {
+    var nf        = (culture).or(Culture.invariant).number,
+        pattern   = f < 0 ? Pattern.percentNegatives[nf.patternNegativePercent] : Pattern.percentPositives[nf.patternPositivePercent],
+        formatted = value(f, decimals, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesPercent, nf.separatorGroupPercent, nf.separatorDecimalPercent);
+    return pattern.replace('n', formatted).replace('%', symbol);
+  }
 
   public static function value(f : Float, decimals : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
     if(Math.isNaN(f))
@@ -105,9 +116,7 @@ enum NFormat {
   Decimal(?decimals : Int);
   Integer;
   Currency(?decimals : Int, ?symbols : String);
-  /*
   Percent(?decimals : Int);
   Permille(?decimals : Int);
   Unit(decimals : Int, symbol : String);
-  */
 }
