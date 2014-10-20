@@ -60,7 +60,7 @@ class DateTimeFormat {
   }
 
   // NOT SUPPORTED
-  // f, ff, fff, ffff, fffff, ffffff, fffffff, F, FF, FFF, FFFF, FFFFF, FFFFFF, FFFFFFF, g, gg
+  // f, ff, fff, ffff, fffff, ffffff, fffffff, F, FF, FFF, FFFF, FFFFF, FFFFFF, FFFFFFF, g, gg, K
   public static function formatTerm(d : Date, format : String, ?culture : Culture) : String {
     var dt = dateTime(culture);
     return switch format {
@@ -76,6 +76,12 @@ class DateTimeFormat {
       case "hh":    formatTerm(d, 'h', culture).lpad('0', 2);
       case "H":     '${d.getHours()}';
       case "HH":    '${d.getHours()}'.lpad('0', 2);
+      case "m":     '${d.getMinutes()}';
+      case "mm":    '${d.getMinutes()}'.lpad('0', 2);
+      case "M":     '${d.getMonth()+1}';
+      case "MM":    '${d.getMonth()+1}'.lpad('0', 2);
+      case "MMM":   dt.nameMonthsAbbreviated[d.getMonth()];
+      case "MMMM":  dt.nameMonths[d.getMonth()];
       case _:       throw new Error('invalid DateTime format $format');
     };
   }

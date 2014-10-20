@@ -25,8 +25,6 @@ class TestDateTimeFormat {
   }
 
   public function testddd() {
-    trace(Date.fromString('2009-05-31 13:45:30').getDay());
-    trace(d1.getDay());
     Assert.equals("Mon",  d1.formatTerm('ddd'));
     Assert.equals("lun.", d1.formatTerm('ddd', fr));
     Assert.equals("lun",  d1.formatTerm('ddd', it));
@@ -54,5 +52,37 @@ class TestDateTimeFormat {
 
   public function testHH() {
     Assert.equals("13", d1.formatTerm('HH'));
+  }
+
+  public function testm() {
+    Assert.equals("45", d1.formatTerm('m'));
+    Assert.equals("5", Date.fromString('2009-06-15 13:05:30').formatTerm('m'));
+  }
+
+  public function testmm() {
+    Assert.equals("45", d1.formatTerm('mm'));
+    Assert.equals("05", Date.fromString('2009-06-15 13:05:30').formatTerm('mm'));
+  }
+
+  public function testM() {
+    Assert.equals("6", d1.formatTerm('M'));
+  }
+
+  public function testMM() {
+    Assert.equals("06", d1.formatTerm('MM'));
+  }
+
+  public function testMMM() {
+    Assert.equals("Jun",  d1.formatTerm('MMM'));
+    Assert.equals("juin", d1.formatTerm('MMM', fr));
+    Assert.equals("giu",  d1.formatTerm('MMM', it));
+    Assert.equals("Июнь", d1.formatTerm('MMM', ru));
+  }
+
+  public function testMMMM() {
+    Assert.equals("June",   d1.formatTerm('MMMM'));
+    Assert.equals("juin",   d1.formatTerm('MMMM', fr));
+    Assert.equals("Giugno", d1.formatTerm('MMMM', it));
+    Assert.equals("Июнь",   d1.formatTerm('MMMM', ru));
   }
 }
