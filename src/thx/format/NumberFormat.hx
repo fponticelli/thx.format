@@ -66,7 +66,7 @@ class NumberFormat {
         d = p[1],
         buf = [];
 
-    if((d).or('').indexOf('e') > 0) {
+    if((d = (d).or('').toLowerCase()).indexOf('e') > 0) {
       p = d.split('e');
       d = p[0];
       var e = Ints.parse(p[1]);
