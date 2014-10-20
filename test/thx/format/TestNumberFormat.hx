@@ -1,9 +1,13 @@
 package thx.format;
 
+import thx.culture.Culture;
+import thx.culture.Embed;
 import utest.Assert;
 using thx.format.NumberFormat;
 
 class TestNumberFormat {
+  static var it : Culture = Embed.culture('it-it');
+  static var us : Culture = Embed.culture('en-us');
   public function new() {}
 
   public function testDecimal() {
@@ -25,6 +29,21 @@ class TestNumberFormat {
 
     var exp = Math.pow(2, -18);
     Assert.equals('0.00000381469', exp.decimal(11));
+  }
+
+  public function testCurrency() {
+    var exp = Math.pow(2, 50);
+    Assert.equals('¤1,125,899,906,842,620.00', exp.currency());
+  }
+
+  public function testCurrencyIT() {
+    var exp = Math.pow(2, 50);
+    Assert.equals('€ 1.125.899.906.842.620,00', exp.currency(it));
+  }
+
+  public function testCurrencyUS() {
+    var exp = Math.pow(2, 50);
+    Assert.equals('$1,125,899,906,842,620.00', exp.currency(us));
   }
 
   public function testInteger() {

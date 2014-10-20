@@ -12,19 +12,24 @@ class NumberFormat {
     return switch format {
       case Decimal(decimals): decimal(f, decimals, culture);
       case Integer: integer(f, culture);
-    }
+      case Currency(decimals, symbol): currency(f, decimals, symbol, culture);
+    };
 /*
   public static function format(num : Float, ?format : NFormat, ?culture : Culture)
     return switch format {
-      case 'C':
-        var s = params.length > 1 ? params[1] : null;
-        return function(v) return FormatNumber.currency(v, s, decimals, culture);
       case 'P':
         return function(v) return FormatNumber.percent(v, decimals, culture);
       case 'M':
         return function(v) return FormatNumber.permille(v, decimals, culture);
     };
 */
+
+  public static function currency(f : Float, ?decimals : Int, ?symbol : String, ?culture : Culture) {
+    var nf        = (culture).or(Culture.invariant).number,
+        pattern   = f < 0 ? Pattern.currencyNegatives[nf.patternNegativeCurrency] : Pattern.currencyPositives[nf.patternPositiveCurrency],
+        formatted = value(f, (decimals).or(nf.decimalDigitsCurrency), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalCurrency);
+    return pattern.replace('n', formatted).replace('$', (symbol).or(nf.symbolCurrency));
+  }
 
   public static function decimal(f : Float, ?decimals : Int, ?culture : Culture) {
     var nf        = (culture).or(Culture.invariant).number,
@@ -99,9 +104,10 @@ class NumberFormat {
 enum NFormat {
   Decimal(?decimals : Int);
   Integer;
+  Currency(?decimals : Int, ?symbols : String);
   /*
-  Currency;
-  Percent(decimals : Int);
-  Permille(decimals : Int);
+  Percent(?decimals : Int);
+  Permille(?decimals : Int);
+  Unit(decimals : Int, symbol : String);
   */
 }
