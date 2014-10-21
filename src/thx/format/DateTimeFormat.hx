@@ -88,8 +88,33 @@ class DateTimeFormat {
     return null != culture && null != culture.dateTime ? culture.dateTime : Culture.invariant.dateTime;
 
   public static function formatPattern(d : Date, format : String, ?culture : Culture) : String {
-    var dt = dateTime(culture);
-    return null;
+    culture = (culture).or(Culture.invariant);
+    var escape = false,
+        buf = [];
+    while(format.length > 0) {
+      if(escape) {
+        escape = false;
+        buf.push(format.substr(0, 1));
+        format = format.substr(1);
+      } else if(PATTERN.match(format)) {
+        var left = PATTERN.matchedLeft();
+        if(left.substr(-1) == "\\") {
+          escape = true;
+          format = format.substr(left.length);
+          buf.push(left.substr(0, left.length - 1));
+          continue;
+        }
+        buf.push(left);
+        buf.push(formatTerm(d, PATTERN.matched(0), culture));
+        format = PATTERN.matchedRight();
+      } else {
+        buf.push(format);
+        format = '';
+      }
+    }
+    if(escape)
+      buf.push('\\');
+    return buf.join('');
   }
 
 // NOT SUPPORTED
@@ -124,8 +149,8 @@ HH    | %H       | The hour as a decimal number using a 24-hour clock (range 00 
 hh    | %I       | The hour as a decimal number using a 12-hour clock (range 01 to 12).| 07
       | %k       | The hour (24-hour clock) as a decimal number (range 0 to 23); single-digits are optionally prefixed by leadingspace. (See also %H). | 7
       | %l       | The hour (12-hour clock) as a decimal number (range 1 to 12); single-digits are optionally prefixed by leadingspace. (See also %I). | 7
-mm    | %m       | The month as a decimal number (range 01 to 12).                    | 04
-      | %M       | The minute as a decimal number (range 00 to 59).                   | 08
+MM    | %m       | The month as a decimal number (range 01 to 12).                    | 04
+mm    | %M       | The minute as a decimal number (range 00 to 59).                   | 08
       | %n       | A newline character.                                               |
 tt    | %p       | Either 'AM' or 'PM' according to the given time value, or the corresponding strings for the current locale. Noon is treated as 'pm' and midnight as 'am'. | AM
       | %P       | Like %p but in lowercase: 'am' or 'pm' or a corresponding string for the current locale. | AM
@@ -162,6 +187,7 @@ yyyy  |          | Four digits year.                                            
 */
   public static function formatTerm(d : Date, format : String, ?culture : Culture) : String {
     var dt = dateTime(culture);
+    //trace(format);
     return switch format {
       case "d":     '${d.getDate()}';
       case "%d",
@@ -206,32 +232,33 @@ yyyy  |          | Four digits year.                                            
       case "/":     dt.separatorDate;
       case "%c":    dateTimeFull(d, culture);
       case "%C":    '${Math.floor(d.getFullYear()/100)}';
-      case '%e':    '${d.getDate()}'.lpad(' ', 2);
+      case "%e":    '${d.getDate()}'.lpad(' ', 2);
       case "%D":    DateTimeFormat.format(d, "%m/%d/%y", culture);
-      case '%f':    '${d.getMonth()+1}'.lpad(' ', 2);
-      case '%i':    '${d.getMinutes()}'.lpad(' ', 2);
-      case '%k':    '${d.getHours()}'.lpad(' ', 2);
-      case '%l':    formatTerm(d, 'h', culture).lpad(' ', 2);
+      case "%f":    '${d.getMonth()+1}'.lpad(' ', 2);
+      case "%i":    '${d.getMinutes()}'.lpad(' ', 2);
+      case "%k":    '${d.getHours()}'.lpad(' ', 2);
+      case "%l":    formatTerm(d, 'h', culture).lpad(' ', 2);
       case "%n":    "\n";
       case "%P":    (d.getHours() < 12 ? dt.designatorAm : dt.designatorPm).toLowerCase();
-      case '%q':    '${d.getSeconds()}'.lpad(' ', 2);
-      case '%r':    DateTimeFormat.format(d, "%I:%M:%S %p", culture);
-      case '%R':    DateTimeFormat.format(d, "%H:%M", culture);
+      case "%q":    '${d.getSeconds()}'.lpad(' ', 2);
+      case "%r":    DateTimeFormat.format(d, "%I:%M:%S %p", culture);
+      case "%R":    DateTimeFormat.format(d, "%H:%M", culture);
       case "%s":    '${Std.int(d.getTime()/1000)}';
       case "%t":    "\t";
-      case '%T':    DateTimeFormat.format(d, "%H:%M:%S", culture);
-      case '%u':    var day = d.getDay();
+      case "%T":    DateTimeFormat.format(d, "%H:%M:%S", culture);
+      case "%u":    var day = d.getDay();
                     day == 0 ? '7' : '$day';
       case "%Y":    '${d.getFullYear()}';
       case "%x":    dateLong(d, culture);
       case "%X":    timeLong(d, culture);
-      case '%w':    '${d.getDay()}';
+      case "%w":    '${d.getDay()}';
       case "%%":    "%";
-      case q if(q.length > 1 &&
+      case q if(q != null && q.length > 1 &&
         (q.substr(0, 1) == "'" && q.substr(-1) == "'") ||
         (q.substr(0, 1) == '"' && q.substr(-1) == '"')):
                     q.substr(1, q.length - 2);
-      case rest:    rest.replace('\\', '');
+      case rest:    rest;
     };
   }
+  static var PATTERN = ~/(d|M|y){1,4}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
 }

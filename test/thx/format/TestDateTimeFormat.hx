@@ -16,6 +16,16 @@ class TestDateTimeFormat {
   static var d2 : Date = Date.fromString('2009-06-15 13:45:30');
   public function new() {}
 
+  public function testFormat() {
+    Assert.equals("Monday, 01 June 2009 13:45:30",   d1.format('U'));
+    Assert.equals("lunedì 1 Giugno 2009 13:45:30",   d1.format('U', it));
+    Assert.equals("lunedì, 1. Giugno 2009 13:45:30", d1.format('U', ch));
+    Assert.equals("Monday, June 1, 2009 1:45:30 PM", d1.format('U', us));
+    Assert.equals("1 Июнь 2009 г. 13:45:30",         d1.format('U', ru));
+    Assert.equals("lundi 1 juin 2009 13:45:30",      d1.format('U', fr));
+    Assert.equals("2009年6月1日 13:45:30",            d1.format('U', jp));
+  }
+
   public function testd() {
     Assert.equals( "1", d1.formatTerm('d'));
     Assert.equals("15", d2.formatTerm('d'));
