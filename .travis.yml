@@ -1,0 +1,34 @@
+language: c
+
+env:
+  global:
+    - TARGET_DIR=bin
+  matrix:
+    - TARGET=cpp
+    - TARGET=cs
+    - TARGET=flash
+    - TARGET=java
+    - TARGET=js TOOLCHAIN="browser"
+    - TARGET=js TOOLCHAIN="nodejs"
+    - TARGET=neko
+    - TARGET=php
+    - TARGET=python
+
+matrix:
+  fast_finish: true
+
+before_install: # clone travis-hx repo
+  - travis_retry git clone --depth=50 --branch=master git://github.com/fponticelli/travis-hx.git ~/travis-hx
+
+install: # setup the target
+  - ~/travis-hx/setup.sh
+  - haxelib install utest
+  - haxelib install thx.core
+  - haxelib git thx.culture git://github.com/fponticelli/thx.culture.git
+
+script:
+  - cd $TRAVIS_BUILD_DIR
+  # build the tests
+  - haxe hxml/$TARGET.hxml -D travis
+  # run the tests
+  - ~/travis-hx/runtests.sh $FILENAME

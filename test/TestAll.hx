@@ -3,7 +3,7 @@ import utest.ui.Report;
 
 class TestAll {
   public static function addTests(runner : Runner) {
-    runner.addCase(new thx.format.TestDateTimeFormat());
+    runner.addCase(new thx.format.TestDateFormat());
     runner.addCase(new thx.format.TestNumberFormat());
   }
 

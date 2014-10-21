@@ -3,9 +3,9 @@ package thx.format;
 import thx.culture.Culture;
 import thx.culture.Embed;
 import utest.Assert;
-using thx.format.DateTimeFormat;
+using thx.format.DateFormat;
 
-class TestDateTimeFormat {
+class TestDateFormat {
   static var it : Culture = Embed.culture('it-it');
   static var ch : Culture = Embed.culture('it-ch');
   static var us : Culture = Embed.culture('en-us');
