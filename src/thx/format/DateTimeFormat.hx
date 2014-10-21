@@ -9,6 +9,8 @@ using thx.core.Defaults;
 using StringTools;
 //O, o    | 
 /**
+Formats the date using a one letter formatting option or using a custom pattern.
+
 pattern | description                          | example
 ------- | ------------------------------------ | -------
 d       | short date pattern                   |
@@ -26,27 +28,29 @@ u       | universal sortable date/time pattern |
 U       | universal full date/time pattern     |
 Y, y    | year/month pattern                   |
 ...     | custom pattern. It splits the pattern into pattern terms and apply them individually
+
+See `formatTerm` for all the possible formatting options to use for custom patterns.
 */
 class DateTimeFormat {
   public static function format(d : Date, format : String, ?culture : Culture) : String
     return switch format {
       case "d": dateShort(d, culture);
-      case "D": null;
-      case "f": null;
-      case "F": null;
-      case "g": null;
-      case "G": null;
+      case "D": dateLong(d, culture);
+      case "f": dateLong(d, culture) + ' ' + timeShort(d, culture);
+      case "F": dateLong(d, culture) + ' ' + timeLong(d, culture);
+      case "g": dateShort(d, culture) + ' ' + timeShort(d, culture);
+      case "G": dateShort(d, culture) + ' ' + timeLong(d, culture);
       case "M",
-           "m": null;
+           "m": monthDay(d, culture);
       case "R",
-           "r": null;
-      case "s": null;
-      case "t": null;
-      case "T": null;
-      case "u": null;
-      case "U": null;
+           "r": rfc1123(d, culture);
+      case "s": dateTimeSortable(d, culture);
+      case "t": timeShort(d, culture);
+      case "T": timeLong(d, culture);
+      case "u": universalSortable(d, culture);
+      case "U": dateTimeFull(d, culture);
       case "y",
-           "Y": null;
+           "Y": yearMonth(d, culture);
       case pattern:
         formatPattern(d, pattern, culture);
     };
@@ -140,22 +144,22 @@ ss    | %S       | The second as a decimal number (range 00 to 61). the upper le
 y     | %y       | The year as a decimal number without a century (range 00 to 99).   | 04
       | %Y       | The year as a decimal number including the century.                | 2004
       | %%       | A literal '%' character.                                           | %
-d     |          |                                                                    |
-h     |          |                                                                    |
-H     |          |                                                                    |
-m     |          |                                                                    |
-M     |          |                                                                    |
-s     |          |                                                                    |
-t     |          |                                                                    |
-yy    |          |                                                                    |
-yyy   |          |                                                                    |
-yyyy  |          |                                                                    |
-:     |          |                                                                    |
-/     |          |                                                                    |
-'...' |          |                                                                    |
-"..." |          |                                                                    |
+d     |          | The day of the month (1 to 31).                                    | 7
+h     |          | The hour on a 12-hour clock (1 to 12).                             | 11
+H     |          | Same as `h` but `0` padded (01 to 12).                             | 07
+m     |          | Minute (0 to 59).                                                  | 7
+M     |          | Same as `m` but `0` padded (00 to 59).                             | 07
+s     |          | Seconds (0 to 59).                                                 | 7
+t     |          | Same as `s` but `0` padded (00 to 59).                             | 07
+yy    |          | Year from 00 to 99.                                                | 99
+yyy   |          | Year with at least 3 digits.                                       | 1999
+yyyy  |          | Four digits year.                                                  | 1999
+:     |          | Time separator.                                                    | %
+/     |          | Date separator.                                                    | /
+'...' |          | Single quoted text is not processed (except for removing the quotes) | ...
+"..." |          | Double quoted text is not processed (except for removing the quotes) | ...
 
-* customs for missing features
+*customs for missing features
 */
   public static function formatTerm(d : Date, format : String, ?culture : Culture) : String {
     var dt = dateTime(culture);
