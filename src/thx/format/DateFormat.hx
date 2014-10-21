@@ -31,8 +31,8 @@ Y, y    | year/month pattern                   |
 See `formatTerm` for all the possible formatting options to use for custom patterns.
 */
 class DateTimeFormat {
-  public static function format(d : Date, format : String, ?culture : Culture) : String
-    return switch format {
+  public static function format(d : Date, pattern : String, ?culture : Culture) : String
+    return switch pattern {
       case "d": dateShort(d, culture);
       case "D": dateLong(d, culture);
       case "f": dateLong(d, culture) + ' ' + timeShort(d, culture);
@@ -87,29 +87,29 @@ class DateTimeFormat {
   static function dateTime(?culture : Culture)
     return null != culture && null != culture.dateTime ? culture.dateTime : Culture.invariant.dateTime;
 
-  public static function formatPattern(d : Date, format : String, ?culture : Culture) : String {
+  public static function formatPattern(d : Date, pattern : String, ?culture : Culture) : String {
     culture = (culture).or(Culture.invariant);
     var escape = false,
         buf = [];
-    while(format.length > 0) {
+    while(pattern.length > 0) {
       if(escape) {
         escape = false;
-        buf.push(format.substr(0, 1));
-        format = format.substr(1);
-      } else if(PATTERN.match(format)) {
+        buf.push(pattern.substr(0, 1));
+        pattern = pattern.substr(1);
+      } else if(PATTERN.match(pattern)) {
         var left = PATTERN.matchedLeft();
         if(left.substr(-1) == "\\") {
           escape = true;
-          format = format.substr(left.length);
+          pattern = pattern.substr(left.length);
           buf.push(left.substr(0, left.length - 1));
           continue;
         }
         buf.push(left);
         buf.push(formatTerm(d, PATTERN.matched(0), culture));
-        format = PATTERN.matchedRight();
+        pattern = PATTERN.matchedRight();
       } else {
-        buf.push(format);
-        format = '';
+        buf.push(pattern);
+        pattern = '';
       }
     }
     if(escape)
@@ -185,10 +185,10 @@ yyyy  |          | Four digits year.                                            
 
 *customs for missing features
 */
-  public static function formatTerm(d : Date, format : String, ?culture : Culture) : String {
+  public static function formatTerm(d : Date, pattern : String, ?culture : Culture) : String {
     var dt = dateTime(culture);
-    //trace(format);
-    return switch format {
+    //trace(pattern);
+    return switch pattern {
       case "d":     '${d.getDate()}';
       case "%d",
            "dd":    '${d.getDate()}'.lpad('0', 2);
@@ -233,7 +233,7 @@ yyyy  |          | Four digits year.                                            
       case "%c":    dateTimeFull(d, culture);
       case "%C":    '${Math.floor(d.getFullYear()/100)}';
       case "%e":    '${d.getDate()}'.lpad(' ', 2);
-      case "%D":    DateTimeFormat.format(d, "%m/%d/%y", culture);
+      case "%D":    format(d, "%m/%d/%y", culture);
       case "%f":    '${d.getMonth()+1}'.lpad(' ', 2);
       case "%i":    '${d.getMinutes()}'.lpad(' ', 2);
       case "%k":    '${d.getHours()}'.lpad(' ', 2);
@@ -241,11 +241,11 @@ yyyy  |          | Four digits year.                                            
       case "%n":    "\n";
       case "%P":    (d.getHours() < 12 ? dt.designatorAm : dt.designatorPm).toLowerCase();
       case "%q":    '${d.getSeconds()}'.lpad(' ', 2);
-      case "%r":    DateTimeFormat.format(d, "%I:%M:%S %p", culture);
-      case "%R":    DateTimeFormat.format(d, "%H:%M", culture);
+      case "%r":    format(d, "%I:%M:%S %p", culture);
+      case "%R":    format(d, "%H:%M", culture);
       case "%s":    '${Std.int(d.getTime()/1000)}';
       case "%t":    "\t";
-      case "%T":    DateTimeFormat.format(d, "%H:%M:%S", culture);
+      case "%T":    format(d, "%H:%M:%S", culture);
       case "%u":    var day = d.getDay();
                     day == 0 ? '7' : '$day';
       case "%Y":    '${d.getFullYear()}';

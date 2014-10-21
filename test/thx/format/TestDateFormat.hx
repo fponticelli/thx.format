@@ -28,7 +28,7 @@ class TestDateFormat {
     Assert.equals("lunedì 1 Giugno 2009 13:45:30",   d1.dateTimeFull(it));
   }
 
-  public function testFormatd() {
+  public function testFormatd_() {
     Assert.equals("06/01/2009", d1.format('d'));
     Assert.equals("6/1/2009",   d1.format('d', us));
     Assert.equals("01/06/2009", d1.format('d', fr));
@@ -73,7 +73,7 @@ class TestDateFormat {
     Assert.equals("2009-06-01T13:45:30", d1.dateTimeSortable(it));
   }
 
-  public function testFormatt() {
+  public function testFormatt_() {
     Assert.equals("13:45", d1.format('t'));
     Assert.equals("1:45 PM", d1.format('t', us));
     Assert.equals("13:45", d1.format('t', fr));
@@ -133,11 +133,11 @@ class TestDateFormat {
     Assert.equals("понедельник", d1.formatTerm('dddd', ru));
   }
 
-  public function testh() {
+  public function testh_() {
     Assert.equals("1", d1.formatTerm('h'));
   }
 
-  public function testhh() {
+  public function testhh_() {
     Assert.equals("01", d1.formatTerm('hh'));
   }
 
@@ -149,12 +149,12 @@ class TestDateFormat {
     Assert.equals("13", d1.formatTerm('HH'));
   }
 
-  public function testm() {
+  public function testm_() {
     Assert.equals("45", d1.formatTerm('m'));
     Assert.equals("5", Date.fromString('2009-06-15 13:05:30').formatTerm('m'));
   }
 
-  public function testmm() {
+  public function testmm_() {
     Assert.equals("45", d1.formatTerm('mm'));
     Assert.equals("05", Date.fromString('2009-06-15 13:05:30').formatTerm('mm'));
   }
