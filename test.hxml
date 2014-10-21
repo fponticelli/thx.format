@@ -1,4 +1,4 @@
--neko bin/thx.format.n
+-js bin/thx.format.js
 -cp src
 -cp test
 -lib utest
@@ -6,4 +6,4 @@
 -lib thx.culture
 -main TestAll
 #-cmd clear
--cmd neko bin/thx.format.n
+-cmd node bin/thx.format.js

@@ -24,8 +24,12 @@ class TestNumberFormat {
     Assert.equals('-12,345.678', (-12345.6789).decimal(3));
 
     var exp = Math.pow(2, 50);
-    // without rounding is '1,125,899,906,842,624.00'
+    #if neko
+    // floats in Neko have a different precision
     Assert.equals('1,125,899,906,842,620.00', exp.decimal(2));
+    #else
+    Assert.equals('1,125,899,906,842,624.00', exp.decimal(2));
+    #end
 
     var exp = Math.pow(2, -18);
     Assert.equals('0.00000381469', exp.decimal(11));
@@ -33,25 +37,41 @@ class TestNumberFormat {
 
   public function testCurrency() {
     var exp = Math.pow(2, 50);
+    #if neko
     Assert.equals('¤1,125,899,906,842,620.00', exp.currency());
+    #else
+    Assert.equals('¤1,125,899,906,842,624.00', exp.currency());
+    #end
     Assert.equals('(¤12,345.67)', (-12345.6789).currency());
   }
 
   public function testCurrencyIT() {
     var exp = Math.pow(2, 50);
+    #if neko
     Assert.equals('€ 1.125.899.906.842.620,00', exp.currency(it));
+    #else
+    Assert.equals('€ 1.125.899.906.842.624,00', exp.currency(it));
+    #end
     Assert.equals('-€ 12.345,67', (-12345.6789).currency(it));
   }
 
   public function testCurrencyUS() {
     var exp = Math.pow(2, 50);
+    #if neko
     Assert.equals('$1,125,899,906,842,620.00', exp.currency(us));
+    #else
+    Assert.equals('$1,125,899,906,842,624.00', exp.currency(us));
+    #end
     Assert.equals('($12,345.67)', (-12345.6789).currency(us));
   }
 
   public function testInteger() {
     Assert.equals('12,345',  12345.6789.integer());
+    #if neko
     Assert.equals('1,125,899,906,842,620', Math.pow(2, 50).integer());
+    #else
+    Assert.equals('1,125,899,906,842,624', Math.pow(2, 50).integer());
+    #end
   }
 
   public function testPercent() {
