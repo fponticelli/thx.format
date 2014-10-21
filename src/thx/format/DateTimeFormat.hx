@@ -1,12 +1,11 @@
 package thx.format;
 
 import haxe.Utf8;
-import thx.core.Error;
 import thx.culture.Culture;
 import thx.culture.DateTimeFormatInfo;
 using thx.core.Defaults;
-//using thx.core.Ints;
 using StringTools;
+
 //O, o    | 
 /**
 Formats the date using a one letter formatting option or using a custom pattern.
