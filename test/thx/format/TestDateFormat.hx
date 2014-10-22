@@ -91,7 +91,7 @@ class TestDateFormat {
     Assert.equals("13:45:30",   d1.timeLong(it));
   }
 
-  public function testFormatu() {
+  public function testFormatu_() {
     Assert.equals("2009-06-01 13:45:30Z", d1.format('u'));
     Assert.equals("2009-06-01 13:45:30Z", d1.format('u', us));
     Assert.equals("2009-06-01 13:45:30Z", d1.format('u', fr));
