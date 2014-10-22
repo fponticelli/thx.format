@@ -18,13 +18,13 @@ var jp = Embed.culture('ja-jp');
 var d  = Date.fromString('2009-06-01 13:45:30');
 
 // dates
-d.format('U'));     // Monday, 01 June 2009 13:45:30
-d.format('U', it)); // lunedì 1 Giugno 2009 13:45:30
-d.format('U', ch)); // lunedì, 1. Giugno 2009 13:45:30
-d.format('U', us)); // Monday, June 1, 2009 1:45:30 PM
-d.format('U', ru)); // 1 Июнь 2009 г. 13:45:30
-d.format('U', fr)); // lundi 1 juin 2009 13:45:30
-d.format('U', jp)); // 2009年6月1日 13:45:30
+d.format('U');     // Monday, 01 June 2009 13:45:30
+d.format('U', it); // lunedì 1 Giugno 2009 13:45:30
+d.format('U', ch); // lunedì, 1. Giugno 2009 13:45:30
+d.format('U', us); // Monday, June 1, 2009 1:45:30 PM
+d.format('U', ru); // 1 Июнь 2009 г. 13:45:30
+d.format('U', fr); // lundi 1 juin 2009 13:45:30
+d.format('U', jp); // 2009年6月1日 13:45:30
 ```
 
 And numbers:
