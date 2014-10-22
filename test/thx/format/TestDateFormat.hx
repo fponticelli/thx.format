@@ -6,14 +6,14 @@ import utest.Assert;
 using thx.format.DateFormat;
 
 class TestDateFormat {
-  static var it : Culture = Embed.culture('it-it');
-  static var ch : Culture = Embed.culture('it-ch');
-  static var us : Culture = Embed.culture('en-us');
-  static var ru : Culture = Embed.culture('ru-ru');
-  static var fr : Culture = Embed.culture('fr-fr');
-  static var jp : Culture = Embed.culture('ja-jp');
-  static var d1 : Date = Date.fromString('2009-06-01 13:45:30');
-  static var d2 : Date = Date.fromString('2009-06-15 13:45:30');
+  static var it = Embed.culture('it-it');
+  static var ch = Embed.culture('it-ch');
+  static var us = Embed.culture('en-us');
+  static var ru = Embed.culture('ru-ru');
+  static var fr = Embed.culture('fr-fr');
+  static var jp = Embed.culture('ja-jp');
+  static var d1 = Date.fromString('2009-06-01 13:45:30');
+  static var d2 = Date.fromString('2009-06-15 13:45:30');
   public function new() {}
 
   public function testFormatU() {
