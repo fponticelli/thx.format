@@ -24,7 +24,7 @@ class TestNumberFormat {
     Assert.equals('-12,345.678', (-12345.6789).decimal(3));
 
     var exp = Math.pow(2, 50);
-    #if (neko || cs)
+    #if (neko || cs || cpp)
     // floats in Neko have a different precision
     Assert.equals('1,125,899,906,842,620.00', exp.decimal(2));
     #else
