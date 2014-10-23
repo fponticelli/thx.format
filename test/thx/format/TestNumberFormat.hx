@@ -65,13 +65,12 @@ class TestNumberFormat {
     Assert.equals('23.33 kg.', 23.3333.unit(2, 'kg.'));
     Assert.equals('23,33kg.',  23.3333.unit(2, 'kg.', it));
   }
-/*
+
   public function testDecimal() {
-    Assert.equals('12',    123.format('d'));
-    Assert.equals('0012',  123.format('d4'));
-    Assert.equals('00012', 123.format('00000'));
+    Assert.equals( '12',      12.format('d'));
+    Assert.equals( '0012',    12.format('d4'));
   }
-*/
+
   public function testHex() {
     Assert.equals('7b',     123.format('x'));
     Assert.equals('7B',     123.format('X'));
@@ -84,4 +83,10 @@ class TestNumberFormat {
     Assert.equals('1234,56',   (1234.5678).format('f', it));
     Assert.equals('1234.5678', (1234.5678).format('f4'));
   }
+/*
+  public function testCustomFormat() {
+    Assert.equals( '00012',   12.format('00000'));
+    Assert.equals('-00012', (-12).format('00000'));
+  }
+*/
 }

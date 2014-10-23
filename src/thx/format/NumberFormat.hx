@@ -10,12 +10,12 @@ using StringTools;
 
 // TODO
 //  - exponential
-//  - decimal
 //  - general
 //  - octal
 //  - customFormat
 //  - printfTerm
-
+// http://msdn.microsoft.com/en-us/library/dwhawy9k(v=vs.110).aspx
+// http://msdn.microsoft.com/en-us/library/0c899ak8(v=vs.110).aspx
 class NumberFormat {
   public static function format(f : Float, pattern : String, ?culture : Culture) : String {
     var specifier = pattern.substring(0, 1),
@@ -148,8 +148,9 @@ L The argument is interpreted as a long double (only applies to floating point s
   }
 
   public static function decimal(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    return null;
+    var nf = numberFormat(culture),
+        formatted = value(f, 0, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, [0], '', '');
+    return (f < 0 ? nf.signNegative : '') + formatted.lpad('0', significantDigits);
   }
 
   public static function exponential(f : Float, ?decimals : Int = 6, ?culture : Culture) : String {
