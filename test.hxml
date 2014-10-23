@@ -7,3 +7,4 @@
 -main TestAll
 #-cmd clear
 -cmd node bin/thx.format.js
+#-D js-flatten

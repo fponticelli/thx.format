@@ -10,29 +10,29 @@ class TestNumberFormat {
   static var us : Culture = Embed.culture('en-us');
   public function new() {}
 
-  public function testDecimal() {
-    Assert.equals('1.00',        1.0.decimal(2));
-    Assert.equals('1.2',         1.2.decimal(1));
-    Assert.equals('1',           1.decimal(0));
-    Assert.equals('10,000',      10000.decimal(0));
-    Assert.equals('12,345.678',  12345.6789.decimal(3));
+  public function testNumber() {
+    Assert.equals('1.00',        1.0.number(2));
+    Assert.equals('1.2',         1.2.number(1));
+    Assert.equals('1',           1.number(0));
+    Assert.equals('10,000',      10000.number(0));
+    Assert.equals('12,345.678',  12345.6789.number(3));
 
-    Assert.equals('-1.00',       (-1.0).decimal(2));
-    Assert.equals('-1.2',        (-1.2).decimal(1));
-    Assert.equals('-1',          (-1).decimal(0));
-    Assert.equals('-10,000',     (-10000).decimal(0));
-    Assert.equals('-12,345.678', (-12345.6789).decimal(3));
+    Assert.equals('-1.00',       (-1.0).number(2));
+    Assert.equals('-1.2',        (-1.2).number(1));
+    Assert.equals('-1',          (-1).number(0));
+    Assert.equals('-10,000',     (-10000).number(0));
+    Assert.equals('-12,345.678', (-12345.6789).number(3));
 
     var exp = Math.pow(2, 50);
     #if (neko || cs || cpp)
     // floats in Neko have a different precision
-    Assert.equals('1,125,899,906,842,620.00', exp.decimal(2));
+    Assert.equals('1,125,899,906,842,620.00', exp.number(2));
     #else
-    Assert.equals('1,125,899,906,842,624.00', exp.decimal(2));
+    Assert.equals('1,125,899,906,842,624.00', exp.number(2));
     #end
 
     var exp = Math.pow(2, -18);
-    Assert.equals('0.00000381469', exp.decimal(11));
+    Assert.equals('0.00000381469', exp.number(11));
   }
 
   public function testCurrency() {
@@ -64,5 +64,24 @@ class TestNumberFormat {
   public function testUnit() {
     Assert.equals('23.33 kg.', 23.3333.unit(2, 'kg.'));
     Assert.equals('23,33kg.',  23.3333.unit(2, 'kg.', it));
+  }
+/*
+  public function testDecimal() {
+    Assert.equals('12',    123.format('d'));
+    Assert.equals('0012',  123.format('d4'));
+    Assert.equals('00012', 123.format('00000'));
+  }
+*/
+  public function testHex() {
+    Assert.equals('7b',     123.format('x'));
+    Assert.equals('7B',     123.format('X'));
+    Assert.equals('007b',   123.format('x4'));
+    Assert.equals('00007B', 123.format('X6'));
+  }
+
+  public function testFormatFixed() {
+    Assert.equals('1234.56',   (1234.5678).format('f'));
+    Assert.equals('1234,56',   (1234.5678).format('f', it));
+    Assert.equals('1234.5678', (1234.5678).format('f4'));
   }
 }
