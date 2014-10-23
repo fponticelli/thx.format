@@ -19,36 +19,36 @@ using StringTools;
 class NumberFormat {
   public static function format(f : Float, pattern : String, ?culture : Culture) : String {
     var specifier = pattern.substring(0, 1),
-        param     = pattern.substring(1);
+        param     = paramOrNull(pattern.substring(1));
     return switch specifier {
-      case 'C', 'c': // currency
-        currency(f, paramOrNull(param), culture);
-      case 'D', 'd': // decimal
-        decimal(f, paramOrNull(param), culture);
-      case 'E': // exponential E
-        exponential(f, paramOrNull(param), culture);
-      case 'e': // exponential e
-        exponential(f, paramOrNull(param), culture).toLowerCase();
-      case 'F', 'f': // fixed point
-        fixed(f, paramOrNull(param), culture);
-      case 'G':
-        general(f, paramOrNull(param), culture);
-      case 'g': // general
-        general(f, paramOrNull(param), culture).toLowerCase();
-      case 'N', 'n': // number
-        number(f, paramOrNull(param), culture);
-      case 'P', 'p': // percent
-        percent(f, paramOrNull(param), culture);
-      case 'R', 'r': // round trip
-        '$f';
-      case 'X': // hexadecimal X
-        StringTools.hex(Std.int(f), paramOrNull(param));
-      case 'x': // hexadecimal x
-        StringTools.hex(Std.int(f), paramOrNull(param)).toLowerCase();
-      case "%":
-        printfTerm(f, pattern, culture);
-      case _:   // custom format
-        customFormat(f, pattern, culture);
+    // currency
+      case 'C', 'c': currency(f, param, culture);
+      // decimal
+      case 'D', 'd': decimal(f, param, culture);
+      // exponential E
+      case 'E':      exponential(f, param, culture);
+      // exponential e
+      case 'e':      exponential(f, param, culture).toLowerCase();
+      // fixed point
+      case 'F', 'f': fixed(f, param, culture);
+      // general
+      case 'G':      general(f, param, culture);
+      // general lower case
+      case 'g':      general(f, param, culture).toLowerCase();
+      // number
+      case 'N', 'n': number(f, param, culture);
+      // percent
+      case 'P', 'p': percent(f, param, culture);
+      // round trip
+      case 'R', 'r': '$f';
+      // hexadecimal X
+      case 'X':      StringTools.hex(Std.int(f), param);
+      // hexadecimal x
+      case 'x':      StringTools.hex(Std.int(f), param).toLowerCase();
+      // printf
+      case "%":      printfTerm(f, pattern, culture);
+      // custom format
+      case _:        customFormat(f, pattern, culture);
     };
   }
 
