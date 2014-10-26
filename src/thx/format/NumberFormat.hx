@@ -3,7 +3,7 @@ package thx.format;
 import thx.culture.Culture;
 import thx.culture.NumberFormatInfo;
 import thx.culture.Pattern;
-using thx.core.Defaults;
+using thx.core.Nulls;
 using thx.core.Ints;
 using thx.core.Strings;
 using StringTools;
