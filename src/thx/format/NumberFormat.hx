@@ -9,8 +9,6 @@ using thx.core.Strings;
 using StringTools;
 
 // TODO
-//  - exponential
-//  - general
 //  - octal
 //  - customFormat
 //  - printfTerm
@@ -153,15 +151,50 @@ L The argument is interpreted as a long double (only applies to floating point s
     return (f < 0 ? nf.signNegative : '') + formatted.lpad('0', significantDigits);
   }
 
-  public static function exponential(f : Float, ?decimals : Int = 6, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    return null;
+  public static function exponential(f : Float, ?decimals : Int = 6, ?digits : Int = 3, ?symbol : String = 'e', ?culture : Culture) : String {
+    var nf = numberFormat(culture),
+        s  = '${Math.abs(f)}'.toLowerCase(),
+        pose = s.indexOf('e');
+    if(pose > 0) {
+      var p = s.substring(0, pose).split('.'),
+          e = Ints.parse(s.substring(pose+1));
+      return (f < 0 ? nf.signNegative : '') +
+        p[0] +
+        nf.separatorDecimalNumber +
+        p[1].substring(0, decimals).rpad('0', decimals) +
+        symbol +
+        (e < 0 ? nf.signNegative : nf.signPositive) +
+        '${Ints.abs(e)}'.lpad('0', digits);
+    } else {
+      var p = s.split('.').concat(['']),
+          e = 0;
+      if(p[0].length > 1) {
+        e = p[0].length - 1;
+        p[1] = p[0].substring(1) + p[1];
+        p[0] = p[0].substring(0, 1);
+      } else if(p[0] == '0') {
+        e = -(1 + p[1].length - p[1].trimLeft('0').length);
+        p[1] = p[1].substring(-e-1);
+        p[0] = p[1].substring(0, 1);
+        p[1] = p[1].substring(1);
+      }
+
+      return (f < 0 ? nf.signNegative : '') +
+        p[0] +
+        nf.separatorDecimalNumber +
+        p[1].substring(0, decimals).rpad('0', decimals) +
+        symbol +
+        (e < 0 ? nf.signNegative : nf.signPositive) +
+        '${Ints.abs(e)}'.lpad('0', digits);
+    }
+    return s;
   }
 
   public static function general(f : Float, ?significantDigits : Null<Int>, ?culture : Culture) : String {
     // shorter between fixed and exponential ensuring significantDifits
-    var nf = numberFormat(culture);
-    return null;
+    var e = exponential(f, significantDigits, culture),
+        f = fixed(f, significantDigits, culture);
+    return e.length < f.length ? e : f;
   }
 
   public static function number(f : Float, ?decimals : Null<Int>, ?culture : Culture) : String {

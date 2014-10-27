@@ -83,6 +83,38 @@ class TestNumberFormat {
     Assert.equals('1234,56',   (1234.5678).format('f', it));
     Assert.equals('1234.5678', (1234.5678).format('f4'));
   }
+
+  public function testExponential() {
+    Assert.equals('1.000000e+001', (10).exponential());
+    Assert.equals('-1.000000e+001', (-10).exponential());
+    Assert.equals('1.000000e+000', (1).exponential());
+    Assert.equals('-1.000000e+000', (-1).exponential());
+    Assert.equals('7.000000e-001', (0.7).exponential());
+    Assert.equals('-7.000000e-001', (-0.7).exponential());
+
+    Assert.equals('1.234000e+003', (1.234e3).exponential());
+    Assert.equals('1.234000e-003', (1.234e-003).exponential());
+    Assert.equals('1.234000e-003', (0.001234).exponential());
+    Assert.equals('-1.234000e+003', (-1.234e3).exponential());
+    Assert.equals('-1.234000e-003', (-1.234e-003).exponential());
+
+    Assert.equals('1.234000e+050', (1.234e50).exponential());
+    Assert.equals('1.234000e-050', (1.234e-50).exponential());
+    Assert.equals('-1.234000e+050', (-1.234e50).exponential());
+    Assert.equals('-1.234000e-050', (-1.234e-50).exponential());
+
+
+    Assert.equals('1.23e+003', (1.234e3).exponential(2));
+    Assert.equals('1.23e-003', (1.234e-003).exponential(2));
+    Assert.equals('-1.23e+003', (-1.234e3).exponential(2));
+    Assert.equals('-1.23e-003', (-1.234e-003).exponential(2));
+
+
+    Assert.equals('1,23e+003', (1.234e3).exponential(2, it));
+    Assert.equals('1,23e-003', (1.234e-003).exponential(2, it));
+    Assert.equals('-1,23e+003', (-1.234e3).exponential(2, it));
+    Assert.equals('-1,23e-003', (-1.234e-003).exponential(2, it));
+  }
 /*
   public function testCustomFormat() {
     Assert.equals( '00012',   12.format('00000'));
