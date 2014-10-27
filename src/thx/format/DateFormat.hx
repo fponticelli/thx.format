@@ -6,7 +6,7 @@ import thx.culture.DateFormatInfo;
 using thx.core.Nulls;
 using StringTools;
 
-//O, o    | 
+//O, o    |
 /**
 Formats the date using a one letter formatting option or using a custom pattern.
 
