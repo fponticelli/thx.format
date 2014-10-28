@@ -11,6 +11,8 @@ using StringTools;
 // TODO
 //  - customFormat
 //  - printfTerm
+//  - move here culture specific Ints.toString (and parse?)
+//  - use UTF8 for substring
 // http://msdn.microsoft.com/en-us/library/dwhawy9k(v=vs.110).aspx
 // http://msdn.microsoft.com/en-us/library/0c899ak8(v=vs.110).aspx
 // in string format add %s where precision is the maximum number of characters to be printed.
