@@ -71,7 +71,7 @@ class TestNumberFormat {
     Assert.equals( '0012',    12.format('d4'));
   }
 
-  public function testHex() {
+  public function testFormatHex() {
     Assert.equals('7b',     123.format('x'));
     Assert.equals('7B',     123.format('X'));
     Assert.equals('007b',   123.format('x4'));
@@ -114,6 +114,19 @@ class TestNumberFormat {
     Assert.equals('1,23e-003', (1.234e-003).exponential(2, it));
     Assert.equals('-1,23e+003', (-1.234e3).exponential(2, it));
     Assert.equals('-1,23e-003', (-1.234e-003).exponential(2, it));
+  }
+
+  public function testOctal() {
+    Assert.equals('112', 74.octal());
+  }
+
+  public function testHex() {
+    Assert.equals('2af3', 10995.hex());
+  }
+
+  public function testBinary() {
+    Assert.equals('11001',        25.binary());
+    Assert.equals('-10000101', (-133).binary());
   }
 /*
   public function testCustomFormat() {
