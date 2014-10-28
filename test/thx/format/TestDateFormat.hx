@@ -18,14 +18,14 @@ class TestDateFormat {
 
   public function testFormatU() {
     Assert.equals("Monday, 01 June 2009 13:45:30",   d1.format('U'));
-    Assert.equals("lunedì 1 Giugno 2009 13:45:30",   d1.format('U', it));
-    Assert.equals("lunedì, 1. Giugno 2009 13:45:30", d1.format('U', ch));
-    Assert.equals("Monday, June 1, 2009 1:45:30 PM", d1.format('U', us));
+    Assert.equals("lunedì 1 giugno 2009 13:45:30",   d1.format('U', it));
+    Assert.equals("lunedì, 1. giugno 2009 13:45:30", d1.format('U', ch));
+    Assert.equals("Monday, June 01, 2009 1:45:30 PM", d1.format('U', us));
     Assert.equals("1 Июнь 2009 г. 13:45:30",         d1.format('U', ru));
     Assert.equals("lundi 1 juin 2009 13:45:30",      d1.format('U', fr));
     Assert.equals("2009年6月1日 13:45:30",            d1.format('U', jp));
 
-    Assert.equals("lunedì 1 Giugno 2009 13:45:30",   d1.dateTimeFull(it));
+    Assert.equals("lunedì 1 giugno 2009 13:45:30",   d1.dateTimeFull(it));
   }
 
   public function testFormatd_() {
@@ -39,20 +39,20 @@ class TestDateFormat {
 
   public function testFormatD() {
     Assert.equals("Monday, 01 June 2009", d1.format('D'));
-    Assert.equals("Monday, June 1, 2009", d1.format('D', us));
+    Assert.equals("Monday, June 01, 2009", d1.format('D', us));
     Assert.equals("lundi 1 juin 2009",    d1.format('D', fr));
     Assert.equals("2009年6月1日",          d1.format('D', jp));
 
-    Assert.equals("lunedì 1 Giugno 2009", d1.dateLong(it));
+    Assert.equals("lunedì 1 giugno 2009", d1.dateLong(it));
   }
 
   public function testFormatM() {
     Assert.equals("June 01",  d1.format('M'));
-    Assert.equals("June 1",   d1.format('M', us));
+    Assert.equals("June 01",  d1.format('M', us));
     Assert.equals("1 juin",   d1.format('M', fr));
     Assert.equals("6月1日",    d1.format('M', jp));
 
-    Assert.equals("1 Giugno", d1.monthDay(it));
+    Assert.equals("01 giugno", d1.monthDay(it));
   }
 
   public function testFormatR() {
@@ -102,11 +102,11 @@ class TestDateFormat {
 
   public function testFormaty() {
     Assert.equals("2009 June",   d1.format('y'));
-    Assert.equals("June 2009",   d1.format('y', us));
+    Assert.equals("June, 2009",   d1.format('y', us));
     Assert.equals("juin 2009",   d1.format('y', fr));
     Assert.equals("2009年6月",    d1.format('y', jp));
 
-    Assert.equals("Giugno 2009", d1.yearMonth(it));
+    Assert.equals("giugno 2009", d1.yearMonth(it));
   }
 
   public function testd() {
@@ -171,13 +171,13 @@ class TestDateFormat {
     Assert.equals("Jun",  d1.formatTerm('MMM'));
     Assert.equals("juin", d1.formatTerm('MMM', fr));
     Assert.equals("giu",  d1.formatTerm('MMM', it));
-    Assert.equals("Июнь", d1.formatTerm('MMM', ru));
+    Assert.equals("июн", d1.formatTerm('MMM', ru));
   }
 
   public function testMMMM() {
     Assert.equals("June",   d1.formatTerm('MMMM'));
     Assert.equals("juin",   d1.formatTerm('MMMM', fr));
-    Assert.equals("Giugno", d1.formatTerm('MMMM', it));
+    Assert.equals("giugno", d1.formatTerm('MMMM', it));
     Assert.equals("Июнь",   d1.formatTerm('MMMM', ru));
   }
 
@@ -193,15 +193,15 @@ class TestDateFormat {
 
   public function testt() {
     Assert.equals("P",  d1.formatTerm('t'));
-    Assert.equals("P",  d1.formatTerm('t', fr));
-    Assert.equals("P",  d1.formatTerm('t', it));
+    Assert.equals("",  d1.formatTerm('t', fr));
+    Assert.equals("",  d1.formatTerm('t', it));
     Assert.equals("午", d1.formatTerm('t', jp));
   }
 
   public function testtt() {
     Assert.equals("PM",   d1.formatTerm('tt'));
-    Assert.equals("PM",   d1.formatTerm('tt', fr));
-    Assert.equals("PM",   d1.formatTerm('tt', it));
+    Assert.equals("",   d1.formatTerm('tt', fr));
+    Assert.equals("",   d1.formatTerm('tt', it));
     Assert.equals("午後",  d1.formatTerm('tt', jp));
   }
 
