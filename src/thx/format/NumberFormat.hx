@@ -11,7 +11,7 @@ using StringTools;
 // TODO
 //  - customFormat
 //  - printfTerm
-//  - move here culture specific Ints.toString (and parse?)
+//  - move here culture specific toBase (and parse?)
 //  - use UTF8 for substring
 // http://msdn.microsoft.com/en-us/library/dwhawy9k(v=vs.110).aspx
 // http://msdn.microsoft.com/en-us/library/0c899ak8(v=vs.110).aspx
@@ -220,18 +220,15 @@ Differences with classic printf:
   }
 
   public static function binary(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    return Ints.toString(Std.int(f), 2, nf.signNegative).lpad('0', significantDigits);
+    return toBase(Std.int(f), 2, culture).lpad('0', significantDigits);
   }
 
   public static function hex(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    return Ints.toString(Std.int(f), 16, nf.signNegative).lpad('0', significantDigits);
+    return toBase(Std.int(f), 16, culture).lpad('0', significantDigits);
   }
 
   public static function octal(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    return Ints.toString(Std.int(f), 8, nf.signNegative).lpad('0', significantDigits);
+    return toBase(Std.int(f), 8, culture).lpad('0', significantDigits);
   }
 
   public static function fixed(f : Float, ?decimals : Null<Int>, ?culture : Culture) : String {
@@ -261,6 +258,86 @@ Differences with classic printf:
     return pattern.replace('n', formatted).replace('%', symbol);
   }
 
+  // Base used for toString/parseInt conversions. Supporting base 2 to 36 for now as common standard.
+  static var BASE = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+/**
+Transform an `Int` value to a `String` using the specified `base`. A negative sign can be provided optionally.
+**/
+  public static function toBase(value : Int, base : Int, ?culture : Culture) : String {
+    var nf = numberFormat(culture);
+    #if(js || flash)
+    return untyped value.toString(base).replace('-', nf.signNegative);
+    #else
+
+    if(base < 2 || base > BASE.length)
+      return throw 'invalid base $base, it must be between 2 and ${BASE.length}';
+    if(base == 10 || value == 0)
+      return '$value';
+
+    var buf = "",
+        abs = Ints.abs(value);
+    while(abs > 0) {
+      buf = BASE.charAt(abs % base) + buf;
+      abs = Std.int(abs / base);
+    }
+
+    return (value < 0 ? nf.signNegative : '') + buf;
+    #end
+  }
+
+
+
+/**
+Parses a string into an Int value using the provided base. Default base is 16 for strings that begin with
+0x (after optional sign) or 10 otherwise.
+
+It is also possible to provide an optiona `negativeSign` and/or `positiveSign`.
+**/
+/*
+  public static function parse(s : String, ?base : Int, ?negativeSign = "-", ?positiveSign = "+") : Null<Int> {
+    #if js
+    var v : Int = untyped __js__("parseInt")(s, base);
+    return Math.isNaN(v) ? null : v;
+    #elseif flash9
+    if(base == null) base = 0;
+    var v : Int = untyped __global__["parseInt"](s, base);
+    return Math.isNaN(v) ? null : v;
+    #else
+
+    if(base != null && (base < 2 || base > BASE.length))
+      return throw 'invalid base $base, it must be between 2 and ${BASE.length}';
+
+    if(s.substring(0, positiveSign.length) == positiveSign)
+      s = s.substring(positiveSign.length);
+
+    var negative = s.substring(0, negativeSign.length) == negativeSign;
+
+    if(negative)
+      s = s.substring(negativeSign.length);
+
+    if(s.length == 0)
+      return null;
+
+    s = s.trim().toLowerCase();
+
+    if(s.startsWith('0x')) {
+      if(null != base && 16 != base)
+        return null; // attempting at converting a hex using a different base
+      base = 16;
+      s = s.substring(2);
+    } else if(null == base) {
+      base = 10;
+    }
+
+    return try ((negative ? -1 : 1) * s.toArray().reduce(function(acc, c) {
+      var i = BASE.indexOf(c);
+      if(i < 0 || i >= base) throw 'invalid';
+      return (acc * base) + i;
+    }, 0) : Null<Int>) catch(e : Dynamic) null;
+    #end
+  }
+*/
   public static function value(f : Float, decimals : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
     if(Math.isNaN(f))
       return symbolNaN;
@@ -296,7 +373,7 @@ Differences with classic printf:
   }
 
   static function pad(s : String, len : Int) : String
-    return (s).or('').substr(0, len).rpad('0', len);
+    return (s).or('').substring(0, len).rpad('0', len);
 
   static function intPart(s : String, groupSizes : Array<Int>, groupSeparator : String) : String {
     var buf = [],
@@ -310,9 +387,9 @@ Differences with classic printf:
         buf.unshift(s);
         s = '';
       } else {
-        seg = s.length > size ? s.substr(s.length - size) : s;
+        seg = s.length > size ? s.substring(s.length - size) : s;
         buf.unshift(seg);
-        s = s.substr(0, s.length - seg.length);
+        s = s.substring(0, s.length - seg.length);
       }
     }
     return buf.join(groupSeparator);
