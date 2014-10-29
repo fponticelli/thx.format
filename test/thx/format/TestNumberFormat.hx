@@ -128,6 +128,24 @@ class TestNumberFormat {
     Assert.equals('11001',        25.binary());
     Assert.equals('-10000101', (-133).binary());
   }
+
+  public function testPrintfd() {
+    var n = 461012;
+    Assert.equals('461012',   n.printfTerm("%d"));
+    Assert.equals('00461012', n.printfTerm("%08d"));
+    Assert.equals(' +461012', n.printfTerm("%+8d"));
+    Assert.equals('461012  ', n.printfTerm("%-8d"));
+    Assert.equals('+461012 ', n.printfTerm("%-+8d"));
+  }
+
+  public function testPrintfb() {
+    var n = 10;
+    Assert.equals('1010',   n.printfTerm("%b"));
+    Assert.equals('b1010',   n.printfTerm("%#b"));
+    Assert.equals('B1010',   n.printfTerm("%#B"));
+    Assert.equals('     B1010', n.printfTerm("%#10B"));
+    Assert.equals('00000B1010', n.printfTerm("%#010B"));
+  }
 /*
   public function testCustomFormat() {
     Assert.equals( '00012',   12.format('00000'));
