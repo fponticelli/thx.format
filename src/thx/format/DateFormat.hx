@@ -94,14 +94,14 @@ class DateTimeFormat {
     while(pattern.length > 0) {
       if(escape) {
         escape = false;
-        buf.push(pattern.substr(0, 1));
-        pattern = pattern.substr(1);
+        buf.push(pattern.substring(0, 1));
+        pattern = pattern.substring(1);
       } else if(PATTERN.match(pattern)) {
         var left = PATTERN.matchedLeft();
-        if(left.substr(-1) == "\\") {
+        if(left.substring(-1) == "\\") {
           escape = true;
-          pattern = pattern.substr(left.length);
-          buf.push(left.substr(0, left.length - 1));
+          pattern = pattern.substring(left.length);
+          buf.push(left.substring(0, left.length - 1));
           continue;
         }
         buf.push(left);
@@ -254,9 +254,9 @@ yyyy  |          | Four digits year.                                            
       case "%w":    '${d.getDay()}';
       case "%%":    "%";
       case q if(q != null && q.length > 1 &&
-        (q.substr(0, 1) == "'" && q.substr(-1) == "'") ||
-        (q.substr(0, 1) == '"' && q.substr(-1) == '"')):
-                    q.substr(1, q.length - 2);
+        (q.substring(0, 1) == "'" && q.substring(q.length - 1) == "'") ||
+        (q.substring(0, 1) == '"' && q.substring(q.length - 1) == '"')):
+                    q.substring(1, q.length - 1);
       case rest:    rest;
     };
   }
