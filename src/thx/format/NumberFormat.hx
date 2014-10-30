@@ -163,28 +163,29 @@ Differences with classic printf:
     return switch specifier {
       case "b": decorate(Ints.toString(Ints.abs(Std.int(f)), 2), 1, "b", "", "");
       case "B": decorate(Ints.toString(Ints.abs(Std.int(f)), 2), 1, "B", "", "");
-      case "d": decorate('${Std.int(f)}', f, "", nf.signNegative, nf.signPositive);
+      case "c": decorate(String.fromCharCode(Ints.abs(Std.int(f))), 1, "", "", "");
+      case "d", "i": decorate('${Std.int(f)}'.lpad('0', precision), f, "", nf.signNegative, nf.signPositive);
+      case "x": decorate(hex(Math.abs(f), precision, culture), f, "0x", nf.signNegative, nf.signPositive);
+      case "X": decorate(hex(Math.abs(f), precision, culture), f, "0X", nf.signNegative, nf.signPositive);
+      case "o": decorate(octal(Math.abs(f), precision, culture), f, "0", nf.signNegative, nf.signPositive);
       case _: throw 'invalid pattern "$pattern"';
 /*
-+           | Forces to preceed the result with a plus or minus sign (+ or -) even for positive numbers. By default, only negative numbers are preceded with a - sign..
-(space)     | If no sign is going to be written, a blank space is inserted before the value.
-#           | Used with o, x or X specifiers the value is preceeded with 0, 0x or 0X respectively for values different than zero. Used with e, E and f, it forces the written output to contain a decimal point even if no digits would follow. By default, if no digits follow, no decimal point is written. Used with g or G the result is the same as with e or E but trailing zeros are not removed. If b or B prefixes the output with either.
-0           | Left-pads the number with zeroes (0) instead of spaces, where padding is specified (see width sub-specifier).
+# | Used with e, E and f, it forces the written output to contain a decimal point even if no digits would follow.
+    By default, if no digits follow, no decimal point is written.
+    Used with g or G the result is the same as with e or E but trailing zeros are not removed.
 
-(number)    | Minimum number of characters to be printed. If the value to be printed is shorter than this number, the result is padded with blank spaces. The value is not truncated even if the result is larger.
+.number | A precision of 0 means that no character is written for the value 0.
+          For e, E and f specifiers: this is the number of digits to be printed after the decimal point.
+          For g and G specifiers: This is the maximum number of significant digits to be printed.
+          By default all characters are printed until the ending null character is encountered.
+          For c type: it has no effect. When no precision is specified, the default is 1.
+          If the period is specified without an explicit value for precision, 0 is assumed.
 
-.number     | For integer specifiers (d, i, o, u, x, X): precision specifies the minimum number of digits to be written. If the value to be written is shorter than this number, the result is padded with leading zeros. The value is not truncated even if the result is longer. A precision of 0 means that no character is written for the value 0. For e, E and f specifiers: this is the number of digits to be printed after the decimal point. For g and G specifiers: This is the maximum number of significant digits to be printed. By default all characters are printed until the ending null character is encountered. For c type: it has no effect. When no precision is specified, the default is 1. If the period is specified without an explicit value for precision, 0 is assumed.
-
-b         | an unsigned integer, in binary
-B         | like %b, but using an upper-case "B" with the # flag
-c         | Character.
-d         | Signed decimal integer
 e         | Scientific notation (mantissa/exponent) using e character
 E         | Like %e, but using an upper-case "E"
 f         | Decimal floating point
 g         | Use the shorter of %e or %f.
 G         | Like %g, but with an upper-case "E" (if applicable)
-i         | Same as `d`
 o         | Signed octal
 u         | Unsigned decimal integer
 x         | Unsigned hexadecimal integer
@@ -299,15 +300,15 @@ n         | Nothing printed.
   }
 
   public static function binary(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
-    return toBase(Std.int(f), 2, culture).lpad('0', significantDigits);
+    return significantDigits == 0 && f == 0 ? "" : toBase(Std.int(f), 2, culture).lpad('0', significantDigits);
   }
 
   public static function hex(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
-    return toBase(Std.int(f), 16, culture).lpad('0', significantDigits);
+    return significantDigits == 0 && f == 0 ? "" : toBase(Std.int(f), 16, culture).lpad('0', significantDigits);
   }
 
   public static function octal(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
-    return toBase(Std.int(f), 8, culture).lpad('0', significantDigits);
+    return significantDigits == 0 && f == 0 ? "" : toBase(Std.int(f), 8, culture).lpad('0', significantDigits);
   }
 
   public static function fixed(f : Float, ?decimals : Null<Int>, ?culture : Culture) : String {
