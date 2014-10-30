@@ -311,7 +311,8 @@ Differences with classic printf:
       case "b": decorate(Ints.toString(Ints.abs(Std.int(f)), 2), 1, "b", "", "");
       case "B": decorate(Ints.toString(Ints.abs(Std.int(f)), 2), 1, "B", "", "");
       case "c": decorate(String.fromCharCode(Ints.abs(Std.int(f))), 1, "", "", "");
-      case "d", "i": decorate('${Std.int(f)}'.lpad('0', precision), f, "", nf.signNegative, nf.signPositive);
+      case "d",
+           "i": decorate('${Std.int(f)}'.lpad('0', (precision).or(0)), f, "", nf.signNegative, nf.signPositive);
       case "e": decorate(exponential(Math.abs(f), precision, 0, "e", culture), f, "", nf.signNegative, nf.signPositive);
       case "E": decorate(exponential(Math.abs(f), precision, 0, "E", culture), f, "", nf.signNegative, nf.signPositive);
       case "f": decorate(fixed(Math.abs(f), precision, culture), f, "", nf.signNegative, nf.signPositive);
