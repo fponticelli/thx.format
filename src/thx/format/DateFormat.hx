@@ -7,6 +7,9 @@ using thx.core.Nulls;
 using StringTools;
 
 class DateTimeFormat {
+/**
+Custom date format.
+*/
   public static function customFormat(d : Date, pattern : String, ?culture : Culture) : String {
     culture = (culture).or(Culture.invariant);
     var escape = false,
@@ -260,35 +263,67 @@ strftime | description                                                        | 
       case rest:    rest;
     };
 
+/**
+Long Date/Time format.
+*/
   public static function dateLong(d : Date, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternDateLong, culture);
 
+/**
+Short Date/Time format.
+*/
   public static function dateShort(d : Date, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternDateShort, culture);
 
+/**
+Full Date/Time format.
+*/
   public static function dateTimeFull(d : Date, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternDateTimeFull, culture);
 
+/**
+Sortable Date/Time format.
+*/
   public static function dateTimeSortable(d : Date, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternDateTimeSortable, culture);
 
+/**
+Month/Day format.
+*/
   public static function monthDay(d : Date, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternMonthDay, culture);
 
+/**
+Rfc1123 date/time format.
+*/
   public static function rfc1123(d : Date, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternRfc1123, culture);
 
+/**
+Long time format.
+*/
   public static function timeLong(d : Date, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternTimeLong, culture);
 
+/**
+Sort time format.
+*/
   public static function timeShort(d : Date, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternTimeShort, culture);
 
+/**
+Format a date in way that it can be correctly ordered alphabetically.
+*/
   public static function universalSortable(d : Date, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternUniversalSortable, culture);
 
+/**
+Format for year and month.
+*/
   public static function yearMonth(d : Date, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternYearMonth, culture);
+
+// PRIVATE
 
   static function dateTime(?culture : Culture)
     return null != culture && null != culture.dateTime ? culture.dateTime : Culture.invariant.dateTime;
