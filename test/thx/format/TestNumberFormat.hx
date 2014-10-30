@@ -132,10 +132,10 @@ class TestNumberFormat {
   public function testPrintfd() {
     var n = 461012;
     Assert.equals('461012',   n.printfTerm("%d"));
-    //Assert.equals('00461012', n.printfTerm("%08d"));
-    //Assert.equals(' +461012', n.printfTerm("%+8d"));
-    //Assert.equals('461012  ', n.printfTerm("%-8d"));
-    //Assert.equals('+461012 ', n.printfTerm("%-+8d"));
+    Assert.equals('00461012', n.printfTerm("%08d"));
+    Assert.equals(' +461012', n.printfTerm("%+8d"));
+    Assert.equals('461012  ', n.printfTerm("%-8d"));
+    Assert.equals('+461012 ', n.printfTerm("%-+8d"));
   }
 
   public function testPrintfb() {
