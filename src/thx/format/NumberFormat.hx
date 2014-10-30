@@ -3,6 +3,7 @@ package thx.format;
 import thx.culture.Culture;
 import thx.culture.NumberFormatInfo;
 import thx.culture.Pattern;
+using thx.core.Floats;
 using thx.core.Nulls;
 using thx.core.Ints;
 using thx.core.Strings;
@@ -10,7 +11,6 @@ using StringTools;
 
 // TODO
 //  - customFormat
-// http://msdn.microsoft.com/en-us/library/dwhawy9k(v=vs.110).aspx
 // http://msdn.microsoft.com/en-us/library/0c899ak8(v=vs.110).aspx
 // in string format add %s where precision is the maximum number of characters to be printed.
 class NumberFormat {
@@ -324,7 +324,7 @@ Differences with classic printf:
       case "B": decorate(Ints.toString(Ints.abs(Std.int(f)), 2), 1, "B", "", "");
       case "c": decorate(String.fromCharCode(Ints.abs(Std.int(f))), 1, "", "", "");
       case "d",
-           "i": decorate('${Std.int(f)}'.lpad('0', (precision).or(0)), f, "", nf.signNegative, nf.signPositive);
+           "i": decorate('${Math.round(f)}'.lpad('0', (precision).or(0)), f, "", nf.signNegative, nf.signPositive);
       case "e": decorate(exponential(Math.abs(f), precision, 0, "e", culture), f, "", nf.signNegative, nf.signPositive);
       case "E": decorate(exponential(Math.abs(f), precision, 0, "E", culture), f, "", nf.signNegative, nf.signPositive);
       case "f": decorate(fixed(Math.abs(f), precision, culture), f, "", nf.signNegative, nf.signPositive);
@@ -412,13 +412,15 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function paramOrNull(param : String) : Null<Int>
     return param.length == 0 ? null : Std.parseInt(param);
 
-  static function value(f : Float, decimals : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
+  static function value(f : Float, precision : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
     if(Math.isNaN(f))
       return symbolNaN;
     if(!Math.isFinite(f))
       return f < 0 ? symbolNegativeInfinity : symbolPositiveInfinity;
 
     f = Math.abs(f);
+    if(precision >= 0)
+      f = Floats.round(f, precision);
     var s = '$f',
         p = s.split('.'),
         i = p[0],
@@ -440,8 +442,8 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
 
     buf.push(intPart(i, groupSizes, groupSeparator));
 
-    if(decimals > 0)
-      buf.push(pad(d, decimals));
+    if(precision > 0)
+      buf.push(pad(d, precision));
 
     return buf.join(decimalSeparator);
   }

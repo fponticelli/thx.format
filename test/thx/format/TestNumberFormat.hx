@@ -15,13 +15,13 @@ class TestNumberFormat {
     Assert.equals('1.2',         1.2.number(1));
     Assert.equals('1',           1.number(0));
     Assert.equals('10,000',      10000.number(0));
-    Assert.equals('12,345.678',  12345.6789.number(3));
+    Assert.equals('12,345.679',  12345.6789.number(3));
 
     Assert.equals('-1.00',       (-1.0).number(2));
     Assert.equals('-1.2',        (-1.2).number(1));
     Assert.equals('-1',          (-1).number(0));
     Assert.equals('-10,000',     (-10000).number(0));
-    Assert.equals('-12,345.678', (-12345.6789).number(3));
+    Assert.equals('-12,345.679', (-12345.6789).number(3));
 
     var exp = Math.pow(2, 50);
     #if (neko || cs || cpp)
@@ -32,23 +32,23 @@ class TestNumberFormat {
     #end
 
     var exp = Math.pow(2, -18);
-    Assert.equals('0.00000381469', exp.number(11));
+    Assert.equals('0.00000381470', exp.number(11));
   }
 
   public function testCurrency() {
-    Assert.equals('(¤12,345.67)', (-12345.6789).currency());
+    Assert.equals('(¤12,345.68)', (-12345.6789).currency());
   }
 
   public function testCurrencyIT() {
-    Assert.equals('-€ 12.345,67', (-12345.6789).currency(it));
+    Assert.equals('-€ 12.345,68', (-12345.6789).currency(it));
   }
 
   public function testCurrencyUS() {
-    Assert.equals('($12,345.67)', (-12345.6789).currency(us));
+    Assert.equals('($12,345.68)', (-12345.6789).currency(us));
   }
 
   public function testInteger() {
-    Assert.equals('12,345',  12345.6789.integer());
+    Assert.equals('12,346',  12345.6789.integer());
   }
 
   public function testPercent() {
@@ -79,8 +79,8 @@ class TestNumberFormat {
   }
 
   public function testFormatFixed() {
-    Assert.equals('1234.56',   (1234.5678).format('f'));
-    Assert.equals('1234,56',   (1234.5678).format('f', it));
+    Assert.equals('1234.57',   (1234.5678).format('f'));
+    Assert.equals('1234,57',   (1234.5678).format('f', it));
     Assert.equals('1234.5678', (1234.5678).format('f4'));
   }
 
@@ -145,6 +145,12 @@ class TestNumberFormat {
     Assert.equals('B1010',   n.printf("%#B"));
     Assert.equals('     B1010', n.printf("%#10B"));
     Assert.equals('00000B1010', n.printf("%#010B"));
+  }
+
+  public function testRounding() {
+    Assert.equals('0.9', 0.89.fixed(1));
+    Assert.equals('1', 0.99.fixed(0));
+    Assert.equals('0.9', 0.91.fixed(1));
   }
 /*
   public function testCustomFormat() {
