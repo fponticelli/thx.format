@@ -86,7 +86,7 @@ flags       | Description
 -           | Left-justify within the given field width; Right justification is the default (see width sub-specifier).
 +           | Forces to preceed the result with a plus or minus sign (+ or -) even for positive numbers. By default, only negative numbers are preceded with a - sign..
 (space)     | If no sign is going to be written, a blank space is inserted before the value.
-#           | Used with o, x or X specifiers the value is preceeded with 0, 0x or 0X respectively for values different than zero. Used with e, E and f, it forces the written output to contain a decimal point even if no digits would follow. By default, if no digits follow, no decimal point is written. Used with g or G the result is the same as with e or E but trailing zeros are not removed. If b or B prefixes the output with either.
+#           | Used with o, x or X specifiers the value is preceeded with 0, 0x or 0X respectively for values different than zero. If b or B prefixes the output with either.
 0           | Left-pads the number with zeroes (0) instead of spaces, where padding is specified (see width sub-specifier).
 
 width       | Description
@@ -164,6 +164,8 @@ Differences with classic printf:
       case "B": decorate(Ints.toString(Ints.abs(Std.int(f)), 2), 1, "B", "", "");
       case "c": decorate(String.fromCharCode(Ints.abs(Std.int(f))), 1, "", "", "");
       case "d", "i": decorate('${Std.int(f)}'.lpad('0', precision), f, "", nf.signNegative, nf.signPositive);
+      case "e": decorate(exponential(Math.abs(f), precision, 0, "e", culture), f, "", nf.signNegative, nf.signPositive);
+      case "E": decorate(exponential(Math.abs(f), precision, 0, "E", culture), f, "", nf.signNegative, nf.signPositive);
       case "g":
         var e = printfTerm(f, "e", culture),
             f = printfTerm(f, "f", culture);
@@ -179,13 +181,8 @@ Differences with classic printf:
       case "%": decorate("%", 1, "", "", "");
       case _: throw 'invalid pattern "$pattern"';
 /*
-# | Used with e, E and f, it forces the written output to contain a decimal point even if no digits would follow.
-    By default, if no digits follow, no decimal point is written.
-    Used with g or G the result is the same as with e or E but trailing zeros are not removed.
-
 .number | A precision of 0 means that no character is written for the value 0.
           For e, E and f specifiers: this is the number of digits to be printed after the decimal point.
-          For c type: it has no effect. When no precision is specified, the default is 1.
           If the period is specified without an explicit value for precision, 0 is assumed.
 
 e         | Scientific notation (mantissa/exponent) using e character
