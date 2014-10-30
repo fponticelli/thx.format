@@ -44,7 +44,7 @@ And numbers:
 
 ## Date Formats
 
-### One Letter Format
+### One Letter Format (`Date.format`)
 
 pattern   | description
 --------- | ------------------------------------
@@ -64,7 +64,7 @@ pattern   | description
 `Y`, `y`  | year/month pattern
 ...       | custom pattern.
 
-### Custom Patterns
+### Custom Patterns (`Date.customFormat` or `Date.strftime`)
 
 MS      | strftime   | description                                                                  | example
 :------ | :--------: | ---------------------------------------------------------------------------- | ------------:
@@ -122,7 +122,34 @@ MS      | strftime   | description                                              
 
 ## Number Formats
 
-### printf formats
+### One Letter Format (`NumberFormat.format`)
+
+Formats a number using the specified pattern.
+
+A `printf` format is formatted using the rules described for `NumberFormat.printf`.
+
+A multi character format uses the formatting rules described for `NumberFormat.customFormat`.
+
+A single character format adopts the following options:
+
+format     | description
+---------- | ---------------------------------------
+`C` or `c` | Currency format.
+`D` or `d` | Decimal format.
+`e`        | Exponential (scientific) format.
+`E`        | Like `e` but with capitalized `E` symbol
+`F` or `f` | Fixed decimal format (no thousand separators).
+`g`        | General format (shortest between `e` and `f`).
+`G`        | Like `g` but if format is exponential uses the upper case `E` symbol
+`N` or `n` | Number format (uses thousand separators if required).
+`P` or `p` | Percent format.
+`R` or `r` | Roundtrip format.
+`x`        | Hexadecimal format.
+`X`        | Same as `x` but prefixed with `0X`.
+`%`...     | Delegates to `printf`
+...        | Delegates to `customFormat`
+
+### Printf Formats (`NumberFormat.printf`)
 
 The `printf` format uses the following pattern:
 

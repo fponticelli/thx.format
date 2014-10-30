@@ -131,20 +131,20 @@ class TestNumberFormat {
 
   public function testPrintfd() {
     var n = 461012;
-    Assert.equals('461012',   n.printfTerm("%d"));
-    Assert.equals('00461012', n.printfTerm("%08d"));
-    Assert.equals(' +461012', n.printfTerm("%+8d"));
-    Assert.equals('461012  ', n.printfTerm("%-8d"));
-    Assert.equals('+461012 ', n.printfTerm("%-+8d"));
+    Assert.equals('461012',   n.printf("%d"));
+    Assert.equals('00461012', n.printf("%08d"));
+    Assert.equals(' +461012', n.printf("%+8d"));
+    Assert.equals('461012  ', n.printf("%-8d"));
+    Assert.equals('+461012 ', n.printf("%-+8d"));
   }
 
   public function testPrintfb() {
     var n = 10;
-    Assert.equals('1010',   n.printfTerm("%b"));
-    Assert.equals('b1010',   n.printfTerm("%#b"));
-    Assert.equals('B1010',   n.printfTerm("%#B"));
-    Assert.equals('     B1010', n.printfTerm("%#10B"));
-    Assert.equals('00000B1010', n.printfTerm("%#010B"));
+    Assert.equals('1010',   n.printf("%b"));
+    Assert.equals('b1010',   n.printf("%#b"));
+    Assert.equals('B1010',   n.printf("%#B"));
+    Assert.equals('     B1010', n.printf("%#10B"));
+    Assert.equals('00000B1010', n.printf("%#010B"));
   }
 /*
   public function testCustomFormat() {

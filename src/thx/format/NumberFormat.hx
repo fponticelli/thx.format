@@ -101,7 +101,7 @@ Formats a fixed point float number with an assigned precision.
 /**
 Formats a number using the specified pattern.
 
-A `printf` format is formatted using the rules described for `NumberFormat.printfTerm`.
+A `printf` format is formatted using the rules described for `NumberFormat.printf`.
 
 A multi character format uses the formatting rules described for `NumberFormat.customFormat`.
 
@@ -109,8 +109,20 @@ A single character format adopts the following options:
 
 format     | description
 ---------- | ---------------------------------------
-`C` or `c` |
-
+`C` or `c` | Currency format.
+`D` or `d` | Decimal format.
+`e`        | Exponential (scientific) format.
+`E`        | Like `e` but with capitalized `E` symbol
+`F` or `f` | Fixed decimal format (no thousand separators).
+`g`        | General format (shortest between `e` and `f`).
+`G`        | Like `g` but if format is exponential uses the upper case `E` symbol
+`N` or `n` | Number format (uses thousand separators if required).
+`P` or `p` | Percent format.
+`R` or `r` | Roundtrip format.
+`x`        | Hexadecimal format.
+`X`        | Same as `x` but prefixed with `0X`.
+`%`...     | Delegates to `printf`
+...        | Delegates to `customFormat`
 **/
   public static function format(f : Float, pattern : String, ?culture : Culture) : String {
     var specifier = pattern.substring(0, 1),
@@ -141,7 +153,7 @@ format     | description
       // hexadecimal x
       case 'x':      hex(f, param, culture);
       // printf
-      case "%":      printfTerm(f, pattern, culture);
+      case "%":      printf(f, pattern, culture);
       // custom format
       case _:        customFormat(f, pattern, culture);
     };
@@ -254,7 +266,7 @@ Differences with classic printf:
   * `%n` is not supported
   * `%s` is not supported since this function is to format numeric values only
 **/
-  public static function printfTerm(f : Float, pattern : String, ?culture) : String {
+  public static function printf(f : Float, pattern : String, ?culture) : String {
     if(!pattern.startsWith('%'))
       throw 'invalid printf term "$pattern"';
     var specifier = pattern.substring(pattern.length-1),
@@ -317,14 +329,14 @@ Differences with classic printf:
       case "E": decorate(exponential(Math.abs(f), precision, 0, "E", culture), f, "", nf.signNegative, nf.signPositive);
       case "f": decorate(fixed(Math.abs(f), precision, culture), f, "", nf.signNegative, nf.signPositive);
       case "g":
-        var e = printfTerm(f, "e", culture),
-            f = printfTerm(f, "f", culture);
+        var e = printf(f, "e", culture),
+            f = printf(f, "f", culture);
         e.length < f.length ? e : f;
       case "G":
-        var e = printfTerm(f, "E", culture),
-            f = printfTerm(f, "f", culture);
+        var e = printf(f, "E", culture),
+            f = printf(f, "f", culture);
         e.length < f.length ? e : f;
-      case "u": printfTerm(Math.abs(f), "d", culture);
+      case "u": printf(Math.abs(f), "d", culture);
       case "x": decorate(hex(Math.abs(f), precision, culture), f, "0x", nf.signNegative, nf.signPositive);
       case "X": decorate(hex(Math.abs(f), precision, culture), f, "0X", nf.signNegative, nf.signPositive);
       case "o": decorate(octal(Math.abs(f), precision, culture), f, "0", nf.signNegative, nf.signPositive);
