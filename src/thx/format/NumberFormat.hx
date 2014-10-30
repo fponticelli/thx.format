@@ -98,6 +98,20 @@ Formats a fixed point float number with an assigned precision.
     return pattern.replace('n', formatted);
   }
 
+/**
+Formats a number using the specified pattern.
+
+A `printf` format is formatted using the rules described for `NumberFormat.printfTerm`.
+
+A multi character format uses the formatting rules described for `NumberFormat.customFormat`.
+
+A single character format adopts the following options:
+
+format     | description
+---------- | ---------------------------------------
+`C` or `c` |
+
+**/
   public static function format(f : Float, pattern : String, ?culture : Culture) : String {
     var specifier = pattern.substring(0, 1),
         param     = paramOrNull(pattern.substring(1));
@@ -195,33 +209,33 @@ The `printf` format uses the following pattern:
 %[flags][width][.precision]specifier
 ```
 
-specifier | Output
---------- | ---------------------------------------------------------
-b         | an unsigned integer, in binary
-B         | like %b, but using an upper-case "B" with the # flag
-c         | Character.
-d         | Signed decimal integer
-e         | Scientific notation (mantissa/exponent) using e character
-E         | Like %e, but using an upper-case "E"
-f         | Decimal floating point
-g         | Use the shorter of %e or %f.
-G         | Like %g, but with an upper-case "E" (if applicable)
-i         | Same as `d`
-o         | Signed octal
-u         | Unsigned decimal integer
-x         | Unsigned hexadecimal integer
-X         | Like %x, but using upper-case letters
-%         | `%` Character
+specifier   | Output
+----------- | ---------------------------------------------------------
+`b`         | an unsigned integer, in binary
+`B`         | like %b, but using an upper-case "B" with the # flag
+`c`         | Character.
+`d`         | Signed decimal integer
+`e`         | Scientific notation (mantissa/exponent) using e character
+`E`         | Like %e, but using an upper-case "E"
+`f`         | Decimal floating point
+`g`         | Use the shorter of %e or %f.
+`G`         | Like %g, but with an upper-case "E" (if applicable)
+`i`         | Same as `d`
+`o`         | Signed octal
+`u`         | Unsigned decimal integer
+`x`         | Unsigned hexadecimal integer
+`X`         | Like %x, but using upper-case letters
+`%`         | `%` Character
 
 http://perldoc.perl.org/functions/sprintf.html
 
-flags       | Description
------------ | ------------------------------------------------------------------------------------------------------
--           | Left-justify within the given field width; Right justification is the default (see width sub-specifier).
-+           | Forces to preceed the result with a plus or minus sign (+ or -) even for positive numbers. By default, only negative numbers are preceded with a - sign..
-(space)     | If no sign is going to be written, a blank space is inserted before the value.
-#           | Used with o, x or X specifiers the value is preceeded with 0, 0x or 0X respectively for values different than zero. If b or B prefixes the output with either.
-0           | Left-pads the number with zeroes (0) instead of spaces, where padding is specified (see width sub-specifier).
+flags         | Description
+------------- | ------------------------------------------------------------------------------------------------------
+`-`           | Left-justify within the given field width; Right justification is the default (see width sub-specifier).
+`+`           | Forces to preceed the result with a plus or minus sign (+ or -) even for positive numbers. By default, only negative numbers are preceded with a - sign..
+` ` (space)   | If no sign is going to be written, a blank space is inserted before the value.
+`#`           | Used with o, x or X specifiers the value is preceeded with 0, 0x or 0X respectively for values different than zero. If b or B prefixes the output with either.
+`0`           | Left-pads the number with zeroes (0) instead of spaces, where padding is specified (see width sub-specifier).
 
 width       | Description
 ----------- | ------------------------------------------------------------------------------------------------------
