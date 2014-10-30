@@ -172,6 +172,7 @@ Differences with classic printf:
         var e = printfTerm(f, "E", culture),
             f = printfTerm(f, "f", culture);
         e.length < f.length ? e : f;
+      case "u": printfTerm(Math.abs(f), "d", culture);
       case "x": decorate(hex(Math.abs(f), precision, culture), f, "0x", nf.signNegative, nf.signPositive);
       case "X": decorate(hex(Math.abs(f), precision, culture), f, "0X", nf.signNegative, nf.signPositive);
       case "o": decorate(octal(Math.abs(f), precision, culture), f, "0", nf.signNegative, nf.signPositive);
@@ -192,10 +193,6 @@ E         | Like %e, but using an upper-case "E"
 f         | Decimal floating point
 g         | Use the shorter of %e or %f.
 G         | Like %g, but with an upper-case "E" (if applicable)
-o         | Signed octal
-u         | Unsigned decimal integer
-x         | Unsigned hexadecimal integer
-X         | Like %x, but using upper-case letters
 */
     };
   }
