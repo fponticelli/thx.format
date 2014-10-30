@@ -32,7 +32,7 @@ class TestNumberFormat {
     #end
 
     var exp = Math.pow(2, -18);
-    Assert.equals('0.00000381470', exp.number(11));
+    Assert.equals('0.000003814610', exp.number(11));
   }
 
   public function testCurrency() {

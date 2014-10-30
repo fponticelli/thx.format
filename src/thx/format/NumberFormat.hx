@@ -406,8 +406,18 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function numberFormat(culture : Culture) : NumberFormatInfo
     return null != culture && null != culture.number ? culture.number : Culture.invariant.number;
 
-  static function pad(s : String, len : Int) : String
-    return (s).or('').substring(0, len).rpad('0', len);
+  static function pad(s : String, len : Int, round : Bool) : String {
+    s = (s).or('');
+    if(len > 0 && s.length > len) {
+      if(round) {
+        return s.substring(0, len - 1) + (Std.parseInt(s.substring(len - 1, len)) + (Std.parseInt(s.substring(len, len + 1)) >= 5 ? 1 : 0));
+      } else {
+        return s.substring(0, len);
+      }
+    } else {
+      return s.rpad('0', len);
+    }
+  }
 
   static function paramOrNull(param : String) : Null<Int>
     return param.length == 0 ? null : Std.parseInt(param);
@@ -419,8 +429,6 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
       return f < 0 ? symbolNegativeInfinity : symbolPositiveInfinity;
 
     f = Math.abs(f);
-    if(precision >= 0)
-      f = Floats.round(f, precision);
     var s = '$f',
         p = s.split('.'),
         i = p[0],
@@ -435,15 +443,21 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
         d = ''.rpad('0', -e-1) + i + d;
         i = '0';
       } else {
-        i = pad(i + d, e + 1);
+        i = pad(i + d, e + 1, false);
         d = '';
       }
+    }
+
+    if(precision <= 0 && d.length > 0) {
+      if(Std.parseFloat('0.$d') >= 0.5)
+        i = i.substring(0, i.length-1) + (Std.parseInt(i.substring(i.length-1)) + 1);
     }
 
     buf.push(intPart(i, groupSizes, groupSeparator));
 
     if(precision > 0)
-      buf.push(pad(d, precision));
+      buf.push(pad(d, precision, true));
+
 
     return buf.join(decimalSeparator);
   }
