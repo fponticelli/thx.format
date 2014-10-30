@@ -77,7 +77,6 @@ o         | Signed octal
 u         | Unsigned decimal integer
 x         | Unsigned hexadecimal integer
 X         | Like %x, but using upper-case letters
-n         | Nothing printed.
 %         | `%` Character
 
 http://perldoc.perl.org/functions/sprintf.html
@@ -165,9 +164,18 @@ Differences with classic printf:
       case "B": decorate(Ints.toString(Ints.abs(Std.int(f)), 2), 1, "B", "", "");
       case "c": decorate(String.fromCharCode(Ints.abs(Std.int(f))), 1, "", "", "");
       case "d", "i": decorate('${Std.int(f)}'.lpad('0', precision), f, "", nf.signNegative, nf.signPositive);
+      case "g":
+        var e = printfTerm(f, "e", culture),
+            f = printfTerm(f, "f", culture);
+        e.length < f.length ? e : f;
+      case "G":
+        var e = printfTerm(f, "E", culture),
+            f = printfTerm(f, "f", culture);
+        e.length < f.length ? e : f;
       case "x": decorate(hex(Math.abs(f), precision, culture), f, "0x", nf.signNegative, nf.signPositive);
       case "X": decorate(hex(Math.abs(f), precision, culture), f, "0X", nf.signNegative, nf.signPositive);
       case "o": decorate(octal(Math.abs(f), precision, culture), f, "0", nf.signNegative, nf.signPositive);
+      case "%": decorate("%", 1, "", "", "");
       case _: throw 'invalid pattern "$pattern"';
 /*
 # | Used with e, E and f, it forces the written output to contain a decimal point even if no digits would follow.
@@ -176,8 +184,6 @@ Differences with classic printf:
 
 .number | A precision of 0 means that no character is written for the value 0.
           For e, E and f specifiers: this is the number of digits to be printed after the decimal point.
-          For g and G specifiers: This is the maximum number of significant digits to be printed.
-          By default all characters are printed until the ending null character is encountered.
           For c type: it has no effect. When no precision is specified, the default is 1.
           If the period is specified without an explicit value for precision, 0 is assumed.
 
@@ -190,38 +196,8 @@ o         | Signed octal
 u         | Unsigned decimal integer
 x         | Unsigned hexadecimal integer
 X         | Like %x, but using upper-case letters
-n         | Nothing printed.
-%         | `%` Character
 */
     };
-
-
-/*
-      switch param {
-          case "%": // a percent sign
-
-          case "c": // a character with the given number
-            String.fromCharCode(Std.int(f));
-          case "s": // a string
-
-          case "d": // a signed integer, in decimal
-            decimal(f, culture);
-          case "u": // an unsigned integer, in decimal
-            decimal(Math.abs(f), culture);
-          case "o": // an unsigned integer, in octal
-            octal(f, culture);
-          case "x": // an unsigned integer, in hexadecimal
-            format(f, 'x', culture);
-          case "e": // a floating-point number, in scientific notation
-            format(f, 'e', culture);
-          case "f": // a floating-point number, in fixed decimal notation
-            format(f, 'f', culture);
-          case "g": // a floating-point number, in %e or %f notation
-            format(f, 'g', culture);
-          case _:
-
-        }
-*/
   }
 
   public static function customFormat(f : Float, pattern : String, ?culture : Culture) : String {
