@@ -458,7 +458,6 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     if(precision > 0)
       buf.push(pad(d, precision, true));
 
-
     return buf.join(decimalSeparator);
   }
 }
