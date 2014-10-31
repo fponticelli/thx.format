@@ -11,7 +11,6 @@ using StringTools;
 
 // TODO
 //  - customFormat
-// http://msdn.microsoft.com/en-us/library/0c899ak8(v=vs.110).aspx
 // in string format add %s where precision is the maximum number of characters to be printed.
 class NumberFormat {
 /**
@@ -31,6 +30,23 @@ provided using setting the `symbol` argument.
     return pattern.replace('n', formatted).replace('$', (symbol).or(nf.symbolCurrency));
   }
 
+/**
+// http://msdn.microsoft.com/en-us/library/0c899ak8(v=vs.110).aspx
+
+format    | description
+--------- | ------------------------
+`0`       | Zero placeholder is replaced with a corresponding digits if present, otherwise a `0` is printed.
+`#`       | Digit placeholder is replaced with a corresponding digits if present or nothing.
+`.`       | Localized decimal separator.
+`,`       | Localized group separator. If added to the end of the pattern it multiplies the number by 1000 for every comma.
+`%`       | Includes the percentage symbol and multiplies the number by 100.
+`‰`       | Includes the permille symbol and multiplies the number by 1000.
+`E0`, `E+0`, `E-0`, `e0`, `e+0`, `e-0` | Exponential notation.
+`\`       | Escapes the following character.
+`'...'`, `"..."` | Escape an entire sequence of characters.
+`;`       | Section separator. There are three possible sections (positive, negative, zero). If two are specified zero numbers use the format from the first section.
+`...`     | Anything else is left untouched and put in the output as it is.
+*/
   public static function customFormat(f : Float, pattern : String, ?culture : Culture) : String {
     trace('custom pattern $pattern');
     var nf = numberFormat(culture);
