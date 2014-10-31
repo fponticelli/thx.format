@@ -31,7 +31,7 @@ provided using setting the `symbol` argument.
   }
 
 /**
-// http://msdn.microsoft.com/en-us/library/0c899ak8(v=vs.110).aspx
+http://msdn.microsoft.com/en-us/library/0c899ak8(v=vs.110).aspx
 
 format    | description
 --------- | ------------------------
@@ -50,7 +50,14 @@ format    | description
   public static function customFormat(f : Float, pattern : String, ?culture : Culture) : String {
     trace('custom pattern $pattern');
     var nf = numberFormat(culture);
-    return null;
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
+
+    var buf = [];
+
+    return buf.join("");
   }
 
 /**
