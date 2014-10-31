@@ -283,4 +283,12 @@ class TestNumberFormat {
     Assert.equals("(1234)", neg.format(fmt2));
     Assert.equals("**Zero**", zero.format(fmt2));
   }
+
+  public function testSectionSeparatorConfusing() {
+    Assert.raises(function() 1.format(";;;"));
+    var f = "\\;0\\;;";"-0;';'*";
+    Assert.equals(";1;", 1.format(f));
+    Assert.equals("-1;", (-1).format(f));
+    Assert.equals(";*", 0.format(f));
+  }
 }
