@@ -152,10 +152,135 @@ class TestNumberFormat {
     Assert.equals('1', 0.99.fixed(0));
     Assert.equals('0.9', 0.91.fixed(1));
   }
-/*
-  public function testCustomFormat() {
-    Assert.equals( '00012',   12.format('00000'));
-    Assert.equals('-00012', (-12).format('00000'));
+
+  public function testCustomFormat0() {
+    var value : Float = 123;
+
+    Assert.equals('00123', value.format('00000'));
+    Assert.equals('1.20', value.format('0.00'));
+    Assert.equals('01,20', value.format('00.00', it));
+
+    value = 0.56;
+    Assert.equals('0.6', value.format('0.0', it));
+
+    value = 1234567890;
+    Assert.equals('1,234,567,890', value.format('0,0'));
+    Assert.equals('1.234.567.890', value.format('0,0', it));
+
+    value = 1234567890.123456;
+    Assert.equals('1,234,567,890.1', value.format('0,0.0'));
+
+    value = 1234.567890;
+    Assert.equals('1,234.56', value.format('0,0.00'));
+
+    value = 1234567890.12345;
+    Assert.equals("(1,234,567,8) 90.123", value.format("(000) 0,0.000"));
+    Assert.equals("(12345678) 90.123", value.format("(000) 00.000"));
+    Assert.equals("(123456789) 0.123", value.format("(000) 0.000"));
+    Assert.equals("1234567890.1", value.format("0.0"));
+    Assert.equals("(123456) 7890", value.format("(000) 0000"));
+
+    value = 1.23;
+    Assert.equals("(00,0) 01.230", value.format("(000) 0,0.000"));
+    Assert.equals("(000) 01.230", value.format("(000) 00.000"));
+    Assert.equals("(000) 1.230", value.format("(000) 0.000"));
+    Assert.equals("1.2", value.format("0.0"));
+    Assert.equals("(000) 0001", value.format("(000) 0000"));
+    Assert.equals("(000) 0001-", value.format("(000) 0000;(000) 0000-"));
   }
-*/
+
+  public function testCustomFormatHash() {
+    var value : Float = 1.2;
+
+    Assert.equals('1.2', value.format('#.##'));
+
+    value = 123;
+    Assert.equals('123', value.format('####'));
+
+
+    value = 123456;
+    Assert.equals('[12-34-56]', value.format('[##-##-##]', it));
+
+    value = 1234567890;
+    Assert.equals('1234567890', value.format('#'));
+    Assert.equals('(123) 456-7890', value.format('(###) ###-####"'));
+
+    value = 1234567890.12345;
+    Assert.equals("(1,234,567,8) 90.123", value.format("(###) #,#.###"));
+    Assert.equals("(12345678) 90.123", value.format("(###) ##.###"));
+    Assert.equals("(123456789) 0.123", value.format("(###) #.###"));
+    Assert.equals("1234567890.1", value.format("#.#"));
+    Assert.equals("(123456) 7890", value.format("(###) ####"));
+
+    value = 1.23;
+    Assert.equals("() 1.23", value.format("(###) #,#.###"));
+    Assert.equals("() 1.23", value.format("(###) ##.###"));
+    Assert.equals("() 1.23", value.format("(###) #.###"));
+    Assert.equals("1.2", value.format("#.#"));
+    Assert.equals("() 1", value.format("(###) ####"));
+    Assert.equals("() 1-", value.format("(###) ####;(###) ####-"));
+  }
+
+  public function testCustomDecimalSeparator() {
+    var value = 1234567890;
+
+    Assert.equals("1,234,567,890", value.format("#,#"));
+
+    Assert.equals("1,235", value.format("#,#,,"));
+    Assert.equals("1,235", value.format("#,##0,,"));
+
+    Assert.equals("1", value.format("#,#,,,"));
+  }
+
+  public function testCustomGroupSeparator() {
+    var value = 1.2;
+
+    Assert.equals("1.20", value.format("0.00"));
+    Assert.equals("01.20", value.format("00.00"));
+    Assert.equals("01,20", value.format("00.00", it));
+
+    value = 0.086;
+    Assert.equals("8.6%", value.format("#0.##%"));
+
+    value = 86000;
+    Assert.equals("8.6E+4", value.format("0.###E+0"));
+  }
+
+  public function testCustomPercentSpecifier() {
+    Assert.equals("8.6%", 0.086.format("#0.##%"));
+  }
+
+  public function testCustomPermilleSpecifier() {
+    Assert.equals("3.4‰", 0.00354.format("#0.##‰"));
+  }
+
+  public function testCustomE() {
+    var value = 86000;
+    Assert.equals("8.6E+4", value.format("0.###E+0"));
+    Assert.equals("8.6E+004", value.format("0.###E-000"));
+    Assert.equals("8.6E004", value.format("0.###E-000"));
+  }
+
+  public function testCustomEscape() {
+    var value = 123;
+    Assert.equals("### 123 dollars and 00 cents ###", value.format("\\#\\#\\# ##0 dollars and \\0\\0 cents \\#\\#\\#"));
+    Assert.equals("\\\\\\ 123 dollars and 00 cents \\\\\\", value.format("\\\\\\\\\\\\ ##0 dollars and \\0\\0 cents \\\\\\\\\\\\"));
+  }
+
+  public function testSectionSeparator() {
+    var pos = 1234.0,
+        neg = -1234.0,
+        zero = 0,
+
+        fmt1 = "##;(##)",
+        fmt2 = "##;(##);**Zero**";
+
+    Assert.equals("1234", pos.format(fmt1));
+    Assert.equals("(1234)", neg.format(fmt1));
+    Assert.equals("0", zero.format(fmt1));
+
+    Assert.equals("1234", pos.format(fmt2));
+    Assert.equals("(1234)", neg.format(fmt2));
+    Assert.equals("**Zero**", zero.format(fmt2));
+  }
 }
