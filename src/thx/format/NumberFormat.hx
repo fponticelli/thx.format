@@ -48,16 +48,60 @@ format    | description
 `...`     | Anything else is left untouched and put in the output as it is.
 */
   public static function customFormat(f : Float, pattern : String, ?culture : Culture) : String {
-    trace('custom pattern $pattern');
     var nf = numberFormat(culture);
     if(Math.isNaN(f))
       return nf.symbolNaN;
     if(!Math.isFinite(f))
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
 
-    var buf = [];
+    // split on section separator
+    var groups = _splitPattern(pattern);
+    return if(f < 0) {
+      if(null != groups[1]) {
+        _customformat(-f, groups[1], nf);
+      } else {
+        _customformat(-f, "-"+groups[0], nf);
+      }
+    } else if(f > 0) {
+      _customformat(f, groups[0], nf);
+    } else {
+      _customformat(0, (groups[2]).or(groups[0]), nf);
+    };
+  }
 
-    return buf.join("");
+  static function _splitPattern(pattern : String) {
+    var pos = [],
+        i = 0,
+        quote = 0; // single quote == 1, double quote == 2
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]: i++; // skip next
+        case ["'", 1],
+             ['"', 2]: quote = 0; // close single or double quote
+        case ["'", 0]: quote = 1; // open single quote
+        case ['"', 0]: quote = 2; // open double quote
+        case [";", 0]: pos.push(i); // count only if not in quotes
+        case [_, _]:
+      }
+      i++;
+    }
+    return switch pos.length {
+      case 0:
+        [pattern];
+      case 1:
+        [pattern.substring(0, pos[0]), pattern.substring(pos[0] + 1)];
+      case 2:
+        [pattern.substring(0, pos[0]), pattern.substring(pos[0] + 1, pos[1]), pattern.substring(pos[1] + 1)];
+      case _:
+        throw 'pattern contains more that 3 sections';
+    }
+  }
+
+  static function _customformat(f : Float, pattern : String, nf : NumberFormatInfo) : String {
+    trace('custom pattern $pattern');
+    var buf = pattern;
+
+    return buf;
   }
 
 /**
