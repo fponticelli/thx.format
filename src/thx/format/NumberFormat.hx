@@ -100,7 +100,7 @@ format    | description
 
   // `f` is always positive
   static function _customformat(f : Float, pattern : String, nf : NumberFormatInfo) : String {
-    var p = pattern.split('.');
+    var p = pattern.split('.'); // TODO this will fail with escaped \. or quoted ".", '.'
 
     var power = p[0].length - (p[0] = p[0].trimRight(",")).length;
     f /= Math.pow(1000, power);
@@ -110,13 +110,14 @@ format    | description
     else if(pattern.contains('‰'))
       f *= 1000;
 
+
     if(p.length == 1)
       return _customFormatInteger('${Math.round(f)}', p[0], nf);
     else {
       var np = splitOnDecimalSeparator(f);
       return _customFormatInteger(np[0], p[0], nf) +
-      nf.separatorDecimalNumber + // TODO Currency/Percent
-      _customFormatDecimalFraction(np[1], p[1], nf);
+             nf.separatorDecimalNumber + // TODO Currency/Percent
+             _customFormatDecimalFraction((np[1]).or(""), p[1], nf);
     }
   }
 
