@@ -3,6 +3,7 @@ package thx.format;
 import thx.culture.Culture;
 import thx.culture.NumberFormatInfo;
 import thx.culture.Pattern;
+using thx.core.Arrays;
 using thx.core.Floats;
 using thx.core.Nulls;
 using thx.core.Ints;
@@ -97,9 +98,146 @@ format    | description
     }
   }
 
+  // `f` is always positive
   static function _customformat(f : Float, pattern : String, nf : NumberFormatInfo) : String {
-    trace('custom pattern $pattern');
-    var buf = pattern;
+    var p = pattern.split('.');
+
+    var power = p[0].length - (p[0] = p[0].trimRight(",")).length;
+    f /= Math.pow(1000, power);
+
+    if(pattern.contains('%'))
+      f *= 100;
+    else if(pattern.contains('‰'))
+      f *= 1000;
+
+    if(p.length == 1)
+      return _customFormatInteger('${Math.round(f)}', p[0], nf);
+    else {
+      var np = splitOnDecimalSeparator(f);
+      return _customFormatInteger(np[0], p[0], nf) +
+      nf.separatorDecimalNumber + // TODO Currency/Percent
+      _customFormatDecimalFraction(np[1], p[1], nf);
+    }
+  }
+
+  static function _customFormatInteger(v : String, pattern : String, nf : NumberFormatInfo) : String {
+    var buf = [],
+        i = 0,
+        quote = 0,
+        p = v.toArray(),
+        lbuf = "",
+        first = true,
+        useGroups = false,
+        zeroes = 0;
+
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]:
+          i++;
+          buf.push(Literal(pattern.substring(i, i+1)));
+        case ['"', 0]:
+          quote = 2;
+        case ["'", 0]:
+          quote = 1;
+        case ['"', 2],
+             ["'", 1]:
+          quote = 0;
+          buf.push(Literal(lbuf));
+          lbuf = "";
+        case [c, 1],
+             [c, 2]:
+          lbuf += c;
+        case [",", 0]:
+          useGroups = true;
+        case ["0", 0]:
+          buf.push(Zero(first));
+          first = false;
+          zeroes++;
+        case ["#", 0]:
+          buf.push(Hash(first));
+          first = false;
+        case ["%", 0]:
+          buf.push(Literal(nf.symbolPercent));
+        case ["‰", 0]:
+          buf.push(Literal(nf.symbolPermille));
+        case [c, _]:
+          buf.push(Literal(c));
+      }
+      i++;
+    }
+    if(lbuf.length > 0)
+      buf.push(Literal(lbuf));
+
+    for(i in p.length...zeroes)
+      p.unshift("0");
+
+    if(useGroups) {
+      i = p.length - 1;
+      var groups = nf.groupSizesNumber.copy(), // TODO Currency/Percent
+          group = groups.shift(),
+          pos = 0;
+      while(i >= 0) {
+        if(group == 0) break;
+        if(pos == group) {
+          p[i] = p[i]+nf.separatorGroupNumber; // TODO Currency/Percent
+          pos = 0;
+          if(groups.length > 0)
+            group = groups.shift();
+        } else {
+          pos++;
+          i--;
+        }
+      }
+    }
+
+    buf.reverse();
+    var r = buf.pluck(switch _ {
+      case Literal(s): s;
+      case Hash(first): p.length == 0 ? "" : first ? p.join("") : p.pop();
+      case Zero(first): first ? p.join("") : p.pop();
+    });
+    r.reverse();
+    return r.join("");
+  }
+
+  static function _customFormatDecimalFraction(d : String, pattern : String, nf : NumberFormatInfo) : String {
+    var buf = "",
+        i = 0,
+        quote = 0,
+        p = d.toArray(),
+        last = 0;
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]:
+          i++;
+          buf += pattern.substring(i, i+1);
+        case ['"', 0]:
+          quote = 2;
+        case ["'", 0]:
+          quote = 1;
+        case ['"', 2],
+             ["'", 1]:
+          quote = 0;
+        case [c, 1],
+             [c, 2]:
+          buf += c;
+        case ["0", 0]:
+          last = buf.length;
+          buf += p.length == 0 ? "0" : p.shift();
+        case ["#", 0]:
+          last = buf.length;
+          buf += p.length == 0 ? "" : p.shift();
+        case ["%", 0]:
+          buf += nf.symbolPercent;
+        case ["‰", 0]:
+          buf += nf.symbolPermille;
+        case [c, _]:
+          buf += c;
+      }
+      i++;
+    }
+
+    // TODO add rounding
 
     return buf;
   }
@@ -476,7 +614,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function pad(s : String, len : Int, round : Bool) : String {
     s = (s).or('');
     if(len > 0 && s.length > len) {
-      if(round) {
+      if(round) { // TODO round doesn't work with numbers that end in 9
         return s.substring(0, len - 1) + (Std.parseInt(s.substring(len - 1, len)) + (Std.parseInt(s.substring(len, len + 1)) >= 5 ? 1 : 0));
       } else {
         return s.substring(0, len);
@@ -496,13 +634,28 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
       return f < 0 ? symbolNegativeInfinity : symbolPositiveInfinity;
 
     f = Math.abs(f);
-    var s = '$f',
-        p = s.split('.'),
-        i = p[0],
-        d = p[1],
-        buf = [];
+    var p = splitOnDecimalSeparator(f);
 
-    if((d = (d).or('').toLowerCase()).indexOf('e') > 0) {
+    if(precision <= 0 && null != p[1]) {
+      if(Std.parseFloat('0.${p[1]}') >= 0.5)
+        p[0] = p[0].substring(0, p[0].length-1) + (Std.parseInt(p[0].substring(p[0].length-1)) + 1);
+    }
+
+    var buf = [];
+    buf.push(intPart(p[0], groupSizes, groupSeparator));
+
+    if(precision > 0)
+      buf.push(pad(p[1], precision, true));
+
+    return buf.join(decimalSeparator);
+  }
+
+  static function splitOnDecimalSeparator(f : Float) {
+    var p = '$f'.split('.'),
+        i = p[0],
+        d = p[1];
+
+    if((d = (d).or('').toLowerCase()).contains('e')) {
       p = d.split('e');
       d = p[0];
       var e = Ints.parse(p[1]);
@@ -514,19 +667,17 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
         d = '';
       }
     }
-
-    if(precision <= 0 && d.length > 0) {
-      if(Std.parseFloat('0.$d') >= 0.5)
-        i = i.substring(0, i.length-1) + (Std.parseInt(i.substring(i.length-1)) + 1);
-    }
-
-    buf.push(intPart(i, groupSizes, groupSeparator));
-
-    if(precision > 0)
-      buf.push(pad(d, precision, true));
-
-    return buf.join(decimalSeparator);
+    if(d.length > 0)
+      return [i, d];
+    else
+      return [i];
   }
+}
+
+private enum CustomFormat {
+  Literal(s : String);
+  Hash(first : Bool);
+  Zero(first : Bool);
 }
 
 /**

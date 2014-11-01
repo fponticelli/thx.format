@@ -157,11 +157,12 @@ class TestNumberFormat {
     var value : Float = 123;
 
     Assert.equals('00123', value.format('00000'));
+
+    value = 1.2;
     Assert.equals('1.20', value.format('0.00'));
     Assert.equals('01,20', value.format('00.00', it));
-
     value = 0.56;
-    Assert.equals('0.6', value.format('0.0', it));
+    Assert.equals('0,6', value.format('0.0', it));
 
     value = 1234567890;
     Assert.equals('1,234,567,890', value.format('0,0'));
@@ -186,7 +187,8 @@ class TestNumberFormat {
     Assert.equals("(000) 1.230", value.format("(000) 0.000"));
     Assert.equals("1.2", value.format("0.0"));
     Assert.equals("(000) 0001", value.format("(000) 0000"));
-    Assert.equals("(000) 0001-", value.format("(000) 0000;(000) 0000-"));
+    Assert.equals("(000) 0001", value.format("(000) 0000;(000) 0000-"));
+    Assert.equals("(000) 0001-", (-value).format("(000) 0000;(000) 0000-"));
   }
 
   public function testCustomFormatHash() {
@@ -218,7 +220,8 @@ class TestNumberFormat {
     Assert.equals("() 1.23", value.format("(###) #.###"));
     Assert.equals("1.2", value.format("#.#"));
     Assert.equals("() 1", value.format("(###) ####"));
-    Assert.equals("() 1-", value.format("(###) ####;(###) ####-"));
+    Assert.equals("() 1", value.format("(###) ####;(###) ####-"));
+    Assert.equals("() 1-", (-value).format("(###) ####;(###) ####-"));
   }
 
   public function testCustomDecimalSeparator() {
@@ -232,7 +235,7 @@ class TestNumberFormat {
     Assert.equals("1", value.format("#,#,,,"));
   }
 
-  public function testCustomGroupSeparator() {
+  public function testCustomDecimalFranction() {
     var value = 1.2;
 
     Assert.equals("1.20", value.format("0.00"));
@@ -251,7 +254,7 @@ class TestNumberFormat {
   }
 
   public function testCustomPermilleSpecifier() {
-    Assert.equals("3.4‰", 0.00354.format("#0.##‰"));
+    Assert.equals("3.54‰", 0.00354.format("#0.##‰"));
   }
 
   public function testCustomE() {
@@ -286,9 +289,23 @@ class TestNumberFormat {
 
   public function testSectionSeparatorConfusing() {
     Assert.raises(function() 1.format(";;;"));
-    var f = "\\;0\\;;";"-0;';'*";
-    Assert.equals(";1;", 1.format(f));
-    Assert.equals("-1;", (-1).format(f));
-    Assert.equals(";*", 0.format(f));
+    var f = "\\; \\;;\";\"- ;';'*";
+    Assert.equals("; ;",   1.format(f));
+    Assert.equals(";- ", (-1).format(f));
+    Assert.equals(";*",    0.format(f));
+  }
+
+  public function testCustomRounding() {
+    Assert.equals("1",   0.99.format("0"));
+    Assert.equals("1.0", 0.99.format("0.0"));
+    Assert.equals("0.1", 0.099.format("0.0"));
+    Assert.equals("10",  9.9.format("0"));
+    Assert.equals("100",  99.9.format("0"));
+
+    Assert.equals("-1",   (-0.99).format("0"));
+    Assert.equals("-1.0", (-0.99).format("0.0"));
+    Assert.equals("-0.1", (-0.099).format("0.0"));
+    Assert.equals("-10",  (-9.9).format("0"));
+    Assert.equals("-100",  (-99.9).format("0"));
   }
 }
