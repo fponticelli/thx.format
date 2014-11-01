@@ -56,7 +56,7 @@ format    | description
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
 
     // split on section separator
-    var groups = _splitPattern(pattern);
+    var groups = _splitPattern(pattern, ";");
     return if(f < 0) {
       if(null != groups[1]) {
         _customformat(-f, groups[1], nf);
@@ -70,7 +70,7 @@ format    | description
     };
   }
 
-  static function _splitPattern(pattern : String) {
+  static function _splitPattern(pattern : String, separator : String) {
     var pos = [],
         i = 0,
         quote = 0; // single quote == 1, double quote == 2
@@ -81,26 +81,24 @@ format    | description
              ['"', 2]: quote = 0; // close single or double quote
         case ["'", 0]: quote = 1; // open single quote
         case ['"', 0]: quote = 2; // open double quote
-        case [";", 0]: pos.push(i); // count only if not in quotes
+        case [s, 0] if(s == separator): pos.push(i); // count only if not in quotes
         case [_, _]:
       }
       i++;
     }
-    return switch pos.length {
-      case 0:
-        [pattern];
-      case 1:
-        [pattern.substring(0, pos[0]), pattern.substring(pos[0] + 1)];
-      case 2:
-        [pattern.substring(0, pos[0]), pattern.substring(pos[0] + 1, pos[1]), pattern.substring(pos[1] + 1)];
-      case _:
-        throw 'pattern contains more that 3 sections';
+    var buf = [],
+        prev = 0;
+    for(p in pos) {
+      buf.push(pattern.substring(prev, p));
+      prev = p + 1;
     }
+    buf.push(pattern.substring(prev));
+    return buf;
   }
 
   // `f` is always positive
   static function _customformat(f : Float, pattern : String, nf : NumberFormatInfo) : String {
-    var p = pattern.split('.'); // TODO this will fail with escaped \. or quoted ".", '.'
+    var p = _splitPattern(pattern, ".");
 
     var power = p[0].length - (p[0] = p[0].trimRight(",")).length;
     f /= Math.pow(1000, power);
@@ -680,54 +678,3 @@ private enum CustomFormat {
   Hash(first : Bool);
   Zero(first : Bool);
 }
-
-/**
-Parses a string into an Int value using the provided base. Default base is 16 for strings that begin with
-0x (after optional sign) or 10 otherwise.
-
-It is also possible to provide an optiona `negativeSign` and/or `positiveSign`.
-**/
-/*
-  public static function parse(s : String, ?base : Int, ?negativeSign = "-", ?positiveSign = "+") : Null<Int> {
-    #if js
-    var v : Int = untyped __js__("parseInt")(s, base);
-    return Math.isNaN(v) ? null : v;
-    #elseif flash9
-    if(base == null) base = 0;
-    var v : Int = untyped __global__["parseInt"](s, base);
-    return Math.isNaN(v) ? null : v;
-    #else
-
-    if(base != null && (base < 2 || base > BASE.length))
-      return throw 'invalid base $base, it must be between 2 and ${BASE.length}';
-
-    if(s.substring(0, positiveSign.length) == positiveSign)
-      s = s.substring(positiveSign.length);
-
-    var negative = s.substring(0, negativeSign.length) == negativeSign;
-
-    if(negative)
-      s = s.substring(negativeSign.length);
-
-    if(s.length == 0)
-      return null;
-
-    s = s.trim().toLowerCase();
-
-    if(s.startsWith('0x')) {
-      if(null != base && 16 != base)
-        return null; // attempting at converting a hex using a different base
-      base = 16;
-      s = s.substring(2);
-    } else if(null == base) {
-      base = 10;
-    }
-
-    return try ((negative ? -1 : 1) * s.toArray().reduce(function(acc, c) {
-      var i = BASE.indexOf(c);
-      if(i < 0 || i >= base) throw 'invalid';
-      return (acc * base) + i;
-    }, 0) : Null<Int>) catch(e : Dynamic) null;
-    #end
-  }
-*/
