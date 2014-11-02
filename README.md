@@ -202,8 +202,26 @@ Differences with classic printf:
   * `%n` is not supported
   * `%s` is not supported since this function is to format numeric values only
 
+### Custom Formats (`NumberFormat.customFormat`)
+
+Custom format uses a pattern composed of the format options described below.
+
+format    | description
+--------- | ------------------------
+`0`       | Zero placeholder is replaced with a corresponding digits if present, otherwise a `0` is printed.
+`#`       | Digit placeholder is replaced with a corresponding digits if present or nothing.
+`.`       | Localized decimal separator.
+`,`       | Localized group separator. If added to the end of the pattern it multiplies the number by 1000 for every comma.
+`%`       | Includes the percentage symbol and multiplies the number by 100.
+`‰`       | Includes the permille symbol and multiplies the number by 1000.
+`E0`, `E+0`, `E-0`, `e0`, `e+0`, `e-0` | Exponential notation.
+`\`       | Escapes the following character.
+`'...'`, `"..."` | Escape an entire sequence of characters.
+`;`       | Section separator. There are three possible sections (positive, negative, zero). If two are specified zero numbers use the format from the first section.
+`...`     | Anything else is left untouched and put in the output as it is.
+
 ## Install
 
 ```bash
-haxelib git thx.format https://github.com/fponticelli/thx.format.git
+haxelib install thx.format
 ```
