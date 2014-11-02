@@ -269,15 +269,15 @@ class TestNumberFormat {
 
   public function testCustomE() {
     var value = 86000;
-    //Assert.equals("8.6E+4", value.format("0.###E+0"));
-    Assert.equals("8.6E+004", value.format("0.###E-000"));
-    //Assert.equals("8.6E004", value.format("0.###E-000"));
+    Assert.equals("8.6E+4", value.format("0.###E+0"));
+    Assert.equals("8.6E+004", value.format("0.###E+000"));
+    Assert.equals("8.6E004", value.format("0.###E-000"));
   }
 
   public function testCustomEscape() {
     var value = 123;
-    Assert.equals("### 123 dollars and 00 cents ###", value.format("\\#\\#\\# ##0 dollars and \\0\\0 cents \\#\\#\\#"));
-    Assert.equals("\\\\\\ 123 dollars and 00 cents \\\\\\", value.format("\\\\\\\\\\\\ ##0 dollars and \\0\\0 cents \\\\\\\\\\\\"));
+    Assert.equals("### 123 dollars and 00 cents ###", value.format("\\#\\#\\# ##0 dollars and \\0\\0 c\\ents \\#\\#\\#"));
+    Assert.equals("\\\\\\ 123 dollars and 00 cents \\\\\\", value.format("\\\\\\\\\\\\ ##0 dollars and \\0\\0 c\\ents \\\\\\\\\\\\"));
   }
 
   public function testSectionSeparator() {
@@ -286,7 +286,7 @@ class TestNumberFormat {
         zero = 0,
 
         fmt1 = "##;(##)",
-        fmt2 = "##;(##);**Zero**";
+        fmt2 = "##;(##);**Z\\ero**";
 
     Assert.equals("1234", pos.format(fmt1));
     Assert.equals("(1234)", neg.format(fmt1));
@@ -304,14 +304,12 @@ class TestNumberFormat {
     Assert.equals(";- ", (-1).format(f));
     Assert.equals(";*",    0.format(f));
   }
-
   public function testCustomRounding() {
     Assert.equals("1",   0.99.format("0"));
     Assert.equals("1.0", 0.99.format("0.0"));
     Assert.equals("0.1", 0.099.format("0.0"));
     Assert.equals("10",  9.9.format("0"));
     Assert.equals("100",  99.9.format("0"));
-
     Assert.equals("-1",   (-0.99).format("0"));
     Assert.equals("-1.0", (-0.99).format("0.0"));
     Assert.equals("-0.1", (-0.099).format("0.0"));

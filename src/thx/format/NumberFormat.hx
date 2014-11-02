@@ -84,7 +84,8 @@ format    | description
              ['"', 2]: quote = 0; // close single or double quote
         case ["'", 0]: quote = 1; // open single quote
         case ['"', 0]: quote = 2; // open double quote
-        case [s, 0] if(s == separator): pos.push(i); // count only if not in quotes
+        case [s, 0] if(separator.contains(s)):
+          pos.push(i); // count only if not in quotes
         case [_, _]:
       }
       i++;
@@ -141,6 +142,26 @@ format    | description
     if(isPercent)
       f *= _hasSymbols(pattern, "‰") ? 1000 : 100;
 
+    var exp = _splitPattern(pattern, "eE");
+    if(exp.length > 1) {
+      var info = _exponentialInfo(f),
+          symbol = pattern.substring(exp[0].length, exp[0].length + 1),
+          forceSign = exp[1].startsWith("+");
+      if(forceSign || exp[1].startsWith("-"))
+        exp[1] = exp[1].substring(1);
+      return _customIntegerAndFraction(info.f, exp[0], nf, isCurrency, isPercent) +
+             symbol +
+             (info.e < 0 ? nf.signNegative : forceSign ? nf.signPositive : "") +
+             _customFormatInteger('${Math.abs(info.e)}', exp[1], nf, isCurrency, isPercent);
+      return _customIntegerAndFraction(f, exp[0], nf, isCurrency, isPercent) +
+             symbol +
+             _customFormatInteger('$f', exp[1], nf, isCurrency, isPercent);
+    } else {
+      return _customIntegerAndFraction(f, pattern, nf, isCurrency, isPercent);
+    }
+  }
+
+  static function _customIntegerAndFraction(f : Float, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) {
     var p = _splitPattern(pattern, "."),
         power = p[0].length - (p[0] = p[0].trimRight(",")).length;
     f /= Math.pow(1000, power);
@@ -148,9 +169,7 @@ format    | description
     if(p.length == 1)
       return _customFormatInteger('${Math.round(f)}', p[0], nf, isCurrency, isPercent);
     else {
-      trace(f);
       f = Floats.round(f, _countSymbols(p[1], "#0"));
-      trace(f);
       var np = splitOnDecimalSeparator(f);
       return _customFormatInteger(np[0], p[0], nf, isCurrency, isPercent) +
              (isCurrency ?
@@ -159,7 +178,7 @@ format    | description
                  nf.separatorDecimalPercent :
                  nf.separatorDecimalNumber) +
              _customFormatDecimalFraction((np[1]).or(""), p[1], nf);
-    }
+        }
   }
 
   static function _customFormatInteger(v : String, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
@@ -310,21 +329,24 @@ Formats a number using the exponential (scientific) format.
 **/
   public static function exponential(f : Float, ?precision : Int = 6, ?digits : Int = 3, ?symbol : String = 'e', ?culture : Culture) : String {
     var nf = numberFormat(culture),
-        s  = '${Math.abs(f)}'.toLowerCase(),
-        pose = s.indexOf('e');
+        info = _exponentialInfo(f);
+    return number(info.f, precision, culture) +
+           symbol +
+           (info.e < 0 ? nf.signNegative : nf.signPositive) +
+           '${Ints.abs(info.e)}'.lpad('0', digits);
+  }
+
+  static function _exponentialInfo(f : Float) {
+    var s  = '${Math.abs(f)}'.toLowerCase(),
+        pose = s.indexOf('e'),
+        p,
+        e;
     if(pose > 0) {
-      var p = s.substring(0, pose).split('.'),
-          e = Ints.parse(s.substring(pose+1));
-      return (f < 0 ? nf.signNegative : '') +
-        p[0] +
-        nf.separatorDecimalNumber +
-        p[1].substring(0, precision).rpad('0', precision) +
-        symbol +
-        (e < 0 ? nf.signNegative : nf.signPositive) +
-        '${Ints.abs(e)}'.lpad('0', digits);
+      p = s.substring(0, pose).split('.');
+      e = Ints.parse(s.substring(pose+1));
     } else {
-      var p = s.split('.').concat(['']),
-          e = 0;
+      p = s.split('.').concat(['']);
+      e = 0;
       if(p[0].length > 1) {
         e = p[0].length - 1;
         p[1] = p[0].substring(1) + p[1];
@@ -335,16 +357,11 @@ Formats a number using the exponential (scientific) format.
         p[0] = p[1].substring(0, 1);
         p[1] = p[1].substring(1);
       }
-
-      return (f < 0 ? nf.signNegative : '') +
-        p[0] +
-        nf.separatorDecimalNumber +
-        p[1].substring(0, precision).rpad('0', precision) +
-        symbol +
-        (e < 0 ? nf.signNegative : nf.signPositive) +
-        '${Ints.abs(e)}'.lpad('0', digits);
     }
-    return s;
+    return {
+      e : e,
+      f : Floats.sign(f) * Std.parseFloat(p.join("."))
+    };
   }
 
 /**
