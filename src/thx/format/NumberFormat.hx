@@ -169,15 +169,18 @@ format    | description
     if(p.length == 1)
       return _customFormatInteger('${Math.round(f)}', p[0], nf, isCurrency, isPercent);
     else {
+      if(f == 0.99) trace('BEFORE $pattern $f ' + _countSymbols(p[1], "#0"));
       f = Floats.round(f, _countSymbols(p[1], "#0"));
+      if(f == 1) trace('AFTER $f');
       var np = splitOnDecimalSeparator(f);
+      if(f == 1) trace(np);
       return _customFormatInteger(np[0], p[0], nf, isCurrency, isPercent) +
              (isCurrency ?
                nf.separatorDecimalCurrency :
                isPercent ?
                  nf.separatorDecimalPercent :
                  nf.separatorDecimalNumber) +
-             _customFormatDecimalFraction((np[1]).or(""), p[1], nf);
+             _customFormatDecimalFraction((np[1]).or("0"), p[1], nf);
         }
   }
 
