@@ -6,7 +6,7 @@ import thx.culture.DateFormatInfo;
 using thx.core.Nulls;
 using StringTools;
 
-class DateTimeFormat {
+class DateFormat {
 /**
 Custom date format.
 */
