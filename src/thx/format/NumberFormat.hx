@@ -56,9 +56,10 @@ format    | description
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
 
     // split on section separator
-    var isCurrency = _hasSymbol(pattern, '$'),
-        isPercent = !isCurrency && (_hasSymbol(pattern, '%') || _hasSymbol(pattern, '‰')),
+    var isCurrency = _hasSymbols(pattern, '$'),
+        isPercent = !isCurrency && (_hasSymbols(pattern, '%‰')),
         groups = _splitPattern(pattern, ";");
+    if(groups.length > 3) throw 'invalid number of sections in "$pattern"';
     return if(f < 0) {
       if(null != groups[1]) {
         _customformat(-f, groups[1], nf, isCurrency, isPercent);
@@ -98,7 +99,7 @@ format    | description
     return buf;
   }
 
-  static function _hasSymbol(pattern : String, symbol : String) {
+  static function _hasSymbols(pattern : String, symbols : String) {
     var i = 0,
         quote = 0; // single quote == 1, double quote == 2
     while(i < pattern.length) {
@@ -108,7 +109,7 @@ format    | description
              ['"', 2]: quote = 0; // close single or double quote
         case ["'", 0]: quote = 1; // open single quote
         case ['"', 0]: quote = 2; // open double quote
-        case [s, 0] if(s == symbol): return true; // accept only if not in quotes
+        case [s, 0] if(symbols.contains(s)): return true; // accept only if not in quotes
         case [_, _]:
       }
       i++;
@@ -116,10 +117,29 @@ format    | description
     return false;
   }
 
+  static function _countSymbols(pattern : String, symbols : String) {
+    var i = 0,
+        quote = 0, // single quote == 1, double quote == 2
+        count = 0;
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]: i++; // skip next
+        case ["'", 1],
+             ['"', 2]: quote = 0; // close single or double quote
+        case ["'", 0]: quote = 1; // open single quote
+        case ['"', 0]: quote = 2; // open double quote
+        case [s, 0] if(symbols.contains(s)): ++count; // accept only if not in quotes
+        case [_, _]:
+      }
+      i++;
+    }
+    return count;
+  }
+
   // `f` is always positive
   static function _customformat(f : Float, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
     if(isPercent)
-      f *= _hasSymbol(pattern, "‰") ? 1000 : 100;
+      f *= _hasSymbols(pattern, "‰") ? 1000 : 100;
 
     var p = _splitPattern(pattern, "."),
         power = p[0].length - (p[0] = p[0].trimRight(",")).length;
@@ -128,6 +148,9 @@ format    | description
     if(p.length == 1)
       return _customFormatInteger('${Math.round(f)}', p[0], nf, isCurrency, isPercent);
     else {
+      trace(f);
+      f = Floats.round(f, _countSymbols(p[1], "#0"));
+      trace(f);
       var np = splitOnDecimalSeparator(f);
       return _customFormatInteger(np[0], p[0], nf, isCurrency, isPercent) +
              (isCurrency ?

@@ -183,8 +183,7 @@ class TestNumberFormat {
     Assert.equals('1,234,567,890.1', value.format('0,0.0'));
 
     value = 1234.567890;
-    Assert.equals('1,234.56', value.format('0,0.00'));
-
+    Assert.equals('1,234.57', value.format('0,0.00'));
     value = 1234567890.12345;
     Assert.equals("(1,234,567,8) 90.123", value.format("(000) 0,0.000"));
     Assert.equals("(12345678) 90.123", value.format("(000) 00.000"));
