@@ -377,7 +377,7 @@ Formats a number using the exponential (scientific) format.
     }
     return {
       e : e,
-      f : Floats.sign(f) * Std.parseFloat(p.join("."))
+      f : Floats.sign(f) * Std.parseFloat(p.slice(0, 2).join("."))
     };
   }
 
