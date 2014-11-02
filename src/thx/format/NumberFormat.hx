@@ -10,9 +10,6 @@ using thx.core.Ints;
 using thx.core.Strings;
 using StringTools;
 
-// TODO
-//  - customFormat
-// in string format add %s where precision is the maximum number of characters to be printed.
 class NumberFormat {
 /**
 Binary format. The result is prefixed with leading `0` up to `significantDigits`. Default is one.
@@ -42,7 +39,7 @@ provided using setting the `symbol` argument.
   }
 
 /**
-http://msdn.microsoft.com/en-us/library/0c899ak8(v=vs.110).aspx
+Custom format uses a pattern composed of the format options described below.
 
 format    | description
 --------- | ------------------------
@@ -66,262 +63,21 @@ format    | description
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
 
     // split on section separator
-    var isCurrency = _hasSymbols(pattern, '$'),
-        isPercent = !isCurrency && (_hasSymbols(pattern, '%‰')),
-        groups = _splitPattern(pattern, ";");
+    var isCurrency = hasSymbols(pattern, '$'),
+        isPercent = !isCurrency && (hasSymbols(pattern, '%‰')),
+        groups = splitPattern(pattern, ";");
     if(groups.length > 3) throw 'invalid number of sections in "$pattern"';
     return if(f < 0) {
       if(null != groups[1]) {
-        _customformat(-f, groups[1], nf, isCurrency, isPercent);
+        customFormatF(-f, groups[1], nf, isCurrency, isPercent);
       } else {
-        _customformat(-f, "-"+groups[0], nf, isCurrency, isPercent);
+        customFormatF(-f, "-"+groups[0], nf, isCurrency, isPercent);
       }
     } else if(f > 0) {
-      _customformat(f, groups[0], nf, isCurrency, isPercent);
+      customFormatF(f, groups[0], nf, isCurrency, isPercent);
     } else {
-      _customformat(0, (groups[2]).or(groups[0]), nf, isCurrency, isPercent);
+      customFormatF(0, (groups[2]).or(groups[0]), nf, isCurrency, isPercent);
     };
-  }
-
-  static function _splitPattern(pattern : String, separator : String) {
-    var pos = [],
-        i = 0,
-        quote = 0; // single quote == 1, double quote == 2
-    while(i < pattern.length) {
-      switch [pattern.substring(i, i+1), quote] {
-        case ["\\", _]: i++; // skip next
-        case ["'", 1],
-             ['"', 2]: quote = 0; // close single or double quote
-        case ["'", 0]: quote = 1; // open single quote
-        case ['"', 0]: quote = 2; // open double quote
-        case [s, 0] if(separator.contains(s)):
-          pos.push(i); // count only if not in quotes
-        case [_, _]:
-      }
-      i++;
-    }
-    var buf = [],
-        prev = 0;
-    for(p in pos) {
-      buf.push(pattern.substring(prev, p));
-      prev = p + 1;
-    }
-    buf.push(pattern.substring(prev));
-    return buf;
-  }
-
-  static function _hasSymbols(pattern : String, symbols : String) {
-    var i = 0,
-        quote = 0; // single quote == 1, double quote == 2
-    while(i < pattern.length) {
-      switch [pattern.substring(i, i+1), quote] {
-        case ["\\", _]: i++; // skip next
-        case ["'", 1],
-             ['"', 2]: quote = 0; // close single or double quote
-        case ["'", 0]: quote = 1; // open single quote
-        case ['"', 0]: quote = 2; // open double quote
-        case [s, 0] if(symbols.contains(s)): return true; // accept only if not in quotes
-        case [_, _]:
-      }
-      i++;
-    }
-    return false;
-  }
-
-  static function _countSymbols(pattern : String, symbols : String) {
-    var i = 0,
-        quote = 0, // single quote == 1, double quote == 2
-        count = 0;
-    while(i < pattern.length) {
-      switch [pattern.substring(i, i+1), quote] {
-        case ["\\", _]: i++; // skip next
-        case ["'", 1],
-             ['"', 2]: quote = 0; // close single or double quote
-        case ["'", 0]: quote = 1; // open single quote
-        case ['"', 0]: quote = 2; // open double quote
-        case [s, 0] if(symbols.contains(s)): ++count; // accept only if not in quotes
-        case [_, _]:
-      }
-      i++;
-    }
-    return count;
-  }
-
-  // `f` is always positive
-  static function _customformat(f : Float, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
-    if(isPercent)
-      f *= _hasSymbols(pattern, "‰") ? 1000 : 100;
-
-    var exp = _splitPattern(pattern, "eE");
-    if(exp.length > 1) {
-      var info = _exponentialInfo(f),
-          symbol = pattern.substring(exp[0].length, exp[0].length + 1),
-          forceSign = exp[1].startsWith("+");
-      if(forceSign || exp[1].startsWith("-"))
-        exp[1] = exp[1].substring(1);
-      return _customIntegerAndFraction(info.f, exp[0], nf, isCurrency, isPercent) +
-             symbol +
-             (info.e < 0 ? nf.signNegative : forceSign ? nf.signPositive : "") +
-             _customFormatInteger('${Math.abs(info.e)}', exp[1], nf, isCurrency, isPercent);
-      return _customIntegerAndFraction(f, exp[0], nf, isCurrency, isPercent) +
-             symbol +
-             _customFormatInteger('$f', exp[1], nf, isCurrency, isPercent);
-    } else {
-      return _customIntegerAndFraction(f, pattern, nf, isCurrency, isPercent);
-    }
-  }
-
-  static function _customIntegerAndFraction(f : Float, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) {
-    var p = _splitPattern(pattern, "."),
-        power = p[0].length - (p[0] = p[0].trimRight(",")).length;
-    f /= Math.pow(1000, power);
-    if(p.length == 1)
-      return _customFormatInteger('${Math.round(f)}', p[0], nf, isCurrency, isPercent);
-    else {
-      f = Floats.round(f, _countSymbols(p[1], "#0"));
-      var np = splitOnDecimalSeparator(f);
-      return _customFormatInteger(np[0], p[0], nf, isCurrency, isPercent) +
-             (isCurrency ?
-               nf.separatorDecimalCurrency :
-               isPercent ?
-                 nf.separatorDecimalPercent :
-                 nf.separatorDecimalNumber) +
-             _customFormatDecimalFraction((np[1]).or("0"), p[1], nf);
-        }
-  }
-
-  static function _customFormatInteger(v : String, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
-    var buf = [],
-        i = 0,
-        quote = 0,
-        p = v.toArray(),
-        lbuf = "",
-        first = true,
-        useGroups = false,
-        zeroes = 0;
-
-    while(i < pattern.length) {
-      switch [pattern.substring(i, i+1), quote] {
-        case ["\\", _]:
-          i++;
-          buf.push(Literal(pattern.substring(i, i+1)));
-        case ['"', 0]:
-          quote = 2;
-        case ["'", 0]:
-          quote = 1;
-        case ['"', 2],
-             ["'", 1]:
-          quote = 0;
-          buf.push(Literal(lbuf));
-          lbuf = "";
-        case [c, 1],
-             [c, 2]:
-          lbuf += c;
-        case [",", 0]:
-          useGroups = true;
-        case ["0", 0]:
-          buf.push(Zero(first));
-          first = false;
-          zeroes++;
-        case ["#", 0]:
-          buf.push(Hash(first));
-          first = false;
-        case ["$", 0]:
-          buf.push(Literal(nf.symbolCurrency));
-        case ["%", 0]:
-          buf.push(Literal(nf.symbolPercent));
-        case ["‰", 0]:
-          buf.push(Literal(nf.symbolPermille));
-        case [c, _]:
-          buf.push(Literal(c));
-      }
-      i++;
-    }
-    if(lbuf.length > 0)
-      buf.push(Literal(lbuf));
-
-    for(i in p.length...zeroes)
-      p.unshift("0");
-
-    if(useGroups) {
-      i = p.length - 1;
-      var groups = isCurrency ?
-            nf.groupSizesCurrency.copy() :
-            isPercent ?
-              nf.groupSizesPercent.copy() :
-              nf.groupSizesNumber.copy(),
-          group = groups.shift(),
-          pos = 0;
-      while(i >= 0) {
-        if(group == 0) break;
-        if(pos == group) {
-          p[i] = p[i] + (isCurrency ?
-            nf.separatorGroupCurrency :
-            isPercent ?
-              nf.separatorGroupPercent :
-              nf.separatorGroupNumber);
-          pos = 0;
-          if(groups.length > 0)
-            group = groups.shift();
-        } else {
-          pos++;
-          i--;
-        }
-      }
-    }
-
-    buf.reverse();
-    var r = buf.pluck(switch _ {
-      case Literal(s): s;
-      case Hash(first): p.length == 0 ? "" : first ? p.join("") : p.pop();
-      case Zero(first): first ? p.join("") : p.pop();
-    });
-    r.reverse();
-    return r.join("");
-  }
-
-  static function _customFormatDecimalFraction(d : String, pattern : String, nf : NumberFormatInfo) : String {
-    var buf = "",
-        i = 0,
-        quote = 0,
-        p = d.toArray(),
-        last = 0;
-    while(i < pattern.length) {
-      switch [pattern.substring(i, i+1), quote] {
-        case ["\\", _]:
-          i++;
-          buf += pattern.substring(i, i+1);
-        case ['"', 0]:
-          quote = 2;
-        case ["'", 0]:
-          quote = 1;
-        case ['"', 2],
-             ["'", 1]:
-          quote = 0;
-        case [c, 1],
-             [c, 2]:
-          buf += c;
-        case ["0", 0]:
-          last = buf.length;
-          buf += p.length == 0 ? "0" : p.shift();
-        case ["#", 0]:
-          last = buf.length;
-          buf += p.length == 0 ? "" : p.shift();
-        case ["$", 0]:
-          buf += nf.symbolCurrency;
-        case ["%", 0]:
-          buf += nf.symbolPercent;
-        case ["‰", 0]:
-          buf += nf.symbolPermille;
-        case [c, _]:
-          buf += c;
-      }
-      i++;
-    }
-
-    // TODO add rounding
-
-    return buf;
   }
 
 /**
@@ -346,39 +102,11 @@ Formats a number using the exponential (scientific) format.
       return nf.symbolNaN;
     if(!Math.isFinite(f))
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
-    var info = _exponentialInfo(f);
+    var info = exponentialInfo(f);
     return number(info.f, precision, culture) +
            symbol +
            (info.e < 0 ? nf.signNegative : nf.signPositive) +
            '${Ints.abs(info.e)}'.lpad('0', digits);
-  }
-
-  static function _exponentialInfo(f : Float) {
-    var s  = '${Math.abs(f)}'.toLowerCase(),
-        pose = s.indexOf('e'),
-        p,
-        e;
-    if(pose > 0) {
-      p = s.substring(0, pose).split('.');
-      e = Ints.parse(s.substring(pose+1));
-    } else {
-      p = s.split('.').concat(['']);
-      e = 0;
-      if(p[0].length > 1) {
-        e = p[0].length - 1;
-        p[1] = p[0].substring(1) + p[1];
-        p[0] = p[0].substring(0, 1);
-      } else if(p[0] == '0') {
-        e = -(1 + p[1].length - p[1].trimLeft('0').length);
-        p[1] = p[1].substring(-e-1);
-        p[0] = p[1].substring(0, 1);
-        p[1] = p[1].substring(1);
-      }
-    }
-    return {
-      e : e,
-      f : Floats.sign(f) * Std.parseFloat(p.slice(0, 2).join("."))
-    };
   }
 
 /**
@@ -714,6 +442,245 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
 // PRIVATE
   static var BASE = "0123456789abcdefghijklmnopqrstuvwxyz";
 
+  static function countSymbols(pattern : String, symbols : String) {
+    var i = 0,
+        quote = 0, // single quote == 1, double quote == 2
+        count = 0;
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]: i++; // skip next
+        case ["'", 1],
+             ['"', 2]: quote = 0; // close single or double quote
+        case ["'", 0]: quote = 1; // open single quote
+        case ['"', 0]: quote = 2; // open double quote
+        case [s, 0] if(symbols.contains(s)): ++count; // accept only if not in quotes
+        case [_, _]:
+      }
+      i++;
+    }
+    return count;
+  }
+
+  static function customFormatDecimalFraction(d : String, pattern : String, nf : NumberFormatInfo) : String {
+    var buf = "",
+        i = 0,
+        quote = 0,
+        p = d.toArray(),
+        last = 0;
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]:
+          i++;
+          buf += pattern.substring(i, i+1);
+        case ['"', 0]:
+          quote = 2;
+        case ["'", 0]:
+          quote = 1;
+        case ['"', 2],
+             ["'", 1]:
+          quote = 0;
+        case [c, 1],
+             [c, 2]:
+          buf += c;
+        case ["0", 0]:
+          last = buf.length;
+          buf += p.length == 0 ? "0" : p.shift();
+        case ["#", 0]:
+          last = buf.length;
+          buf += p.length == 0 ? "" : p.shift();
+        case ["$", 0]:
+          buf += nf.symbolCurrency;
+        case ["%", 0]:
+          buf += nf.symbolPercent;
+        case ["‰", 0]:
+          buf += nf.symbolPermille;
+        case [c, _]:
+          buf += c;
+      }
+      i++;
+    }
+    return buf;
+  }
+
+  // `f` is always positive
+  static function customFormatF(f : Float, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
+    if(isPercent)
+      f *= hasSymbols(pattern, "‰") ? 1000 : 100;
+
+    var exp = splitPattern(pattern, "eE");
+    if(exp.length > 1) {
+      var info = exponentialInfo(f),
+          symbol = pattern.substring(exp[0].length, exp[0].length + 1),
+          forceSign = exp[1].startsWith("+");
+      if(forceSign || exp[1].startsWith("-"))
+        exp[1] = exp[1].substring(1);
+      return customIntegerAndFraction(info.f, exp[0], nf, isCurrency, isPercent) +
+             symbol +
+             (info.e < 0 ? nf.signNegative : forceSign ? nf.signPositive : "") +
+             customFormatInteger('${Math.abs(info.e)}', exp[1], nf, isCurrency, isPercent);
+      return customIntegerAndFraction(f, exp[0], nf, isCurrency, isPercent) +
+             symbol +
+             customFormatInteger('$f', exp[1], nf, isCurrency, isPercent);
+    } else {
+      return customIntegerAndFraction(f, pattern, nf, isCurrency, isPercent);
+    }
+  }
+
+  static function customFormatInteger(v : String, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
+    var buf = [],
+        i = 0,
+        quote = 0,
+        p = v.toArray(),
+        lbuf = "",
+        first = true,
+        useGroups = false,
+        zeroes = 0;
+
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]:
+          i++;
+          buf.push(Literal(pattern.substring(i, i+1)));
+        case ['"', 0]:
+          quote = 2;
+        case ["'", 0]:
+          quote = 1;
+        case ['"', 2],
+             ["'", 1]:
+          quote = 0;
+          buf.push(Literal(lbuf));
+          lbuf = "";
+        case [c, 1],
+             [c, 2]:
+          lbuf += c;
+        case [",", 0]:
+          useGroups = true;
+        case ["0", 0]:
+          buf.push(Zero(first));
+          first = false;
+          zeroes++;
+        case ["#", 0]:
+          buf.push(Hash(first));
+          first = false;
+        case ["$", 0]:
+          buf.push(Literal(nf.symbolCurrency));
+        case ["%", 0]:
+          buf.push(Literal(nf.symbolPercent));
+        case ["‰", 0]:
+          buf.push(Literal(nf.symbolPermille));
+        case [c, _]:
+          buf.push(Literal(c));
+      }
+      i++;
+    }
+    if(lbuf.length > 0)
+      buf.push(Literal(lbuf));
+
+    for(i in p.length...zeroes)
+      p.unshift("0");
+
+    if(useGroups) {
+      i = p.length - 1;
+      var groups = isCurrency ?
+            nf.groupSizesCurrency.copy() :
+            isPercent ?
+              nf.groupSizesPercent.copy() :
+              nf.groupSizesNumber.copy(),
+          group = groups.shift(),
+          pos = 0;
+      while(i >= 0) {
+        if(group == 0) break;
+        if(pos == group) {
+          p[i] = p[i] + (isCurrency ?
+            nf.separatorGroupCurrency :
+            isPercent ?
+              nf.separatorGroupPercent :
+              nf.separatorGroupNumber);
+          pos = 0;
+          if(groups.length > 0)
+            group = groups.shift();
+        } else {
+          pos++;
+          i--;
+        }
+      }
+    }
+
+    buf.reverse();
+    var r = buf.pluck(switch _ {
+      case Literal(s): s;
+      case Hash(first): p.length == 0 ? "" : first ? p.join("") : p.pop();
+      case Zero(first): first ? p.join("") : p.pop();
+    });
+    r.reverse();
+    return r.join("");
+  }
+
+  static function customIntegerAndFraction(f : Float, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) {
+    var p = splitPattern(pattern, "."),
+        power = p[0].length - (p[0] = p[0].trimRight(",")).length;
+    f /= Math.pow(1000, power);
+    if(p.length == 1)
+      return customFormatInteger('${Math.round(f)}', p[0], nf, isCurrency, isPercent);
+    else {
+      f = Floats.round(f, countSymbols(p[1], "#0"));
+      var np = splitOnDecimalSeparator(f);
+      return customFormatInteger(np[0], p[0], nf, isCurrency, isPercent) +
+             (isCurrency ?
+               nf.separatorDecimalCurrency :
+               isPercent ?
+                 nf.separatorDecimalPercent :
+                 nf.separatorDecimalNumber) +
+             customFormatDecimalFraction((np[1]).or("0"), p[1], nf);
+        }
+  }
+
+  static function exponentialInfo(f : Float) {
+    var s  = '${Math.abs(f)}'.toLowerCase(),
+        pose = s.indexOf('e'),
+        p,
+        e;
+    if(pose > 0) {
+      p = s.substring(0, pose).split('.');
+      e = Ints.parse(s.substring(pose+1));
+    } else {
+      p = s.split('.').concat(['']);
+      e = 0;
+      if(p[0].length > 1) {
+        e = p[0].length - 1;
+        p[1] = p[0].substring(1) + p[1];
+        p[0] = p[0].substring(0, 1);
+      } else if(p[0] == '0') {
+        e = -(1 + p[1].length - p[1].trimLeft('0').length);
+        p[1] = p[1].substring(-e-1);
+        p[0] = p[1].substring(0, 1);
+        p[1] = p[1].substring(1);
+      }
+    }
+    return {
+      e : e,
+      f : Floats.sign(f) * Std.parseFloat(p.slice(0, 2).join("."))
+    };
+  }
+
+  static function hasSymbols(pattern : String, symbols : String) {
+    var i = 0,
+        quote = 0; // single quote == 1, double quote == 2
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]: i++; // skip next
+        case ["'", 1],
+             ['"', 2]: quote = 0; // close single or double quote
+        case ["'", 0]: quote = 1; // open single quote
+        case ['"', 0]: quote = 2; // open double quote
+        case [s, 0] if(symbols.contains(s)): return true; // accept only if not in quotes
+        case [_, _]:
+      }
+      i++;
+    }
+    return false;
+  }
+
   static function intPart(s : String, groupSizes : Array<Int>, groupSeparator : String) : String {
     var buf = [],
         pos = 0,
@@ -756,24 +723,6 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function paramOrNull(param : String) : Null<Int>
     return param.length == 0 ? null : Std.parseInt(param);
 
-  static function value(f : Float, precision : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
-    f = Math.abs(f);
-    var p = splitOnDecimalSeparator(f);
-
-    if(precision <= 0 && null != p[1]) {
-      if(Std.parseFloat('0.${p[1]}') >= 0.5)
-        p[0] = p[0].substring(0, p[0].length-1) + (Std.parseFloat(p[0].substring(p[0].length-1)) + 1);
-    }
-
-    var buf = [];
-    buf.push(intPart(p[0], groupSizes, groupSeparator));
-
-    if(precision > 0)
-      buf.push(pad(p[1], precision, true));
-
-    return buf.join(decimalSeparator);
-  }
-
   static function splitOnDecimalSeparator(f : Float) {
     var p = '$f'.split('.'),
         i = p[0],
@@ -797,6 +746,51 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
       return [i, d];
     else
       return [i];
+  }
+
+  static function splitPattern(pattern : String, separator : String) {
+    var pos = [],
+        i = 0,
+        quote = 0; // single quote == 1, double quote == 2
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]: i++; // skip next
+        case ["'", 1],
+             ['"', 2]: quote = 0; // close single or double quote
+        case ["'", 0]: quote = 1; // open single quote
+        case ['"', 0]: quote = 2; // open double quote
+        case [s, 0] if(separator.contains(s)):
+          pos.push(i); // count only if not in quotes
+        case [_, _]:
+      }
+      i++;
+    }
+    var buf = [],
+        prev = 0;
+    for(p in pos) {
+      buf.push(pattern.substring(prev, p));
+      prev = p + 1;
+    }
+    buf.push(pattern.substring(prev));
+    return buf;
+  }
+
+  static function value(f : Float, precision : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
+    f = Math.abs(f);
+    var p = splitOnDecimalSeparator(f);
+
+    if(precision <= 0 && null != p[1]) {
+      if(Std.parseFloat('0.${p[1]}') >= 0.5)
+        p[0] = p[0].substring(0, p[0].length-1) + (Std.parseFloat(p[0].substring(p[0].length-1)) + 1);
+    }
+
+    var buf = [];
+    buf.push(intPart(p[0], groupSizes, groupSeparator));
+
+    if(precision > 0)
+      buf.push(pad(p[1], precision, true));
+
+    return buf.join(decimalSeparator);
   }
 }
 
