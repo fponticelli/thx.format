@@ -726,9 +726,9 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function splitOnDecimalSeparator(f : Float) {
     var p = '$f'.split('.'),
         i = p[0],
-        d = p[1];
+        d = (p[1]).or("").toLowerCase();
 
-    if((d = (d).or('').toLowerCase()).contains('e')) {
+    if(d.contains('e')) {
       p = d.split('e');
       d = p[0];
       var e = Ints.parse(p[1]);
@@ -736,10 +736,12 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
         d = ''.rpad('0', -e-1) + i + d;
         i = '0';
       } else {
-        i = pad(i + d, e + 1, false);
-        d = '';
+        var s = i + d;
+        d = s.substring(e + 1);
+        i = pad(s, e + 1, false);
       }
     }
+
     if(d.length > 0)
       return [i, d];
     else

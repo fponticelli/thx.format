@@ -1,0 +1,10 @@
+-cp src
+-cp test
+-lib utest
+-lib thx.core
+-lib thx.culture
+-php bin/php
+-main TestAll
+-D thx-format
+
+-cmd php bin/php/index.php
