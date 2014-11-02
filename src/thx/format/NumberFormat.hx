@@ -17,16 +17,26 @@ class NumberFormat {
 /**
 Binary format. The result is prefixed with leading `0` up to `significantDigits`. Default is one.
 **/
-  public static function binary(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String
+  public static function binary(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
+    var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
     return significantDigits == 0 && f == 0 ? "" : toBase(Std.int(f), 2, culture).lpad('0', significantDigits);
+  }
 
 /**
 Formats a currency value. By default the currency symbol is extracted from the applied culture but it can be optionally
 provided using setting the `symbol` argument.
 **/
   public static function currency(f : Float, ?precision : Null<Int>, ?symbol : String, ?culture : Culture) : String {
-    var nf        = numberFormat(culture),
-        pattern   = f < 0 ? Pattern.currencyNegatives[nf.patternNegativeCurrency] : Pattern.currencyPositives[nf.patternPositiveCurrency],
+    var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
+    var pattern   = f < 0 ? Pattern.currencyNegatives[nf.patternNegativeCurrency] : Pattern.currencyPositives[nf.patternPositiveCurrency],
         formatted = value(f, (precision).or(nf.decimalDigitsCurrency), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesCurrency, nf.separatorGroupCurrency, nf.separatorDecimalCurrency);
     return pattern.replace('n', formatted).replace('$', (symbol).or(nf.symbolCurrency));
   }
@@ -318,8 +328,12 @@ format    | description
 Formats a decimal (integer) value.
 **/
   public static function decimal(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
-    var nf = numberFormat(culture),
-        formatted = value(f, 0, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, [0], '', '');
+    var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
+    var formatted = value(f, 0, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, [0], '', '');
     return (f < 0 ? nf.signNegative : '') + formatted.lpad('0', significantDigits);
   }
 
@@ -327,8 +341,12 @@ Formats a decimal (integer) value.
 Formats a number using the exponential (scientific) format.
 **/
   public static function exponential(f : Float, ?precision : Int = 6, ?digits : Int = 3, ?symbol : String = 'e', ?culture : Culture) : String {
-    var nf = numberFormat(culture),
-        info = _exponentialInfo(f);
+    var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
+    var info = _exponentialInfo(f);
     return number(info.f, precision, culture) +
            symbol +
            (info.e < 0 ? nf.signNegative : nf.signPositive) +
@@ -367,8 +385,12 @@ Formats a number using the exponential (scientific) format.
 Formats a fixed point float number with an assigned precision.
 **/
   public static function fixed(f : Float, ?precision : Null<Int>, ?culture : Culture) : String {
-    var nf        = numberFormat(culture),
-        pattern   = f < 0 ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
+    var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
+    var pattern   = f < 0 ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
         formatted = value(f, (precision).or(nf.decimalDigitsNumber), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, [0], '', nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
@@ -446,21 +468,37 @@ Formats a number using either the shortest result between `fixed` and `exponenti
 /**
 Formats a number to hexadecimal format.
 **/
-  public static function hex(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String
+  public static function hex(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
+    var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
     return significantDigits == 0 && f == 0 ? "" : toBase(Std.int(f), 16, culture).lpad('0', significantDigits);
+  }
 
 /**
 Formats the integer part of a number.
 **/
-  public static function integer(f : Float, ?culture : Culture) : String
+  public static function integer(f : Float, ?culture : Culture) : String {
+    var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
     return number(f, 0, culture);
+  }
 
 /**
 Formats a number with group separators (eg: thousands separators).
 **/
   public static function number(f : Float, ?precision : Null<Int>, ?culture : Culture) : String {
-    var nf        = numberFormat(culture),
-        pattern   = f < 0 ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
+    var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
+    var pattern   = f < 0 ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
         formatted = value(f, (precision).or(nf.decimalDigitsNumber), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
@@ -468,14 +506,24 @@ Formats a number with group separators (eg: thousands separators).
 /**
 Formats a number to octals.
 **/
-  public static function octal(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String
+  public static function octal(f : Float, ?significantDigits : Int = 1, ?culture : Culture) : String {
+    var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
     return significantDigits == 0 && f == 0 ? "" : toBase(Std.int(f), 8, culture).lpad('0', significantDigits);
+  }
 
 /**
 Formats a number as a percent value. The output result is multiplied by 100. So `0.1` will result in `10%`.
 **/
   public static function percent(f : Float, ?decimals : Null<Int>, ?culture : Culture) : String {
     var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
     return unit(f * 100, (decimals).or(nf.decimalDigitsPercent), nf.symbolPercent, culture);
   }
 
@@ -484,6 +532,10 @@ Formats a number as a percent value. The output result is multiplied by 1000. So
 **/
   public static function permille(f : Float, ?decimals : Null<Int>, ?culture : Culture) : String {
     var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
     return unit(f * 1000, (decimals).or(nf.decimalDigitsPercent), nf.symbolPermille, culture);
   }
 
@@ -649,8 +701,12 @@ Transform an `Int` value to a `String` using the specified `base`. A negative si
 Formats a number with a specified `unitSymbol` and a specified number of decimals.
 **/
   public static function unit(f : Float, decimals : Int, unitSymbol : String, ?culture : Culture) : String {
-    var nf        = numberFormat(culture),
-        pattern   = f < 0 ? Pattern.percentNegatives[nf.patternNegativePercent] : Pattern.percentPositives[nf.patternPositivePercent],
+    var nf = numberFormat(culture);
+    if(Math.isNaN(f))
+      return nf.symbolNaN;
+    if(!Math.isFinite(f))
+      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
+    var pattern   = f < 0 ? Pattern.percentNegatives[nf.patternNegativePercent] : Pattern.percentPositives[nf.patternPositivePercent],
         formatted = value(f, decimals, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesPercent, nf.separatorGroupPercent, nf.separatorDecimalPercent);
     return pattern.replace('n', formatted).replace('%', unitSymbol);
   }
@@ -701,11 +757,6 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     return param.length == 0 ? null : Std.parseInt(param);
 
   static function value(f : Float, precision : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
-    if(Math.isNaN(f))
-      return symbolNaN;
-    if(!Math.isFinite(f))
-      return f < 0 ? symbolNegativeInfinity : symbolPositiveInfinity;
-
     f = Math.abs(f);
     var p = splitOnDecimalSeparator(f);
 
