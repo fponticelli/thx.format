@@ -5,11 +5,6 @@ import thx.culture.Embed;
 import utest.Assert;
 using thx.format.NumberFormat;
 
-// TODO
-//  * custom format:
-//    * test decimal, group separator, group sizes for Permille
-//    * test decimal, group separator, group sizes for Percent
-//    * test decimal, group separator, group sizes for Currency
 class TestNumberFormat {
   static var it : Culture = Embed.culture('it-it');
   static var us : Culture = Embed.culture('en-us');

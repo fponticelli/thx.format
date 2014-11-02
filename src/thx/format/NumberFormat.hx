@@ -622,18 +622,21 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function intPart(s : String, groupSizes : Array<Int>, groupSeparator : String) : String {
     var buf = [],
         pos = 0,
-        len = groupSizes.length,
-        size,
+        sizes = groupSizes.copy(),
+        size = sizes.shift(),
         seg;
     while(s.length > 0) {
-      size = groupSizes[pos++ % len];
       if(size == 0) {
         buf.unshift(s);
-        s = '';
+        s = "";
+      } else if(s.length > size) {
+        buf.unshift(s.substring(s.length - size));
+        s = s.substring(0, s.length - size);
+        if(sizes.length > 0)
+          size = sizes.shift();
       } else {
-        seg = s.length > size ? s.substring(s.length - size) : s;
-        buf.unshift(seg);
-        s = s.substring(0, s.length - seg.length);
+        buf.unshift(s);
+        s = "";
       }
     }
     return buf.join(groupSeparator);
