@@ -165,7 +165,6 @@ format    | description
     var p = _splitPattern(pattern, "."),
         power = p[0].length - (p[0] = p[0].trimRight(",")).length;
     f /= Math.pow(1000, power);
-
     if(p.length == 1)
       return _customFormatInteger('${Math.round(f)}', p[0], nf, isCurrency, isPercent);
     else {
@@ -688,7 +687,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function pad(s : String, len : Int, round : Bool) : String {
     s = (s).or('');
     if(len > 0 && s.length > len) {
-      if(round) { // TODO round doesn't work with numbers that end in 9
+      if(round) {
         return s.substring(0, len - 1) + (Std.parseInt(s.substring(len - 1, len)) + (Std.parseInt(s.substring(len, len + 1)) >= 5 ? 1 : 0));
       } else {
         return s.substring(0, len);
@@ -712,7 +711,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
 
     if(precision <= 0 && null != p[1]) {
       if(Std.parseFloat('0.${p[1]}') >= 0.5)
-        p[0] = p[0].substring(0, p[0].length-1) + (Std.parseInt(p[0].substring(p[0].length-1)) + 1);
+        p[0] = p[0].substring(0, p[0].length-1) + (Std.parseFloat(p[0].substring(p[0].length-1)) + 1);
     }
 
     var buf = [];
