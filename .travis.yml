@@ -23,8 +23,8 @@ before_install: # clone travis-hx repo
 install: # setup the target
   - ~/travis-hx/setup.sh
   - haxelib install utest
-  - haxelib git thx.core git://github.com/fponticelli/thx.core.git
-  - haxelib git thx.culture git://github.com/fponticelli/thx.culture.git
+  - haxelib install thx.core
+  - haxelib install thx.culture
 
 script:
   - cd $TRAVIS_BUILD_DIR
