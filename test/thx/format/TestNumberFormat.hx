@@ -6,16 +6,15 @@ import utest.Assert;
 using thx.format.NumberFormat;
 
 // TODO
-//  * one letter formats
-//    * test Culture with group separators different from the usual 3
 //  * custom format:
-//    * test Culture with group separators different from the usual 3
 //    * test decimal, group separator, group sizes for Permille
 //    * test decimal, group separator, group sizes for Percent
 //    * test decimal, group separator, group sizes for Currency
 class TestNumberFormat {
   static var it : Culture = Embed.culture('it-it');
   static var us : Culture = Embed.culture('en-us');
+  static var asIn : Culture = Embed.culture('as-in');
+  static var baRu : Culture = Embed.culture('ba-ru');
   public function new() {}
 
   public function testNumber() {
@@ -159,6 +158,15 @@ class TestNumberFormat {
     Assert.equals('0.9', 0.89.fixed(1));
     Assert.equals('1', 0.99.fixed(0));
     Assert.equals('0.9', 0.91.fixed(1));
+  }
+
+  public function testDifferentGroups() {
+    var value = 1234567890.123456;
+    Assert.equals('1,23,45,67,890.12', value.number(asIn));
+    Assert.equals('1234567 890,12', value.number(baRu));
+
+    Assert.equals('1,23,45,67,890.1', value.format("0,0000.0", asIn));
+    Assert.equals('1234567 890,1', value.format("0,0000.0", baRu));
   }
 
   public function testCustomFormat0() {
