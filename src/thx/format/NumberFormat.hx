@@ -56,17 +56,19 @@ format    | description
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
 
     // split on section separator
-    var groups = _splitPattern(pattern, ";");
+    var isCurrency = _hasSymbol(pattern, '$'),
+        isPercent = !isCurrency && (_hasSymbol(pattern, '%') || _hasSymbol(pattern, '‰')),
+        groups = _splitPattern(pattern, ";");
     return if(f < 0) {
       if(null != groups[1]) {
-        _customformat(-f, groups[1], nf);
+        _customformat(-f, groups[1], nf, isCurrency, isPercent);
       } else {
-        _customformat(-f, "-"+groups[0], nf);
+        _customformat(-f, "-"+groups[0], nf, isCurrency, isPercent);
       }
     } else if(f > 0) {
-      _customformat(f, groups[0], nf);
+      _customformat(f, groups[0], nf, isCurrency, isPercent);
     } else {
-      _customformat(0, (groups[2]).or(groups[0]), nf);
+      _customformat(0, (groups[2]).or(groups[0]), nf, isCurrency, isPercent);
     };
   }
 
@@ -96,30 +98,48 @@ format    | description
     return buf;
   }
 
-  // `f` is always positive
-  static function _customformat(f : Float, pattern : String, nf : NumberFormatInfo) : String {
-    var p = _splitPattern(pattern, ".");
+  static function _hasSymbol(pattern : String, symbol : String) {
+    var i = 0,
+        quote = 0; // single quote == 1, double quote == 2
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]: i++; // skip next
+        case ["'", 1],
+             ['"', 2]: quote = 0; // close single or double quote
+        case ["'", 0]: quote = 1; // open single quote
+        case ['"', 0]: quote = 2; // open double quote
+        case [s, 0] if(s == symbol): return true; // accept only if not in quotes
+        case [_, _]:
+      }
+      i++;
+    }
+    return false;
+  }
 
-    var power = p[0].length - (p[0] = p[0].trimRight(",")).length;
+  // `f` is always positive
+  static function _customformat(f : Float, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
+    if(isPercent)
+      f *= _hasSymbol(pattern, "‰") ? 1000 : 100;
+
+    var p = _splitPattern(pattern, "."),
+        power = p[0].length - (p[0] = p[0].trimRight(",")).length;
     f /= Math.pow(1000, power);
 
-    if(pattern.contains('%'))
-      f *= 100;
-    else if(pattern.contains('‰'))
-      f *= 1000;
-
-
     if(p.length == 1)
-      return _customFormatInteger('${Math.round(f)}', p[0], nf);
+      return _customFormatInteger('${Math.round(f)}', p[0], nf, isCurrency, isPercent);
     else {
       var np = splitOnDecimalSeparator(f);
-      return _customFormatInteger(np[0], p[0], nf) +
-             nf.separatorDecimalNumber + // TODO Currency/Percent
+      return _customFormatInteger(np[0], p[0], nf, isCurrency, isPercent) +
+             (isCurrency ?
+               nf.separatorDecimalCurrency :
+               isPercent ?
+                 nf.separatorDecimalPercent :
+                 nf.separatorDecimalNumber) +
              _customFormatDecimalFraction((np[1]).or(""), p[1], nf);
     }
   }
 
-  static function _customFormatInteger(v : String, pattern : String, nf : NumberFormatInfo) : String {
+  static function _customFormatInteger(v : String, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
     var buf = [],
         i = 0,
         quote = 0,
@@ -155,6 +175,8 @@ format    | description
         case ["#", 0]:
           buf.push(Hash(first));
           first = false;
+        case ["$", 0]:
+          buf.push(Literal(nf.symbolCurrency));
         case ["%", 0]:
           buf.push(Literal(nf.symbolPercent));
         case ["‰", 0]:
@@ -172,13 +194,21 @@ format    | description
 
     if(useGroups) {
       i = p.length - 1;
-      var groups = nf.groupSizesNumber.copy(), // TODO Currency/Percent
+      var groups = isCurrency ?
+            nf.groupSizesCurrency.copy() :
+            isPercent ?
+              nf.groupSizesPercent.copy() :
+              nf.groupSizesNumber.copy(),
           group = groups.shift(),
           pos = 0;
       while(i >= 0) {
         if(group == 0) break;
         if(pos == group) {
-          p[i] = p[i]+nf.separatorGroupNumber; // TODO Currency/Percent
+          p[i] = p[i] + (isCurrency ?
+            nf.separatorGroupCurrency :
+            isPercent ?
+              nf.separatorGroupPercent :
+              nf.separatorGroupNumber);
           pos = 0;
           if(groups.length > 0)
             group = groups.shift();
@@ -226,6 +256,8 @@ format    | description
         case ["#", 0]:
           last = buf.length;
           buf += p.length == 0 ? "" : p.shift();
+        case ["$", 0]:
+          buf += nf.symbolCurrency;
         case ["%", 0]:
           buf += nf.symbolPercent;
         case ["‰", 0]:
