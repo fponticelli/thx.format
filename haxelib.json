@@ -5,8 +5,8 @@
   "classPath": "src",
   "tags": ["format", "localization", "thx", "cross"],
   "description": "Formatting library (Numbers and Dates).",
-  "releasenote": "First release.",
-  "version": "0.1.1",
+  "releasenote": "Fixed API change in thx.core.",
+  "version": "0.1.2",
   "contributors": ["fponticelli"],
   "dependencies": {
     "thx.core": "",
