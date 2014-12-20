@@ -618,7 +618,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
 
   static function customIntegerAndFraction(f : Float, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) {
     var p = splitPattern(pattern, "."),
-        power = p[0].length - (p[0] = p[0].trimRight(",")).length;
+        power = p[0].length - (p[0] = p[0].trimCharsRight(",")).length;
     f /= Math.pow(1000, power);
     if(p.length == 1)
       return customFormatInteger('${Math.round(f)}', p[0], nf, isCurrency, isPercent);
@@ -651,7 +651,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
         p[1] = p[0].substring(1) + p[1];
         p[0] = p[0].substring(0, 1);
       } else if(p[0] == '0') {
-        e = -(1 + p[1].length - p[1].trimLeft('0').length);
+        e = -(1 + p[1].length - p[1].trimCharsLeft('0').length);
         p[1] = p[1].substring(-e-1);
         p[0] = p[1].substring(0, 1);
         p[1] = p[1].substring(1);
