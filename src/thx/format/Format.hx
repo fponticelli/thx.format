@@ -14,7 +14,7 @@ Date.now().f("D"); // returns the date in long format
 ```
 */
   macro public static function f(subject : Expr, pattern : ExprOf<String>, ?culture : ExprOf<thx.culture.Culture>)
-    return switch TypeTools.toString(Context.typeof(subject)) {
+    return switch TypeTools.toString(Context.follow(Context.typeof(subject))) {
       case "Date":
         macro thx.format.DateFormat.format($e{subject}, $e{pattern}, $e{culture});
       case "Int", "Float":
