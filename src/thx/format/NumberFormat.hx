@@ -623,7 +623,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     if(p.length == 1)
       return customFormatInteger('${Math.round(f)}', p[0], nf, isCurrency, isPercent);
     else {
-      f = Floats.round(f, countSymbols(p[1], "#0"));
+      f = f.roundTo(countSymbols(p[1], "#0"));
       var np = splitOnDecimalSeparator(f);
       return customFormatInteger(np[0], p[0], nf, isCurrency, isPercent) +
              (isCurrency ?
