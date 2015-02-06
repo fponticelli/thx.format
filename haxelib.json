@@ -5,8 +5,8 @@
   "classPath": "src",
   "tags": ["format", "localization", "thx", "cross"],
   "description": "Formatting library (Numbers and Dates).",
-  "releasenote": "Updated thx.core API.",
-  "version": "0.1.4",
+  "releasenote": "When culture is not defined now it uses Format.defaultCulture instead of Culture.invariant.",
+  "version": "0.2.0",
   "contributors": ["fponticelli"],
   "dependencies": {
     "thx.core": "",
