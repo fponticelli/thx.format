@@ -705,7 +705,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   }
 
   static function numberFormat(culture : Culture) : NumberFormatInfo
-    return null != culture && null != culture.number ? culture.number : Culture.invariant.number;
+    return null != culture && null != culture.number ? culture.number : Format.defaultCulture.number;
 
   static function pad(s : String, len : Int, round : Bool) : String {
     s = (s).or('');

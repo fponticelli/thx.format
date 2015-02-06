@@ -11,7 +11,7 @@ class DateFormat {
 Custom date format.
 */
   public static function customFormat(d : Date, pattern : String, ?culture : Culture) : String {
-    culture = (culture).or(Culture.invariant);
+    culture = (culture).or(Format.defaultCulture);
     var escape = false,
         buf = [];
     while(pattern.length > 0) {
@@ -326,7 +326,7 @@ Format for year and month.
 // PRIVATE
 
   static function dateTime(?culture : Culture)
-    return null != culture && null != culture.dateTime ? culture.dateTime : Culture.invariant.dateTime;
+    return null != culture && null != culture.dateTime ? culture.dateTime : Format.defaultCulture.dateTime;
 
   static var PATTERN = ~/(d|M|y){1,4}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
 }

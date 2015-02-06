@@ -3,8 +3,19 @@ package thx.format;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.TypeTools;
+import thx.culture.Culture;
 
 class Format {
+  @:isVar public static var defaultCulture(get, set) : Culture;
+
+  static function get_defaultCulture()
+    return null != defaultCulture ? defaultCulture : Culture.invariant;
+
+  static function set_defaultCulture(culture : Culture) {
+    defaultCulture = culture;
+    return get_defaultCulture();
+  }
+
 /**
 Applies the right format according to the type of subject.
 
