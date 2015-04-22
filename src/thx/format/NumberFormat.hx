@@ -3,11 +3,11 @@ package thx.format;
 import thx.culture.Culture;
 import thx.culture.NumberFormatInfo;
 import thx.culture.Pattern;
-using thx.core.Arrays;
-using thx.core.Floats;
-using thx.core.Nulls;
-using thx.core.Ints;
-using thx.core.Strings;
+using thx.Arrays;
+using thx.Floats;
+using thx.Nulls;
+using thx.Ints;
+using thx.Strings;
 using StringTools;
 
 class NumberFormat {

@@ -3,7 +3,7 @@ package thx.format;
 import haxe.Utf8;
 import thx.culture.Culture;
 import thx.culture.DateFormatInfo;
-using thx.core.Nulls;
+using thx.Nulls;
 using StringTools;
 
 class DateFormat {
