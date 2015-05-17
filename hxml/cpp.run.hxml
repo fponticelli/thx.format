@@ -3,8 +3,9 @@
 -lib utest
 -lib thx.core
 -lib thx.culture
--neko bin/neko.n
+-lib hxcpp
+-cpp bin/cpp
 -main TestAll
 -D thx-format
 
--cmd neko bin/neko.n
+-cmd ./bin/cpp/TestAll

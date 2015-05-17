@@ -7,6 +7,5 @@
 -java bin/java
 -main TestAll
 -D thx-format
--debug
 
--cmd java -jar bin/java/TestAll-debug.jar
+-cmd java -jar bin/java/TestAll.jar

@@ -3,8 +3,9 @@
 -lib utest
 -lib thx.core
 -lib thx.culture
--neko bin/neko.n
+-js bin/js.js
 -main TestAll
 -D thx-format
 
--cmd neko bin/neko.n
+-cmd node bin/js.js
+-cmd phantomjs bin/js.js
