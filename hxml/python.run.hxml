@@ -6,6 +6,5 @@
 -python bin/python.py
 -main TestAll
 -D thx-format
--debug
 
 -cmd python3 bin/python.py
