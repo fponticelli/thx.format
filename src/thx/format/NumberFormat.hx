@@ -5,6 +5,7 @@ import thx.culture.NumberFormatInfo;
 import thx.culture.Pattern;
 using thx.Arrays;
 using thx.Floats;
+using thx.Functions;
 using thx.Nulls;
 using thx.Ints;
 using thx.Strings;
@@ -607,7 +608,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     }
 
     buf.reverse();
-    var r = buf.pluck(switch _ {
+    var r = buf.map.fn(switch _ {
       case Literal(s): s;
       case Hash(first): p.length == 0 ? "" : first ? p.join("") : p.pop();
       case Zero(first): first ? p.join("") : p.pop();
