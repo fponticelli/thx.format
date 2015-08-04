@@ -222,6 +222,10 @@ strftime | description                                                        | 
 
 *customs for missing features
 */
+/*
+%z	The time zone offset. Not implemented as described on Windows. See below for more information.	Example: -0500 for US Eastern Time
+%Z	The time zone abbreviation. Not implemented as described on Windows. See below for more information.	Example: EST for Eastern Time
+*/
   public static function strftime(d : DateTime, pattern : String, ?culture : Culture) : String
     return switch pattern {
       case "%d":    formatTerm(d, "dd", culture);
