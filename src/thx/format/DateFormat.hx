@@ -1,6 +1,7 @@
 package thx.format;
 
 import haxe.Utf8;
+import thx.DateTime;
 import thx.culture.Culture;
 import thx.culture.DateFormatInfo;
 using thx.Nulls;
@@ -10,7 +11,7 @@ class DateFormat {
 /**
 Custom date format.
 */
-  public static function customFormat(d : Date, pattern : String, ?culture : Culture) : String {
+  public static function customFormat(d : DateTime, pattern : String, ?culture : Culture) : String {
     culture = (culture).or(Format.defaultCulture);
     var escape = false,
         buf = [];
@@ -64,7 +65,7 @@ pattern   | description
 
 See `formatTerm` for all the possible formatting options to use for custom patterns.
 */
-  public static function format(d : Date, pattern : String, ?culture : Culture) : String
+  public static function format(d : DateTime, pattern : String, ?culture : Culture) : String
     return switch pattern {
       case "d": dateShort(d, culture);
       case "D": dateLong(d, culture);
@@ -133,40 +134,40 @@ yyyy     | Four digits year.                                                    
 %?       | Delegates to `strftime`                                              | %d
 
 */
-  public static function formatTerm(d : Date, pattern : String, ?culture : Culture) : String
+  public static function formatTerm(d : DateTime, pattern : String, ?culture : Culture) : String
     return switch pattern {
-      case "d":     '${d.getDate()}';
-      case "dd":    '${d.getDate()}'.lpad('0', 2);
+      case "d":     '${d.day}';
+      case "dd":    '${d.day}'.lpad('0', 2);
       case "ddd":   var dt = dateTime(culture);
-                    dt.nameDaysAbbreviated[d.getDay()];
+                    dt.nameDaysAbbreviated[d.dayOfWeek];
       case "dddd":  var dt = dateTime(culture);
-                    dt.nameDays[d.getDay()];
-      case "h":     switch d.getHours() {
+                    dt.nameDays[d.dayOfWeek];
+      case "h":     switch d.hour {
                       case 0:             "12";
                       case d if(d <= 12): '$d';
                       case d:             '${d - 12}';
                     };
       case "hh":    formatTerm(d, 'h', culture).lpad('0', 2);
-      case "H":     '${d.getHours()}';
-      case "HH":    '${d.getHours()}'.lpad('0', 2);
-      case "m":     '${d.getMinutes()}';
-      case "mm":    '${d.getMinutes()}'.lpad('0', 2);
-      case "M":     '${d.getMonth()+1}';
-      case "MM":    '${d.getMonth()+1}'.lpad('0', 2);
+      case "H":     '${d.hour}';
+      case "HH":    '${d.hour}'.lpad('0', 2);
+      case "m":     '${d.minute}';
+      case "mm":    '${d.minute}'.lpad('0', 2);
+      case "M":     '${d.month}';
+      case "MM":    '${d.month}'.lpad('0', 2);
       case "MMM":   var dt = dateTime(culture);
-                    dt.nameMonthsAbbreviated[d.getMonth()];
+                    dt.nameMonthsAbbreviated[d.month-1];
       case "MMMM":  var dt = dateTime(culture);
-                    dt.nameMonths[d.getMonth()];
-      case "s":     '${d.getSeconds()}';
-      case "ss":    '${d.getSeconds()}'.lpad('0', 2);
+                    dt.nameMonths[d.month-1];
+      case "s":     '${d.second}';
+      case "ss":    '${d.second}'.lpad('0', 2);
       case "t":     var dt = dateTime(culture);
-                    Utf8.sub(d.getHours() < 12 ? dt.designatorAm : dt.designatorPm, 0, 1);
+                    Utf8.sub(d.hour < 12 ? dt.designatorAm : dt.designatorPm, 0, 1);
       case "tt":    var dt = dateTime(culture);
-                    d.getHours() < 12 ? dt.designatorAm : dt.designatorPm;
-      case "y":     '${d.getFullYear()%100}';
-      case "yy":    '${d.getFullYear()%100}'.lpad('0', 2);
-      case "yyy":   '${d.getFullYear()}'.lpad('0', 3);
-      case "yyyy":  '${d.getFullYear()}'.lpad('0', 4);
+                    d.hour < 12 ? dt.designatorAm : dt.designatorPm;
+      case "y":     '${d.year%100}';
+      case "yy":    '${d.year%100}'.lpad('0', 2);
+      case "yyy":   '${d.year}'.lpad('0', 3);
+      case "yyyy":  '${d.year}'.lpad('0', 4);
       case ":":     dateTime(culture).separatorTime;
       case "/":     dateTime(culture).separatorDate;
       case q if(q.substring(0, 1) == "%"):
@@ -221,7 +222,7 @@ strftime | description                                                        | 
 
 *customs for missing features
 */
-  public static function strftime(d : Date, pattern : String, ?culture : Culture) : String
+  public static function strftime(d : DateTime, pattern : String, ?culture : Culture) : String
     return switch pattern {
       case "%d":    formatTerm(d, "dd", culture);
       case "%a":    formatTerm(d, "ddd", culture);
@@ -237,28 +238,28 @@ strftime | description                                                        | 
       case "%p":    formatTerm(d, "tt", culture);
       case "%y":    formatTerm(d, "y", culture);
       case "%c":    dateTimeFull(d, culture);
-      case "%C":    '${Math.floor(d.getFullYear()/100)}';
-      case "%e":    '${d.getDate()}'.lpad(' ', 2);
+    case "%C":    '${Math.floor(d.year/100)}';
+  case "%e":    '${d.day}'.lpad(' ', 2);
       case "%D":    format(d, "%m/%d/%y", culture);
-      case "%f":    '${d.getMonth()+1}'.lpad(' ', 2);
-      case "%i":    '${d.getMinutes()}'.lpad(' ', 2);
-      case "%k":    '${d.getHours()}'.lpad(' ', 2);
+      case "%f":    '${d.month}'.lpad(' ', 2);
+      case "%i":    '${d.minute}'.lpad(' ', 2);
+      case "%k":    '${d.hour}'.lpad(' ', 2);
       case "%l":    formatTerm(d, 'h', culture).lpad(' ', 2);
       case "%n":    "\n";
       case "%P":    var dt = dateTime(culture);
-                    (d.getHours() < 12 ? dt.designatorAm : dt.designatorPm).toLowerCase();
-      case "%q":    '${d.getSeconds()}'.lpad(' ', 2);
+                    (d.hour < 12 ? dt.designatorAm : dt.designatorPm).toLowerCase();
+      case "%q":    '${d.second}'.lpad(' ', 2);
       case "%r":    format(d, "%I:%M:%S %p", culture);
       case "%R":    format(d, "%H:%M", culture);
-      case "%s":    '${Std.int(d.getTime()/1000)}';
+      case "%s":    '${Std.int(d.utc.toTime()/1000)}';
       case "%t":    "\t";
       case "%T":    format(d, "%H:%M:%S", culture);
-      case "%u":    var day = d.getDay();
+      case "%u":    var day = d.dayOfWeek;
                     day == 0 ? '7' : '$day';
-      case "%Y":    '${d.getFullYear()}';
+      case "%Y":    '${d.year}';
       case "%x":    dateLong(d, culture);
       case "%X":    timeLong(d, culture);
-      case "%w":    '${d.getDay()}';
+      case "%w":    '${d.dayOfWeek}';
       case "%%":    "%";
       case rest:    rest;
     };
@@ -266,61 +267,61 @@ strftime | description                                                        | 
 /**
 Long Date/Time format.
 */
-  public static function dateLong(d : Date, ?culture : Culture)
+  public static function dateLong(d : DateTime, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternDateLong, culture);
 
 /**
 Short Date/Time format.
 */
-  public static function dateShort(d : Date, ?culture : Culture)
+  public static function dateShort(d : DateTime, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternDateShort, culture);
 
 /**
 Full Date/Time format.
 */
-  public static function dateTimeFull(d : Date, ?culture : Culture)
+  public static function dateTimeFull(d : DateTime, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternDateTimeFull, culture);
 
 /**
 Sortable Date/Time format.
 */
-  public static function dateTimeSortable(d : Date, ?culture : Culture)
+  public static function dateTimeSortable(d : DateTime, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternDateTimeSortable, culture);
 
 /**
 Month/Day format.
 */
-  public static function monthDay(d : Date, ?culture : Culture)
+  public static function monthDay(d : DateTime, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternMonthDay, culture);
 
 /**
 Rfc1123 date/time format.
 */
-  public static function rfc1123(d : Date, ?culture : Culture)
+  public static function rfc1123(d : DateTime, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternRfc1123, culture);
 
 /**
 Long time format.
 */
-  public static function timeLong(d : Date, ?culture : Culture)
+  public static function timeLong(d : DateTime, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternTimeLong, culture);
 
 /**
 Sort time format.
 */
-  public static function timeShort(d : Date, ?culture : Culture)
+  public static function timeShort(d : DateTime, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternTimeShort, culture);
 
 /**
 Format a date in way that it can be correctly ordered alphabetically.
 */
-  public static function universalSortable(d : Date, ?culture : Culture)
+  public static function universalSortable(d : DateTime, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternUniversalSortable, culture);
 
 /**
 Format for year and month.
 */
-  public static function yearMonth(d : Date, ?culture : Culture)
+  public static function yearMonth(d : DateTime, ?culture : Culture)
     return customFormat(d, dateTime(culture).patternYearMonth, culture);
 
 // PRIVATE
