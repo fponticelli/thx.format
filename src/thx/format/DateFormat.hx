@@ -13,15 +13,16 @@ Custom date format.
 */
   public static function customFormat(d : DateTime, pattern : String, ?culture : Culture) : String {
     culture = (culture).or(Format.defaultCulture);
-    var escape = false,
+    var ereg = getPattern(),
+        escape = false,
         buf = [];
     while(pattern.length > 0) {
       if(escape) {
         escape = false;
         buf.push(pattern.substring(0, 1));
         pattern = pattern.substring(1);
-      } else if(PATTERN.match(pattern)) {
-        var left = PATTERN.matchedLeft();
+      } else if(ereg.match(pattern)) {
+        var left = ereg.matchedLeft();
         if(left.substring(-1) == "\\") {
           escape = true;
           pattern = pattern.substring(left.length);
@@ -29,8 +30,8 @@ Custom date format.
           continue;
         }
         buf.push(left);
-        buf.push(formatTerm(d, PATTERN.matched(0), culture));
-        pattern = PATTERN.matchedRight();
+        buf.push(formatTerm(d, ereg.matched(0), culture));
+        pattern = ereg.matchedRight();
       } else {
         buf.push(pattern);
         pattern = '';
@@ -242,8 +243,8 @@ strftime | description                                                        | 
       case "%p":    formatTerm(d, "tt", culture);
       case "%y":    formatTerm(d, "y", culture);
       case "%c":    dateTimeFull(d, culture);
-    case "%C":    '${Math.floor(d.year/100)}';
-  case "%e":    '${d.day}'.lpad(' ', 2);
+      case "%C":    '${Math.floor(d.year/100)}';
+      case "%e":    '${d.day}'.lpad(' ', 2);
       case "%D":    format(d, "%m/%d/%y", culture);
       case "%f":    '${d.month}'.lpad(' ', 2);
       case "%i":    '${d.minute}'.lpad(' ', 2);
@@ -329,9 +330,8 @@ Format for year and month.
     return customFormat(d, dateTime(culture).patternYearMonth, culture);
 
 // PRIVATE
-
   static function dateTime(?culture : Culture)
     return null != culture && null != culture.dateTime ? culture.dateTime : Format.defaultCulture.dateTime;
 
-  static var PATTERN = ~/(d|M|y){1,4}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
+  static inline function getPattern() return ~/(d|M|y){1,4}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
 }
