@@ -6,6 +6,7 @@ class TestAll {
     runner.addCase(new thx.format.TestDateFormat());
     runner.addCase(new thx.format.TestFormat());
     runner.addCase(new thx.format.TestNumberFormat());
+    runner.addCase(new thx.format.TestTimeFormat());
   }
 
   public static function main() {
