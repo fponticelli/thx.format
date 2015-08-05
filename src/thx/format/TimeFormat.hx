@@ -1,7 +1,6 @@
 package thx.format;
 
 import haxe.Utf8; // remove?
-import thx.DateTime; // remove?
 import thx.Time;
 import thx.culture.Culture;
 import thx.culture.DateFormatInfo;
@@ -46,12 +45,16 @@ class TimeFormat {
     return buf.join('');
   }
 
-//O, o    |
 /**
-Formats the date using a one letter formatting option or using a custom pattern.
+Formats the time using a one letter formatting option or using a custom pattern.
 
 pattern   | description
 --------- | ------------------------------------
+`c`       | constant format (not culture specific)
+`g`       | short time pattern
+`G`       | long time pattern
+
+
 `d`       | short date pattern
 `D`       | long date pattern
 `f`       | long date + short time pattern
@@ -109,6 +112,24 @@ public static function format(t : Time, pattern : String, ?culture : Culture) : 
 
   format   | description                                                          | example
   :------- | -------------------------------------------------------------------- | ------------:
+  d        | The number of days.                                                  | 7
+  dd-dddddddd
+           | The number of days padded left with zeroes up to 8.                  | 7
+  h        | The number of whole hours in the time interval that are not counted
+             as part of days.                                                     | 11
+  hh       | The number of whole hours in the time interval that are not counted
+             as part of days. Single-digit hours have a leading zero.             | 07
+  s        | Seconds (0 to 59).                                                   | 7
+  ss       | The number of whole seconds in the time interval that are not
+             included as part of hours, days, or minutes. Single-digit seconds
+             have a leading zero.                                                 | 7
+  f-fffffff |
+  F-FFFFFFF |
+
+  ??? H-HHHHHHHH
+
+
+
   ddd      | The abbreviated weekday name according to the current locale.        | Wed
   dddd     | The full weekday name according to the current locale.               | Wednesday
   MMM      | The abbreviated month name according to the current locale.          | Jan
