@@ -4,6 +4,7 @@ import haxe.Utf8; // remove?
 import thx.Time;
 import thx.culture.Culture;
 import thx.culture.DateFormatInfo;
+using thx.Ints;
 using thx.Nulls;
 using thx.Strings;
 
@@ -51,49 +52,19 @@ Formats the time using a one letter formatting option or using a custom pattern.
 pattern   | description
 --------- | ------------------------------------
 `c`       | constant format (not culture specific)
-`g`       | short time pattern
-`G`       | long time pattern
-
-
-`d`       | short date pattern
-`D`       | long date pattern
-`f`       | long date + short time pattern
-`F`       | long date + long time pattern
-`g`       | short date + short time pattern
-`G`       | short date + long time pattern
-`M`, `m`  | month/day pattern
-`R`, `r`  | RFC1123 pattern
-`s`       | sortable date/time pattern
-`t`       | short time pattern
-`T`       | long time pattern
-`u`       | universal sortable date/time pattern
-`U`       | universal full date/time pattern
-`Y`, `y`  | year/month pattern
+`g` | `t` | short time pattern
+`G` | `T` | long time pattern
+          |   [-]d’:’hh’:’mm’:’ss.fffffff
 ...       | custom pattern. It splits the pattern into pattern terms and apply them individually
 
 See `formatTerm` for all the possible formatting options to use for custom patterns.
 */
 public static function format(t : Time, pattern : String, ?culture : Culture) : String
   return switch pattern {
-    //case "d": dateShort(t, culture);
-    //case "D": dateLong(t, culture);
-    //case "f": dateLong(t, culture) + ' ' + timeShort(t, culture);
-    //case "F": dateLong(t, culture) + ' ' + timeLong(t, culture);
-    //case "g": dateShort(t, culture) + ' ' + timeShort(t, culture);
-    //case "G": dateShort(t, culture) + ' ' + timeLong(t, culture);
-    //case "M",
-    //     "m": monthDay(t, culture);
-    //case "R",
-    //     "r": rfc1123(t, culture);
-    //case "s": dateTimeSortable(t, culture);
-    case "t": timeShort(t, culture);
-    case "T": timeLong(t, culture);
-    //case "u": universalSortable(t, culture);
-    //case "U": dateTimeFull(t, culture);
-    //case "y",
-    //     "Y": yearMonth(t, culture);
-    case pattern:
-              customFormat(t, pattern, culture);
+    case "c": invariantTimeLong(t);
+    case "g", "t": timeShort(t, culture);
+    case "G", "T": timeLong(t, culture);
+    case pattern:  customFormat(t, pattern, culture);
   };
 
   // NOT SUPPORTED
@@ -315,14 +286,57 @@ strftime | description                                                        | 
 /**
 Long time format.
 */
-  public static function timeLong(t : Time, ?culture : Culture)
-    return customFormat(t, dateTime(culture).patternTimeLong, culture);
+  public static function timeLong(t : Time, ?culture : Culture) {
+    var dt = dateTime(culture),
+        n = (null == culture ? Format.defaultCulture : culture).number;
+    // TODO fffffffff
+    // [-][d’.’]hh’:’mm’:’ss[‘.’fffffff]
+    var days = t.days,
+        hours = t.hours,
+        minutes = t.minutes,
+        seconds = t.seconds,
+        buf = '';
+    if(t.isNegative)
+      buf += n.signNegative;
+    if(days != 0)
+      buf += days + n.separatorDecimalNumber;
+    buf += hours.lpad(2, '0');
+    buf += dt.separatorTime;
+    buf += minutes.lpad(2, '0');
+    buf += dt.separatorTime;
+    buf += seconds.lpad(2, '0');
+
+    return buf;
+  }
 
 /**
 Sort time format.
 */
-  public static function timeShort(t : Time, ?culture : Culture)
-    return customFormat(t, dateTime(culture).patternTimeShort, culture);
+  public static function timeShort(t : Time, ?culture : Culture) {
+    // TODO FFFFFFF
+    // [-][d’:’]h’:’mm’:’ss[.FFFFFFF]
+      var dt = dateTime(culture),
+          n = (null == culture ? Format.defaultCulture : culture).number;
+      var days = t.days,
+          hours = t.hours,
+          minutes = t.minutes,
+          seconds = t.seconds,
+          buf = '';
+      if(t.isNegative)
+        buf += n.signNegative;
+      if(days != 0)
+        buf += days + dt.separatorTime;
+      buf += hours.lpad(2, '0');
+      buf += dt.separatorTime;
+      buf += minutes.lpad(2, '0');
+      buf += dt.separatorTime;
+      buf += seconds.lpad(2, '0');
+
+    return buf;
+  }
+
+  public static function invariantTimeLong(t : Time)
+    return timeLong(t, Culture.invariant);
 
   static inline function getPattern() return ~/(d|M|y){1,4}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
 }
