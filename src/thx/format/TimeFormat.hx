@@ -12,7 +12,7 @@ import thx.format.DateFormat.dateTime;
 @:access(thx.format.DateFormat)
 class TimeFormat {
   /**
-  Custom date format.
+  Custom time format.
   */
   public static function customFormat(t : Time, pattern : String, ?culture : Culture) : String {
     culture = (culture).or(Format.defaultCulture);
@@ -98,14 +98,6 @@ public static function format(t : Time, pattern : String, ?culture : Culture) : 
 
   // NOT SUPPORTED
   // f, ff, fff, ffff, fffff, ffffff, fffffff, F, FF, FFF, FFFF, FFFFF, FFFFFF, FFFFFFF, g, gg, K, yyyyy, z, zz, zzz
-  //      | %z | The time-zone as hour offset from GMT. Required to emit RFC822-conformant dates (using "%a, %d %b %Y %H:%M:%S %z"). | -2
-  //      | %Z | The time zone or name or abbreviation.                             | GMT
-  //      | %G | The ISO 8601 year with century as a decimal number. The 4-digit year corresponding to the ISO week number (see %V). This has the same format and value as %y, except that if the ISO week number belongs to the previous or next year, that year is used instead. | 2004
-  //      | %g | Like %G, but without century, i.e., with a 2-digit year (00-99).   | 04
-  //      | %j | The day of the year as a decimal number (range 001 to 366).        | 008
-  //      | %U | The week number of the current year as a decimal number, range 00 to 53, starting with the first Sunday as the first day of week 01. See also %V and %W. | 26
-  //      | %V | The ISO 8601:1988 week number of the current year as a decimal number, range 01 to 53, where week 1 is the first week that has at least 4 days in the current year, and with Monday as the first day of the week. See also %U and %W. | 26
-  //      | %W | The week number of the current year as a decimal number, range 00 to 53, starting with the first Monday as the first day of week 01. |
   /**
   Returns a formatted date according to the passed term and culture. The pattern
   parameter accepts the following modifiers in either Microsoft format or strftime format.
@@ -210,6 +202,32 @@ Format a date using a `strftime` term.
 
 strftime | description                                                        | example
 :------: | -------------------------------------------------------------------| ------------:
+%H       | The hour as a decimal number using a 24-hour clock (range 00 to 23). | 22
+%i       | The minute. Single-digit minutes may be prefixed by leadingspace.* | " 8"
+%k       | The hour (24-hour clock) as a decimal number (range 0 to 23); single-digits are optionally prefixed by leadingspace. (See also %H). | 7
+%M       | The minute as a decimal number (range 00 to 59).                   | 08
+%n       | A newline character.                                               |
+%q       | The second. Single-digit seconds may be prefixed by leadingspace.* | " 9"
+%R       | The time in 24-hour notation (%H:%M). For a version including the seconds, see %T below. | 07:08
+%S       | The second as a decimal number (range 00 to 61). the upper level of the range 61 rather than 59 to allow for the occasional leap second and even more occasional double leap second. | 07
+%t       | A tab character.                                                   |
+%T       | The time in 24-hour notation (%H:%M:%S).                           | 17:08:09
+%%       | A literal '%' character.                                           | %
+
+
+
+%M - Minute of the hour (00..59)
+
+%S - Second of the minute (00..60)
+
+%L - Millisecond of the second (000..999)
+%N - Fractional seconds digits, default is 9 digits (nanosecond)
+        %3N  millisecond (3 digits)
+        %6N  microsecond (6 digits)
+        %9N  nanosecond (9 digits)
+        %12N picosecond (12 digits)
+
+
 %a       | The abbreviated weekday name according to the current locale.      | Wed
 %A       | The full weekday name according to the current locale.             | Wednesday
 %b       | The abbreviated month name according to the current locale.        | Jan
