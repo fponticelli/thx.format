@@ -8,7 +8,7 @@ using thx.format.TimeFormat;
 
 class TestTimeFormat {
   static var it = Embed.culture('it-it');
-  static var ch = Embed.culture('it-ch');
+  static var bn = Embed.culture('bn-in');
   static var us = Embed.culture('en-us');
   static var ru = Embed.culture('ru-ru');
   static var fr = Embed.culture('fr-fr');
@@ -16,6 +16,21 @@ class TestTimeFormat {
   static var t1 : Time = '13:45:30';
   static var t2 : Time = '18:40:20';
   public function new() {}
+
+  public function testFormat_c() {
+    Assert.equals("00:30:00", Time.createDays(0, 0, 30, 0).format("c"));
+    Assert.equals("3.17:25:30.5000000", Time.createDays(3, 17, 25, 30, 500).format("c", it)); // culture should be irrelevant
+  }
+
+  public function testFormat_g() {
+    Assert.equals("00:30:00", Time.createDays(0, 0, 30, 0).format("g", it));
+    Assert.equals("3.17.25.30,5", Time.createDays(3, 17, 25, 30, 500).format("g", bn));
+  }
+
+  public function testFormat_G() {
+    Assert.equals("00:30:00", Time.createDays(0, 0, 30, 0).format("G", it));
+    Assert.equals("3.17.25.30,5000000", Time.createDays(3, 17, 25, 30, 500).format("G", bn));
+  }
 /*
   public function testFormatU() {
     Assert.equals("Monday, 01 June 2009 13:45:30",   t1.format('U'));
