@@ -132,8 +132,8 @@ Long time format.
 */
   public static function timeLong(time : Time, ?culture : Culture) {
     var dt = dateTime(culture),
-        n = (null == culture ? Format.defaultCulture : culture).number;
-    var days = time.days,
+        n = (null == culture ? Format.defaultCulture : culture).number,
+        days = time.days,
         hours = time.hours,
         minutes = time.minutes,
         seconds = time.seconds,
@@ -158,8 +158,8 @@ Short time format.
 */
   public static function timeShort(time : Time, ?culture : Culture) {
     var dt = dateTime(culture),
-        n = (null == culture ? Format.defaultCulture : culture).number;
-    var days = time.days,
+        n = (null == culture ? Format.defaultCulture : culture).number,
+        days = time.days,
         hours = time.hours,
         minutes = time.minutes,
         seconds = time.seconds,
