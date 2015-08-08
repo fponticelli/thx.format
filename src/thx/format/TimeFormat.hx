@@ -12,9 +12,9 @@ import thx.format.DateFormat.dateTime;
 
 @:access(thx.format.DateFormat)
 class TimeFormat {
-  /**
-  Custom time format.
-  */
+/**
+Custom time format.
+*/
   public static function customFormat(t : Time, pattern : String, ?culture : Culture) : String {
     culture = (culture).or(Format.defaultCulture);
     var ereg = getPattern(),
@@ -159,8 +159,6 @@ public static function format(t : Time, pattern : String, ?culture : Culture) : 
       //case "yyyy":  '${t.year}'.lpad('0', 4);
       case ":":     dateTime(culture).separatorTime;
       //case "/":     dateTime(culture).separatorDate;
-      case q if(q.substring(0, 1) == "%"):
-                    strftime(t, pattern, culture);
       case q if(q != null && q.length > 1 &&
         (q.substring(0, 1) == "'" && q.substring(q.length - 1) == "'") ||
         (q.substring(0, 1) == '"' && q.substring(q.length - 1) == '"')):
@@ -225,5 +223,5 @@ Short time format.
   public static function invariantTimeLong(t : Time)
     return timeLong(t, Culture.invariant);
 
-  static inline function getPattern() return ~/(d|M|y){1,4}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
+  static inline function getPattern() return ~/(d|M|y){1,4}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"/;
 }
