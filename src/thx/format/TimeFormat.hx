@@ -54,14 +54,13 @@ pattern   | description
 `c`       | constant format (not culture specific)
 `g` | `t` | short time pattern
 `G` | `T` | long time pattern
-          |   [-]d’:’hh’:’mm’:’ss.fffffff
 ...       | custom pattern. It splits the pattern into pattern terms and apply them individually
 
 See `formatTerm` for all the possible formatting options to use for custom patterns.
 */
 public static function format(t : Time, pattern : String, ?culture : Culture) : String
   return switch pattern {
-    case "c": invariantTimeLong(t);
+    case "c":      invariantTimeLong(t);
     case "g", "t": timeShort(t, culture);
     case "G", "T": timeLong(t, culture);
     case pattern:  customFormat(t, pattern, culture);
@@ -91,36 +90,9 @@ public static function format(t : Time, pattern : String, ?culture : Culture) : 
 
   ??? H-HHHHHHHH
 
-
-
-  ddd      | The abbreviated weekday name according to the current locale.        | Wed
-  dddd     | The full weekday name according to the current locale.               | Wednesday
-  MMM      | The abbreviated month name according to the current locale.          | Jan
-  MMMM     | The full month name according to the current locale.                 | January
-  dd       | The day of the month as a decimal number (range 01 to 31).           | 07
-  MMM      | Equivalent to %b.                                                    | Jan
-  HH       | The hour as a decimal number using a 24-hour clock (range 00 to 23). | 22
-  hh       | The hour as a decimal number using a 12-hour clock (range 01 to 12). | 07
-  MM       | The month as a decimal number (range 01 to 12).                      | 04
-  mm       | The minute as a decimal number (range 00 to 59).                     | 08
-  tt       | Either 'AM' or 'PM' according to the given time value, or the corresponding strings for the current locale. Noon is treated as 'pm' and midnight as 'am'. | AM
-  ss       | The second as a decimal number (range 00 to 61). the upper level of the range 61 rather than 59 to allow for the occasional leap second and even more occasional double leap second. | 07
-  y        | The year as a decimal number without a century (range 00 to 99).     | 04
-  d        | The day of the month (1 to 31).                                      | 7
-  h        | The hour on a 12-hour clock (1 to 12).                               | 11
-  H        | Same as `h` but `0` padded (01 to 12).                               | 07
-  m        | Minute (0 to 59).                                                    | 7
-  M        | Same as `m` but `0` padded (00 to 59).                               | 07
-  s        | Seconds (0 to 59).                                                   | 7
-  t        | Same as `s` but `0` padded (00 to 59).                               | 07
-  yy       | Year from 00 to 99.                                                  | 99
-  yyy      | Year with at least 3 digits.                                         | 1999
-  yyyy     | Four digits year.                                                    | 1999
   :        | Time separator.                                                      | %
-  /        | Date separator.                                                      | /
   '...'    | Single quoted text is not processed (except for removing the quotes) | ...
   "..."    | Double quoted text is not processed (except for removing the quotes) | ...
-  %?       | Delegates to `strftime`                                              | %d
 
   */
   public static function formatTerm(t : Time, pattern : String, ?culture : Culture) : String
@@ -141,24 +113,13 @@ public static function format(t : Time, pattern : String, ?culture : Culture) : 
       case "HH":    '${t.hours}'.lpad('0', 2);
       case "m":     '${t.minutes}';
       case "mm":    '${t.minutes}'.lpad('0', 2);
-      //case "M":     '${t.month}';
-      //case "MM":    '${t.month}'.lpad('0', 2);
-      //case "MMM":   var dt = dateTime(culture);
-      //              dt.nameMonthsAbbreviated[t.month-1];
-      //case "MMMM":  var dt = dateTime(culture);
-      //              dt.nameMonths[t.month-1];
       case "s":     '${t.seconds}';
       case "ss":    '${t.seconds}'.lpad('0', 2);
       case "t":     var dt = dateTime(culture);
                     Utf8.sub(t.hours < 12 ? dt.designatorAm : dt.designatorPm, 0, 1);
       case "tt":    var dt = dateTime(culture);
                     t.hours < 12 ? dt.designatorAm : dt.designatorPm;
-      //case "y":     '${t.year%100}';
-      //case "yy":    '${t.year%100}'.lpad('0', 2);
-      //case "yyy":   '${t.year}'.lpad('0', 3);
-      //case "yyyy":  '${t.year}'.lpad('0', 4);
       case ":":     dateTime(culture).separatorTime;
-      //case "/":     dateTime(culture).separatorDate;
       case q if(q != null && q.length > 1 &&
         (q.substring(0, 1) == "'" && q.substring(q.length - 1) == "'") ||
         (q.substring(0, 1) == '"' && q.substring(q.length - 1) == '"')):
@@ -223,5 +184,5 @@ Short time format.
   public static function invariantTimeLong(t : Time)
     return timeLong(t, Culture.invariant);
 
-  static inline function getPattern() return ~/(d|M|y){1,4}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"/;
+  static inline function getPattern() return ~/(d){1,4}|(h|H|m|s|t){1,2}|[:]|'[^']*'|"[^"]*"/;
 }
