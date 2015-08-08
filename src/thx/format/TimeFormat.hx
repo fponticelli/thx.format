@@ -169,128 +169,11 @@ public static function format(t : Time, pattern : String, ?culture : Culture) : 
     };
 
 /**
-Format a date using a `strftime` term.
-
-strftime | description                                                        | example
-:------: | -------------------------------------------------------------------| ------------:
-%H       | The hour as a decimal number using a 24-hour clock (range 00 to 23). | 22
-%i       | The minute. Single-digit minutes may be prefixed by leadingspace.* | " 8"
-%k       | The hour (24-hour clock) as a decimal number (range 0 to 23); single-digits are optionally prefixed by leadingspace. (See also %H). | 7
-%M       | The minute as a decimal number (range 00 to 59).                   | 08
-%n       | A newline character.                                               |
-%q       | The second. Single-digit seconds may be prefixed by leadingspace.* | " 9"
-%R       | The time in 24-hour notation (%H:%M). For a version including the seconds, see %T below. | 07:08
-%S       | The second as a decimal number (range 00 to 61). the upper level of the range 61 rather than 59 to allow for the occasional leap second and even more occasional double leap second. | 07
-%t       | A tab character.                                                   |
-%T       | The time in 24-hour notation (%H:%M:%S).                           | 17:08:09
-%%       | A literal '%' character.                                           | %
-
-
-
-%M - Minute of the hour (00..59)
-
-%S - Second of the minute (00..60)
-
-%L - Millisecond of the second (000..999)
-%N - Fractional seconds digits, default is 9 digits (nanosecond)
-        %3N  millisecond (3 digits)
-        %6N  microsecond (6 digits)
-        %9N  nanosecond (9 digits)
-        %12N picosecond (12 digits)
-
-
-%a       | The abbreviated weekday name according to the current locale.      | Wed
-%A       | The full weekday name according to the current locale.             | Wednesday
-%b       | The abbreviated month name according to the current locale.        | Jan
-%B       | The full month name according to the current locale.               | January
-%c       | The preferred date and time representation for the current locale. |
-%C       | The century number (year/100) as a 2-digit integer.                | 19
-%d       | The day of the month as a decimal number (range 01 to 31).         | 07
-%D       | Equivalent to %m/%d/%y. (This is the USA date format. In many countries %d/%m/%y is the standard date format. Thus, in an international context, both of these formats are ambiguous and should be avoided). | 06/25/04
-%e       | Like %d, the day of the month as a decimal number, but a leading zero may be replaced by a leadingspace. | " 7"
-%f       | The month. Single-digit months may be prefixed by leadingspace.*   | " 6"
-%h       | Equivalent to %b.                                                  | Jan
-%H       | The hour as a decimal number using a 24-hour clock (range 00 to 23). | 22
-%i       | The minute. Single-digit minutes may be prefixed by leadingspace.* | " 8"
-%I       | The hour as a decimal number using a 12-hour clock (range 01 to 12).| 07
-%k       | The hour (24-hour clock) as a decimal number (range 0 to 23); single-digits are optionally prefixed by leadingspace. (See also %H). | 7
-%l       | The hour (12-hour clock) as a decimal number (range 1 to 12); single-digits are optionally prefixed by leadingspace. (See also %I). | 7
-%m       | The month as a decimal number (range 01 to 12).                    | 04
-%M       | The minute as a decimal number (range 00 to 59).                   | 08
-%n       | A newline character.                                               |
-%p       | Either 'AM' or 'PM' according to the given time value, or the corresponding strings for the current locale. Noon is treated as 'pm' and midnight as 'am'. | AM
-%P       | Like %p but in lowercase: 'am' or 'pm' or a corresponding string for the current locale. | AM
-%q       | The second. Single-digit seconds may be prefixed by leadingspace.* | " 9"
-%r       | The time in a.m. or p.m. notation. In the POSIX locale this is equivalent to '%I:%M:%S %p'. | 07:08:09 am
-%R       | The time in 24-hour notation (%H:%M). For a version including the seconds, see %T below. | 07:08
-%s       | The number of seconds since the Epoch, i.e., since 1970-01-01 00:00:00 UTC. | 1099928130
-%S       | The second as a decimal number (range 00 to 61). the upper level of the range 61 rather than 59 to allow for the occasional leap second and even more occasional double leap second. | 07
-%t       | A tab character.                                                   |
-%T       | The time in 24-hour notation (%H:%M:%S).                           | 17:08:09
-%u       | The day of the week as a decimal, range 1 to 7, Monday being 1. See also %w. |
-%w       | The day of the week as a decimal, range 0 to 6, Sunday being 0. See also %u. |
-%x       | The preferred date representation for the current locale without the time. |
-%X       | The preferred time representation for the current locale without the date. |
-%y       | The year as a decimal number without a century (range 00 to 99).   | 04
-%Y       | The year as a decimal number including the century.                | 2004
-%%       | A literal '%' character.                                           | %
-
-*customs for missing features
-*/
-/*
-%z	The time zone offset. Not implemented as described on Windows. See below for more information.	Example: -0500 for US Eastern Time
-%Z	The time zone abbreviation. Not implemented as described on Windows. See below for more information.	Example: EST for Eastern Time
-*/
-  public static function strftime(t : Time, pattern : String, ?culture : Culture) : String
-    return switch pattern {
-      case "%d":    formatTerm(t, "dd", culture);
-      case "%a":    formatTerm(t, "ddd", culture);
-      case "%A":    formatTerm(t, "dddd", culture);
-      case "%I":    formatTerm(t, "hh", culture);
-      case "%H":    formatTerm(t, "HH", culture);
-      case "%M":    formatTerm(t, "mm", culture);
-      case "%m":    formatTerm(t, "MM", culture);
-      case "%b",
-           "%h":    formatTerm(t, "MMM", culture);
-      case "%B":    formatTerm(t, "MMMM", culture);
-      case "%S":    formatTerm(t, "ss", culture);
-      case "%p":    formatTerm(t, "tt", culture);
-      case "%y":    formatTerm(t, "y", culture);
-      //case "%c":    dateTimeFull(t, culture);
-      //case "%C":    '${Math.floor(t.year/100)}';
-      case "%e":    '${t.days}'.lpad(' ', 2);
-      case "%D":    format(t, "%m/%d/%y", culture);
-      //case "%f":    '${t.month}'.lpad(' ', 2);
-      case "%i":    '${t.minutes}'.lpad(' ', 2);
-      case "%k":    '${t.hours}'.lpad(' ', 2);
-      case "%l":    formatTerm(t, 'h', culture).lpad(' ', 2);
-      case "%n":    "\n";
-      case "%P":    var dt = dateTime(culture);
-                    (t.hours < 12 ? dt.designatorAm : dt.designatorPm).toLowerCase();
-      case "%q":    '${t.seconds}'.lpad(' ', 2);
-      case "%r":    format(t, "%I:%M:%S %p", culture);
-      case "%R":    format(t, "%H:%M", culture);
-      //case "%s":    '${Std.int(t.utc.toTime()/1000)}';
-      case "%t":    "\t";
-      case "%T":    format(t, "%H:%M:%S", culture);
-      //case "%u":    var day = t.dayOfWeek;
-      //              day == 0 ? '7' : '$day';
-      //case "%Y":    '${t.year}';
-      //case "%x":    dateLong(t, culture);
-      case "%X":    timeLong(t, culture);
-      //case "%w":    '${t.dayOfWeek}';
-      case "%%":    "%";
-      case rest:    rest;
-    };
-
-/**
 Long time format.
 */
   public static function timeLong(time : Time, ?culture : Culture) {
     var dt = dateTime(culture),
         n = (null == culture ? Format.defaultCulture : culture).number;
-    // TODO fffffffff
-    // [-][d’.’]hh’:’mm’:’ss[‘.’fffffff]
     var days = time.days,
         hours = time.hours,
         minutes = time.minutes,
@@ -312,27 +195,25 @@ Long time format.
   }
 
 /**
-Sort time format.
+Short time format.
 */
   public static function timeShort(time : Time, ?culture : Culture) {
-    // TODO FFFFFFF
-    // [-][d’:’]h’:’mm’:’ss[.FFFFFFF]
-      var dt = dateTime(culture),
-          n = (null == culture ? Format.defaultCulture : culture).number;
-      var days = time.days,
-          hours = time.hours,
-          minutes = time.minutes,
-          seconds = time.seconds,
-          buf = '';
-      if(time.isNegative)
-        buf += n.signNegative;
-      if(days != 0)
-        buf += days + dt.separatorTime;
-      buf += hours.lpad(2, '0');
-      buf += dt.separatorTime;
-      buf += minutes.lpad(2, '0');
-      buf += dt.separatorTime;
-      buf += seconds.lpad(2, '0');
+    var dt = dateTime(culture),
+        n = (null == culture ? Format.defaultCulture : culture).number;
+    var days = time.days,
+        hours = time.hours,
+        minutes = time.minutes,
+        seconds = time.seconds,
+        buf = '';
+    if(time.isNegative)
+      buf += n.signNegative;
+    if(days != 0)
+      buf += days + dt.separatorTime;
+    buf += hours.lpad(2, '0');
+    buf += dt.separatorTime;
+    buf += minutes.lpad(2, '0');
+    buf += dt.separatorTime;
+    buf += seconds.lpad(2, '0');
     var t = time.ticksInSecond;
     if(t != 0) {
       buf += n.separatorDecimalNumber + t.lpad(7, '0');
