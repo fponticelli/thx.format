@@ -19,17 +19,17 @@ class TestTimeFormat {
 
   public function testFormat_c() {
     Assert.equals("00:30:00", Time.createDays(0, 0, 30, 0).format("c"));
-    Assert.equals("3.17:25:30.5000000", Time.createDays(3, 17, 25, 30, 500).format("c", it)); // culture should be irrelevant
+    Assert.equals("3.17:25:30.0050000", Time.createDays(3, 17, 25, 30, 5).format("c", it)); // culture should be irrelevant
   }
 
   public function testFormat_g() {
     Assert.equals("00:30:00", Time.createDays(0, 0, 30, 0).format("g", it));
-    Assert.equals("3.17.25.30,5", Time.createDays(3, 17, 25, 30, 500).format("g", bn));
+    Assert.equals("3.17.25.30.05", Time.createDays(3, 17, 25, 30, 50).format("g", bn));
   }
 
   public function testFormat_G() {
     Assert.equals("00:30:00", Time.createDays(0, 0, 30, 0).format("G", it));
-    Assert.equals("3.17.25.30,5000000", Time.createDays(3, 17, 25, 30, 500).format("G", bn));
+    Assert.equals("3.17.25.30.5000000", Time.createDays(3, 17, 25, 30, 500).format("G", bn));
   }
 /*
   public function testFormatU() {
