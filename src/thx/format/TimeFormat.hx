@@ -312,17 +312,17 @@ Long time format.
 /**
 Sort time format.
 */
-  public static function timeShort(t : Time, ?culture : Culture) {
+  public static function timeShort(time : Time, ?culture : Culture) {
     // TODO FFFFFFF
     // [-][d’:’]h’:’mm’:’ss[.FFFFFFF]
       var dt = dateTime(culture),
           n = (null == culture ? Format.defaultCulture : culture).number;
-      var days = t.days,
-          hours = t.hours,
-          minutes = t.minutes,
-          seconds = t.seconds,
+      var days = time.days,
+          hours = time.hours,
+          minutes = time.minutes,
+          seconds = time.seconds,
           buf = '';
-      if(t.isNegative)
+      if(time.isNegative)
         buf += n.signNegative;
       if(days != 0)
         buf += days + dt.separatorTime;
@@ -331,7 +331,11 @@ Sort time format.
       buf += minutes.lpad(2, '0');
       buf += dt.separatorTime;
       buf += seconds.lpad(2, '0');
-
+    var t = time.ticksInSecond;
+    if(t != 0) {
+      buf += n.separatorDecimalNumber + t.lpad(7, '0');
+      buf = buf.trimCharsRight('0');
+    }
     return buf;
   }
 
