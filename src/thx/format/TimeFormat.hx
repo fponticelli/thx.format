@@ -131,12 +131,13 @@ public static function format(t : Time, pattern : String, ?culture : Culture) : 
 Long time format.
 */
   public static function timeLong(time : Time, ?culture : Culture) {
-    var dt = dateTime(culture),
+    var abs = time.abs(),
+        dt = dateTime(culture),
         n = (null == culture ? Format.defaultCulture : culture).number,
-        days = time.days,
-        hours = time.hours,
-        minutes = time.minutes,
-        seconds = time.seconds,
+        days = abs.days,
+        hours = abs.hours,
+        minutes = abs.minutes,
+        seconds = abs.seconds,
         buf = '';
     if(time.isNegative)
       buf += n.signNegative;
@@ -147,7 +148,7 @@ Long time format.
     buf += minutes.lpad(2, '0');
     buf += dt.separatorTime;
     buf += seconds.lpad(2, '0');
-    var t = time.ticksInSecond;
+    var t = abs.ticksInSecond;
     if(t != 0)
       buf += n.separatorDecimalNumber + t.lpad(7, '0');
     return buf;
@@ -157,12 +158,13 @@ Long time format.
 Short time format.
 */
   public static function timeShort(time : Time, ?culture : Culture) {
-    var dt = dateTime(culture),
+    var abs = time.abs(),
+        dt = dateTime(culture),
         n = (null == culture ? Format.defaultCulture : culture).number,
-        days = time.days,
-        hours = time.hours,
-        minutes = time.minutes,
-        seconds = time.seconds,
+        days = abs.days,
+        hours = abs.hours,
+        minutes = abs.minutes,
+        seconds = abs.seconds,
         buf = '';
     if(time.isNegative)
       buf += n.signNegative;
@@ -173,7 +175,7 @@ Short time format.
     buf += minutes.lpad(2, '0');
     buf += dt.separatorTime;
     buf += seconds.lpad(2, '0');
-    var t = time.ticksInSecond;
+    var t = abs.ticksInSecond;
     if(t != 0) {
       buf += n.separatorDecimalNumber + t.lpad(7, '0');
       buf = buf.trimCharsRight('0');
