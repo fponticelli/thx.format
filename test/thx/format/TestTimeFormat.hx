@@ -26,7 +26,7 @@ class TestTimeFormat {
     Assert.equals("-3.17.25.30.05", ("-3.17:25:30.05" : Time).format("g", bn));
   }
 
-  public function testFormat_G() {
+  public function testFormat_G_() {
     Assert.equals("00:30:00", ("00:30:00" : Time).format("G", it));
     Assert.equals("3.17.25.30.5000000", ("3.17:25:30.5000000" : Time).format("G", bn));
     Assert.equals("-3.17.25.30.5000000", ("-3.17:25:30.5000000" : Time).format("G", bn));

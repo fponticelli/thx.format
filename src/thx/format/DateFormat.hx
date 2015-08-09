@@ -194,11 +194,11 @@ zzz      | Time zone offset with hours and minutes                              
                       Utf8.sub(d.hour < 12 ? dt.designatorAm : dt.designatorPm, 0, 1);
       case "tt":      var dt = dateTime(culture);
                       d.hour < 12 ? dt.designatorAm : dt.designatorPm;
-      case "y":       '${d.year%100}';
-      case "yy":      '${d.year%100}'.lpad('0', 2);
-      case "yyy":     '${d.year}'.lpad('0', 3);
-      case "yyyy":    '${d.year}'.lpad('0', 4);
-      case "yyyyy":   '${d.year}'.lpad('0', 5);
+      case "y":       '${d.year % 100}';
+      case "yy":      (d.year % 100).lpad('0', 2);
+      case "yyy":     d.year.lpad('0', 3);
+      case "yyyy":    d.year.lpad('0', 4);
+      case "yyyyy":   d.year.lpad('0', 5);
       case "z":       TimeFormat.offsetHoursShort(d.offset, culture);
       case "zz":      TimeFormat.offsetHoursLong(d.offset, culture);
       case "zzz",
@@ -339,7 +339,7 @@ Month/Day format.
 Rfc1123 date/time format.
 */
   public static function rfc1123(d : DateTime, ?culture : Culture)
-    return customFormat(d, dateTime(culture).patternRfc1123, culture);
+    return customFormat(d.utc, dateTime(culture).patternRfc1123, culture);
 
 /**
 Long time format.
@@ -357,7 +357,7 @@ Sort time format.
 Format a date in way that it can be correctly ordered alphabetically.
 */
   public static function universalSortable(d : DateTime, ?culture : Culture)
-    return customFormat(d, dateTime(culture).patternUniversalSortable, culture);
+    return customFormat(d.utc, dateTime(culture).patternUniversalSortable, culture);
 
 /**
 Format a date in way that is compatible with the iso8601 specification.

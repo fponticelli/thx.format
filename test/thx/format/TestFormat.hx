@@ -12,14 +12,12 @@ class TestFormat {
   public function new() {}
 
   public function testF() {
-    var date = Date.fromString("2014-01-01");
-    var sDate:SDate = date;
+    var date = DateTime.fromString("2014-01-01");
     Assert.equals("Wednesday, 01 January 2014", date.f("D"));
-    Assert.equals("Wednesday, 01 January 2014", sDate.f("D"));
     Assert.equals("Wednesday, 01 January 2014", ("2014-01-01" : thx.DateTime).f("D"));
     Assert.equals("1,000.00", 1000.f("n"));
 
-    Assert.equals("mercoledì 1 gennaio 2014", Date.fromString("2014-01-01").f("D", it));
+    Assert.equals("mercoledì 1 gennaio 2014", DateTime.fromString("2014-01-01").f("D", it));
     Assert.equals("1.000,00", 1000.f("n", it));
   }
 }
