@@ -53,7 +53,6 @@ Custom date format.
     return buf.join('');
   }
 
-//O, o    |
 /**
 Formats the date using a one letter formatting option or using a custom pattern.
 
@@ -66,6 +65,7 @@ pattern   | description
 `g`       | short date + short time pattern
 `G`       | short date + long time pattern
 `M`, `m`  | month/day pattern
+`O`, `o`  | roundtrip format
 `R`, `r`  | RFC1123 pattern
 `s`       | sortable date/time pattern
 `t`       | short time pattern
@@ -87,6 +87,8 @@ See `formatTerm` for all the possible formatting options to use for custom patte
       case "G": dateShort(d, culture) + ' ' + timeLong(d, culture);
       case "M",
            "m": monthDay(d, culture);
+      case "O",
+           "o": iso8601(d, culture);
       case "R",
            "r": rfc1123(d, culture);
       case "s": dateTimeSortable(d, culture);
@@ -100,17 +102,9 @@ See `formatTerm` for all the possible formatting options to use for custom patte
                 customFormat(d, pattern, culture);
     };
 
-// NOT SUPPORTED
-// g, gg,
-// K, z, zz, zzz
-//      | %z | The time-zone as hour offset from GMT. Required to emit RFC822-conformant dates (using "%a, %d %b %Y %H:%M:%S %z"). | -2
-//      | %Z | The time zone or name or abbreviation.                             | GMT
-//      | %G | The ISO 8601 year with century as a decimal number. The 4-digit year corresponding to the ISO week number (see %V). This has the same format and value as %y, except that if the ISO week number belongs to the previous or next year, that year is used instead. | 2004
-//      | %g | Like %G, but without century, i.e., with a 2-digit year (00-99).   | 04
-//      | %j | The day of the year as a decimal number (range 001 to 366).        | 008
-//      | %U | The week number of the current year as a decimal number, range 00 to 53, starting with the first Sunday as the first day of week 01. See also %V and %W. | 26
-//      | %V | The ISO 8601:1988 week number of the current year as a decimal number, range 01 to 53, where week 1 is the first week that has at least 4 days in the current year, and with Monday as the first day of the week. See also %U and %W. | 26
-//      | %W | The week number of the current year as a decimal number, range 00 to 53, starting with the first Monday as the first day of week 01. |
+// NOT SUPPORTED YET
+// g, gg (period ERA, still not supported - requires calendar)
+// Z (TZ abbreviation - requires time zones)
 /**
 Returns a formatted date according to the passed term and culture. The pattern
 parameter accepts the following modifiers in either Microsoft format or strftime format.
@@ -125,6 +119,7 @@ dd       | The day of the month as a decimal number (range 01 to 31).           
 MMM      | Equivalent to %b.                                                    | Jan
 HH       | The hour as a decimal number using a 24-hour clock (range 00 to 23). | 22
 hh       | The hour as a decimal number using a 12-hour clock (range 01 to 12). | 07
+K        | Same as `zzz`                                                        |
 MM       | The month as a decimal number (range 01 to 12).                      | 04
 mm       | The minute as a decimal number (range 00 to 59).                     | 08
 tt       | Either 'AM' or 'PM' according to the given time value, or the corresponding strings for the current locale. Noon is treated as 'pm' and midnight as 'am'. | AM
@@ -145,13 +140,16 @@ f        | Outputs the tenth of a second.                                       
 fffffff  | Outputs up to the tenth of a microsecond. the tenth of a second.     |                                 |
 F        | Outputs the tenth of a second.                                       |
 FFFFFFF  |                                                                      |
+z        | Time zone offset with hours only and no padding                      | -6
+zz       | Time zone offset with hours only and padding                         | -06
+zzz      | Time zone offset with hours and minutes                              | -06:00
 :        | Time separator.                                                      | %
 /        | Date separator.                                                      | /
 '...'    | Single quoted text is not processed (except for removing the quotes) | ...
 "..."    | Double quoted text is not processed (except for removing the quotes) | ...
 %?       | Delegates to `strftime`                                              | %d
-
 */
+
   public static function formatTerm(d : DateTime, pattern : String, ?culture : Culture) : String
     return switch pattern {
       case "d":       '${d.day}';
@@ -201,6 +199,10 @@ FFFFFFF  |                                                                      
       case "yyy":     '${d.year}'.lpad('0', 3);
       case "yyyy":    '${d.year}'.lpad('0', 4);
       case "yyyyy":   '${d.year}'.lpad('0', 5);
+      case "z":       TimeFormat.offsetHoursShort(d.offset, culture);
+      case "zz":      TimeFormat.offsetHoursLong(d.offset, culture);
+      case "zzz",
+             "K":     TimeFormat.offsetLong(d.offset, culture);
       case ":":       dateTime(culture).separatorTime;
       case ".":       culture.number.separatorDecimalNumber;
       case "/":       dateTime(culture).separatorDate;
@@ -252,13 +254,13 @@ strftime | description                                                        | 
 %X       | The preferred time representation for the current locale without the date. |
 %y       | The year as a decimal number without a century (range 00 to 99).   | 04
 %Y       | The year as a decimal number including the century.                | 2004
+%z	     | The time zone offset.                                              |
 %%       | A literal '%' character.                                           | %
 
 *customs for missing features
 */
 /*
-%z	The time zone offset. Not implemented as described on Windows. See below for more information.	Example: -0500 for US Eastern Time
-%Z	The time zone abbreviation. Not implemented as described on Windows. See below for more information.	Example: EST for Eastern Time
+%Z  Replaced by the timezone name or abbreviation (requires time-zones)
 */
   public static function strftime(d : DateTime, pattern : String, ?culture : Culture) : String
     return switch pattern {
@@ -298,6 +300,7 @@ strftime | description                                                        | 
       case "%x":    dateLong(d, culture);
       case "%X":    timeLong(d, culture);
       case "%w":    '${d.dayOfWeek}';
+      case "%z":    TimeFormat.iso8601OffsetShort(d.offset);
       case "%%":    "%";
       case rest:    rest;
     };
@@ -357,6 +360,12 @@ Format a date in way that it can be correctly ordered alphabetically.
     return customFormat(d, dateTime(culture).patternUniversalSortable, culture);
 
 /**
+Format a date in way that is compatible with the iso8601 specification.
+*/
+  public static function iso8601(d : DateTime, ?culture : Culture)
+    return customFormat(d, "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffK", culture);
+
+/**
 Format for year and month.
 */
   public static function yearMonth(d : DateTime, ?culture : Culture)
@@ -378,5 +387,5 @@ Format for year and month.
   static function dateTime(?culture : Culture)
     return null != culture && null != culture.dateTime ? culture.dateTime : Format.defaultCulture.dateTime;
 
-  static inline function getPattern() return ~/(d|M){1,4}|(y){1,5}|(f|F){1,7}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
+  static inline function getPattern() return ~/(d|M){1,4}|(z){1,3}|(y){1,5}|(f|F){1,7}|(h|H|m|s|t){1,2}|K|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
 }
