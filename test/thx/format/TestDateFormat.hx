@@ -12,8 +12,8 @@ class TestDateFormat {
   static var ru = Embed.culture('ru-ru');
   static var fr = Embed.culture('fr-fr');
   static var jp = Embed.culture('ja-jp');
-  static var d1 = Date.fromString('2009-06-01 13:45:30');
-  static var d2 = Date.fromString('2009-06-15 13:45:30');
+  static var d1 = DateTime.fromString('2009-06-01 13:45:30-06:00');
+  static var d2 = DateTime.fromString('2009-06-15 13:45:30-06:00');
   public function new() {}
 
   public function testFormatU() {
