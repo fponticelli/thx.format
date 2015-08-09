@@ -101,7 +101,8 @@ See `formatTerm` for all the possible formatting options to use for custom patte
     };
 
 // NOT SUPPORTED
-// g, gg, K, yyyyy, z, zz, zzz
+// g, gg,
+// K, z, zz, zzz
 //      | %z | The time-zone as hour offset from GMT. Required to emit RFC822-conformant dates (using "%a, %d %b %Y %H:%M:%S %z"). | -2
 //      | %Z | The time zone or name or abbreviation.                             | GMT
 //      | %G | The ISO 8601 year with century as a decimal number. The 4-digit year corresponding to the ISO week number (see %V). This has the same format and value as %y, except that if the ISO week number belongs to the previous or next year, that year is used instead. | 2004
@@ -139,6 +140,7 @@ t        | Same as `s` but `0` padded (00 to 59).                               
 yy       | Year from 00 to 99.                                                  | 99
 yyy      | Year with at least 3 digits.                                         | 1999
 yyyy     | Four digits year.                                                    | 1999
+yyyyy    | Five digits year.                                                    | 19999
 f        | Outputs the tenth of a second.                                       |
 fffffff  | Outputs up to the tenth of a microsecond. the tenth of a second.     |                                 |
 F        | Outputs the tenth of a second.                                       |
@@ -198,6 +200,7 @@ FFFFFFF  |                                                                      
       case "yy":      '${d.year%100}'.lpad('0', 2);
       case "yyy":     '${d.year}'.lpad('0', 3);
       case "yyyy":    '${d.year}'.lpad('0', 4);
+      case "yyyyy":   '${d.year}'.lpad('0', 5);
       case ":":       dateTime(culture).separatorTime;
       case ".":       culture.number.separatorDecimalNumber;
       case "/":       dateTime(culture).separatorDate;
@@ -375,5 +378,5 @@ Format for year and month.
   static function dateTime(?culture : Culture)
     return null != culture && null != culture.dateTime ? culture.dateTime : Format.defaultCulture.dateTime;
 
-  static inline function getPattern() return ~/(d|M|y){1,4}|(f|F){1,7}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
+  static inline function getPattern() return ~/(d|M){1,4}|(y){1,5}|(f|F){1,7}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
 }
