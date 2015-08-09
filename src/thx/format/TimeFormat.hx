@@ -1,14 +1,13 @@
 package thx.format;
 
-import haxe.Utf8; // remove?
 import thx.Time;
+using thx.Ints;
 import thx.culture.Culture;
 import thx.culture.DateFormatInfo;
-using thx.Ints;
 using thx.Nulls;
 using thx.Strings;
 
-import thx.format.DateFormat.dateTime;
+import thx.format.DateFormat.*;
 
 @:access(thx.format.DateFormat)
 class TimeFormat {
@@ -34,8 +33,17 @@ Custom time format.
           continue;
         }
         buf.push(left);
-        buf.push(formatTerm(t, ereg.matched(0), culture));
-        pattern = ereg.matchedRight();
+        var term = ereg.matched(0),
+            right = ereg.matchedRight();
+        pattern = right;
+        if(term == "." && right.substring(0, 1).toLowerCase() == "f") {
+          if(t.ticksInSecond == thx.Int64s.zero) {
+            ereg.match(pattern);
+            pattern = ereg.matchedRight();
+            continue;
+          }
+        }
+        buf.push(formatTerm(t, term, culture));
       } else {
         buf.push(pattern);
         pattern = '';
@@ -66,64 +74,82 @@ public static function format(t : Time, pattern : String, ?culture : Culture) : 
     case pattern:  customFormat(t, pattern, culture);
   };
 
-  // NOT SUPPORTED
-  // f, ff, fff, ffff, fffff, ffffff, fffffff, F, FF, FFF, FFFF, FFFFF, FFFFFF, FFFFFFF, g, gg, K, yyyyy, z, zz, zzz
-  /**
-  Returns a formatted date according to the passed term and culture. The pattern
-  parameter accepts the following modifiers in either Microsoft format or strftime format.
+/**
+Returns a formatted date according to the passed term and culture. The pattern
+parameter accepts the following modifiers in either Microsoft format or strftime format.
 
-  format   | description                                                          | example
-  :------- | -------------------------------------------------------------------- | ------------:
-  d        | The number of days.                                                  | 7
-  dd-dddddddd
-           | The number of days padded left with zeroes up to 8.                  | 7
-  h        | The number of whole hours in the time interval that are not counted
-             as part of days.                                                     | 11
-  hh       | The number of whole hours in the time interval that are not counted
-             as part of days. Single-digit hours have a leading zero.             | 07
-  s        | Seconds (0 to 59).                                                   | 7
-  ss       | The number of whole seconds in the time interval that are not
-             included as part of hours, days, or minutes. Single-digit seconds
-             have a leading zero.                                                 | 7
-  f-fffffff |
-  F-FFFFFFF |
+format   | description                                                          | example
+:------- | -------------------------------------------------------------------- | ------------:
+d        | The number of days                                                   | 7
+dd       | Left padded number of days (between 2 and 8 characters)              | 07
+dddddddd | The number of days padded left with zeroes up to 8.                  | 00000007
+h        | The number of whole hours in the time interval that are not counted  |
+         | as part of days.                                                     | 11
+hh       | The number of whole hours in the time interval that are not counted  |
+         | as part of days. Single-digit hours have a leading zero.             | 07
+H        | The number of whole hours in the time interval.                      | 11
+HHHHHHHH | The number of whole hours in the time interval. Left padded with 0   | 00000007
+m        | Minutes (0 to 59).                                                   | 7
+mm       | The number of whole minutes in the time interval that are not        | 07
+         | included as part of hours or days. Single-digit seconds have a       |
+         | leading zero.                                                        |
+s        | Seconds (0 to 59).                                                   | 7
+ss       | The number of whole seconds in the time interval that are not        | 07
+         | included as part of hours, days, or minutes. Single-digit seconds    |
+         | have a leading zero.                                                 |
+f        | Outputs the tenth of a second.                                       |
+fffffff  | Outputs up to the tenth of a microsecond. the tenth of a second.     |                                 |
+F        | Outputs the tenth of a second.                                       |
+FFFFFFF  |                                                                      |
+:        | Time separator.                                                      | %
+'...'    | Single quoted text is not processed (except for removing the quotes) | ...
+"..."    | Double quoted text is not processed (except for removing the quotes) | ...
 
-  ??? H-HHHHHHHH
-
-  :        | Time separator.                                                      | %
-  '...'    | Single quoted text is not processed (except for removing the quotes) | ...
-  "..."    | Double quoted text is not processed (except for removing the quotes) | ...
-
-  */
+*/
   public static function formatTerm(t : Time, pattern : String, ?culture : Culture) : String
     return switch pattern {
-      case "d":     '${t.days}';
-      case "dd":    '${t.days}'.lpad('0', 2);
-      //case "ddd":   var dt = dateTime(culture);
-      //              dt.nameDaysAbbreviated[t.dayOfWeek];
-      //case "dddd":  var dt = dateTime(culture);
-      //              dt.nameDays[t.dayOfWeek];
-      case "h":     switch t.hours {
-                      case 0:             "12";
-                      case d if(d <= 12): '$d';
-                      case d:             '${d - 12}';
-                    };
-      case "hh":    formatTerm(t, 'h', culture).lpad('0', 2);
-      case "H":     '${t.hours}';
-      case "HH":    '${t.hours}'.lpad('0', 2);
-      case "m":     '${t.minutes}';
-      case "mm":    '${t.minutes}'.lpad('0', 2);
-      case "s":     '${t.seconds}';
-      case "ss":    '${t.seconds}'.lpad('0', 2);
-      case "t":     var dt = dateTime(culture);
-                    Utf8.sub(t.hours < 12 ? dt.designatorAm : dt.designatorPm, 0, 1);
-      case "tt":    var dt = dateTime(culture);
-                    t.hours < 12 ? dt.designatorAm : dt.designatorPm;
-      case ":":     dateTime(culture).separatorTime;
+      case "d":        '${t.days}';
+      case "dd":       '${t.days}'.lpad('0', 2);
+      case "ddd":      '${t.days}'.lpad('0', 3);
+      case "dddd":     '${t.days}'.lpad('0', 4);
+      case "ddddd":    '${t.days}'.lpad('0', 5);
+      case "dddddd":   '${t.days}'.lpad('0', 6);
+      case "ddddddd":  '${t.days}'.lpad('0', 7);
+      case "dddddddd": '${t.days}'.lpad('0', 8);
+      case "h":        '${t.hours}';
+      case "hh":        t.hours.lpad('0', 2);
+      case "H":        '${t.totalHours}';
+      case "HH":       '${t.totalHours}'.lpad('0', 2);
+      case "HHH":      '${t.totalHours}'.lpad('0', 3);
+      case "HHHH":     '${t.totalHours}'.lpad('0', 4);
+      case "HHHHH":    '${t.totalHours}'.lpad('0', 5);
+      case "HHHHHH":   '${t.totalHours}'.lpad('0', 6);
+      case "HHHHHHH":  '${t.totalHours}'.lpad('0', 7);
+      case "HHHHHHHH": '${t.totalHours}'.lpad('0', 8);
+      case "m":        '${t.minutes}';
+      case "mm":       '${t.minutes}'.lpad('0', 2);
+      case "s":        '${t.seconds}';
+      case "ss":       '${t.seconds}'.lpad('0', 2);
+      case "f":        getDecimalsPaddedUpTo(t.ticksInSecond, 1);
+      case "ff":       getDecimalsPaddedUpTo(t.ticksInSecond, 2);
+      case "fff":      getDecimalsPaddedUpTo(t.ticksInSecond, 3);
+      case "ffff":     getDecimalsPaddedUpTo(t.ticksInSecond, 4);
+      case "fffff":    getDecimalsPaddedUpTo(t.ticksInSecond, 5);
+      case "ffffff":   getDecimalsPaddedUpTo(t.ticksInSecond, 6);
+      case "fffffff":  getDecimalsPadded(t.ticksInSecond);
+      case "F":        getDecimalsUpTo(t.ticksInSecond, 1);
+      case "FF":       getDecimalsUpTo(t.ticksInSecond, 2);
+      case "FFF":      getDecimalsUpTo(t.ticksInSecond, 3);
+      case "FFFF":     getDecimalsUpTo(t.ticksInSecond, 4);
+      case "FFFFF":    getDecimalsUpTo(t.ticksInSecond, 5);
+      case "FFFFFF":   getDecimalsUpTo(t.ticksInSecond, 6);
+      case "FFFFFFF":  getDecimalsString(t.ticksInSecond);
+      case ".":        culture.number.separatorDecimalNumber;
+      case ":":        dateTime(culture).separatorTime;
       case q if(q != null && q.length > 1 &&
         (q.substring(0, 1) == "'" && q.substring(q.length - 1) == "'") ||
         (q.substring(0, 1) == '"' && q.substring(q.length - 1) == '"')):
-                    q.substring(1, q.length - 1);
+                       q.substring(1, q.length - 1);
       case rest:    rest;
     };
 
@@ -143,14 +169,14 @@ Long time format.
       buf += n.signNegative;
     if(days != 0)
       buf += days + n.separatorDecimalNumber;
-    buf += hours.lpad(2, '0');
+    buf += hours.lpad("0", 2);
     buf += dt.separatorTime;
-    buf += minutes.lpad(2, '0');
+    buf += minutes.lpad("0", 2);
     buf += dt.separatorTime;
-    buf += seconds.lpad(2, '0');
+    buf += seconds.lpad("0", 2);
     var t = abs.ticksInSecond;
     if(t != 0)
-      buf += n.separatorDecimalNumber + t.lpad(7, '0');
+      buf += n.separatorDecimalNumber + getDecimalsPadded(t);
     return buf;
   }
 
@@ -170,15 +196,14 @@ Short time format.
       buf += n.signNegative;
     if(days != 0)
       buf += days + dt.separatorTime;
-    buf += hours.lpad(2, '0');
+    buf += hours.lpad("0", 2);
     buf += dt.separatorTime;
-    buf += minutes.lpad(2, '0');
+    buf += minutes.lpad("0", 2);
     buf += dt.separatorTime;
-    buf += seconds.lpad(2, '0');
+    buf += seconds.lpad("0", 2);
     var t = abs.ticksInSecond;
     if(t != 0) {
-      buf += n.separatorDecimalNumber + t.lpad(7, '0');
-      buf = buf.trimCharsRight('0');
+      buf += n.separatorDecimalNumber + getDecimalsString(t);
     }
     return buf;
   }
@@ -186,5 +211,5 @@ Short time format.
   public static function invariantTimeLong(t : Time)
     return timeLong(t, Culture.invariant);
 
-  static inline function getPattern() return ~/(d){1,4}|(h|H|m|s|t){1,2}|[:]|'[^']*'|"[^"]*"/;
+  static inline function getPattern() return ~/(d|H){1,8}|(f|F){1,7}|(h|m|s){1,2}|[:.]|'[^']*'|"[^"]*"/;
 }
