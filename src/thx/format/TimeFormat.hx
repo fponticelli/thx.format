@@ -2,6 +2,7 @@ package thx.format;
 
 import thx.Time;
 using thx.Ints;
+using haxe.Int64;
 import thx.culture.Culture;
 import thx.culture.DateFormatInfo;
 using thx.Nulls;
@@ -208,8 +209,39 @@ Short time format.
     return buf;
   }
 
-  public static function invariantTimeLong(t : Time)
-    return timeLong(t, Culture.invariant);
+  public static function invariantTimeLong(time : Time)
+    return timeLong(time, Culture.invariant);
+
+  public static function offsetHoursShort(offset : Time, ?culture : Culture) {
+    var n = (null == culture ? Format.defaultCulture : culture).number,
+        abs = offset.abs();
+    return (offset.isNegative ? n.signNegative : n.signPositive) +
+      abs.totalHours;
+  }
+
+  public static function offsetHoursLong(offset : Time, ?culture : Culture) {
+    var n = (null == culture ? Format.defaultCulture : culture).number,
+        abs = offset.abs();
+    return (offset.isNegative ? n.signNegative : n.signPositive) +
+      abs.totalHours.toStr().lpad("0", 2);
+  }
+
+  public static function offsetLong(offset : Time, ?culture : Culture) {
+    var dt = dateTime(culture),
+        n = (null == culture ? Format.defaultCulture : culture).number,
+            abs = offset.abs();
+    return (offset.isNegative ? n.signNegative : n.signPositive) +
+      abs.totalHours.toStr().lpad("0", 2) +
+      dt.separatorTime +
+      abs.minutes.lpad("0", 2);
+  }
+
+  public static function iso8601OffsetShort(offset : Time) {
+    var abs = offset.abs();
+    return (offset.isNegative ? "-" : "+") +
+      abs.totalHours.toStr().lpad("0", 2) +
+      abs.minutes.lpad("0", 2);
+  }
 
   static inline function getPattern() return ~/(d|H){1,8}|(f|F){1,7}|(h|m|s){1,2}|[:.]|'[^']*'|"[^"]*"/;
 }
