@@ -100,6 +100,13 @@ class TestDateFormat {
     Assert.equals("2009-06-01 13:45:30Z", d1.universalSortable(it));
   }
 
+  public function testFormatO() {
+    Assert.equals("2009-06-01T13:45:30.0000000-06:00", d1.format('O'));
+    Assert.equals("2009-06-01T13:45:30.0000000-06:00", d1.format('o', fr));
+    Assert.equals("2009-06-01T13:45:30.0000000-06:00", d1.format('O', jp));
+    Assert.equals("2009-06-01T13:45:30.0000000-06:00", d1.iso8601(it));
+  }
+
   public function testFormaty() {
     Assert.equals("2009 June",   d1.format('y'));
     Assert.equals("June, 2009",   d1.format('y', us));
