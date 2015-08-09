@@ -101,7 +101,7 @@ See `formatTerm` for all the possible formatting options to use for custom patte
     };
 
 // NOT SUPPORTED
-// f, ff, fff, ffff, fffff, ffffff, fffffff, F, FF, FFF, FFFF, FFFFF, FFFFFF, FFFFFFF, g, gg, K, yyyyy, z, zz, zzz
+// g, gg, K, yyyyy, z, zz, zzz
 //      | %z | The time-zone as hour offset from GMT. Required to emit RFC822-conformant dates (using "%a, %d %b %Y %H:%M:%S %z"). | -2
 //      | %Z | The time zone or name or abbreviation.                             | GMT
 //      | %G | The ISO 8601 year with century as a decimal number. The 4-digit year corresponding to the ISO week number (see %V). This has the same format and value as %y, except that if the ISO week number belongs to the previous or next year, that year is used instead. | 2004
