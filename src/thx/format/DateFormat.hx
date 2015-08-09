@@ -1,6 +1,8 @@
 package thx.format;
 
 import haxe.Utf8;
+using thx.Ints;
+using thx.Strings;
 import thx.DateTime;
 import thx.culture.Culture;
 import thx.culture.DateFormatInfo;
@@ -30,8 +32,17 @@ Custom date format.
           continue;
         }
         buf.push(left);
-        buf.push(formatTerm(d, ereg.matched(0), culture));
-        pattern = ereg.matchedRight();
+        var term = ereg.matched(0),
+            right = ereg.matchedRight();
+        pattern = right;
+        if(term == "." && right.substring(0, 1).toLowerCase() == "f") {
+          if(d.tickInSecond == thx.Int64s.zero) {
+            ereg.match(pattern);
+            pattern = ereg.matchedRight();
+            continue;
+          }
+        }
+        buf.push(formatTerm(d, term, culture));
       } else {
         buf.push(pattern);
         pattern = '';
@@ -128,6 +139,10 @@ t        | Same as `s` but `0` padded (00 to 59).                               
 yy       | Year from 00 to 99.                                                  | 99
 yyy      | Year with at least 3 digits.                                         | 1999
 yyyy     | Four digits year.                                                    | 1999
+f        | Outputs the tenth of a second.                                       |
+fffffff  | Outputs up to the tenth of a microsecond. the tenth of a second.     |                                 |
+F        | Outputs the tenth of a second.                                       |
+FFFFFFF  |                                                                      |
 :        | Time separator.                                                      | %
 /        | Date separator.                                                      | /
 '...'    | Single quoted text is not processed (except for removing the quotes) | ...
@@ -137,47 +152,62 @@ yyyy     | Four digits year.                                                    
 */
   public static function formatTerm(d : DateTime, pattern : String, ?culture : Culture) : String
     return switch pattern {
-      case "d":     '${d.day}';
-      case "dd":    '${d.day}'.lpad('0', 2);
-      case "ddd":   var dt = dateTime(culture);
-                    dt.nameDaysAbbreviated[d.dayOfWeek];
-      case "dddd":  var dt = dateTime(culture);
-                    dt.nameDays[d.dayOfWeek];
-      case "h":     switch d.hour {
-                      case 0:             "12";
-                      case d if(d <= 12): '$d';
-                      case d:             '${d - 12}';
-                    };
-      case "hh":    formatTerm(d, 'h', culture).lpad('0', 2);
-      case "H":     '${d.hour}';
-      case "HH":    '${d.hour}'.lpad('0', 2);
-      case "m":     '${d.minute}';
-      case "mm":    '${d.minute}'.lpad('0', 2);
-      case "M":     '${d.month}';
-      case "MM":    '${d.month}'.lpad('0', 2);
-      case "MMM":   var dt = dateTime(culture);
-                    dt.nameMonthsAbbreviated[d.month-1];
-      case "MMMM":  var dt = dateTime(culture);
-                    dt.nameMonths[d.month-1];
-      case "s":     '${d.second}';
-      case "ss":    '${d.second}'.lpad('0', 2);
-      case "t":     var dt = dateTime(culture);
-                    Utf8.sub(d.hour < 12 ? dt.designatorAm : dt.designatorPm, 0, 1);
-      case "tt":    var dt = dateTime(culture);
-                    d.hour < 12 ? dt.designatorAm : dt.designatorPm;
-      case "y":     '${d.year%100}';
-      case "yy":    '${d.year%100}'.lpad('0', 2);
-      case "yyy":   '${d.year}'.lpad('0', 3);
-      case "yyyy":  '${d.year}'.lpad('0', 4);
-      case ":":     dateTime(culture).separatorTime;
-      case "/":     dateTime(culture).separatorDate;
+      case "d":       '${d.day}';
+      case "dd":      '${d.day}'.lpad('0', 2);
+      case "ddd":     var dt = dateTime(culture);
+                      dt.nameDaysAbbreviated[d.dayOfWeek];
+      case "dddd":    var dt = dateTime(culture);
+                      dt.nameDays[d.dayOfWeek];
+      case "h":       switch d.hour {
+                        case 0:             "12";
+                        case d if(d <= 12): '$d';
+                        case d:             '${d - 12}';
+                      };
+      case "hh":      formatTerm(d, 'h', culture).lpad('0', 2);
+      case "H":       '${d.hour}';
+      case "HH":      '${d.hour}'.lpad('0', 2);
+      case "m":       '${d.minute}';
+      case "mm":      '${d.minute}'.lpad('0', 2);
+      case "M":       '${d.month}';
+      case "MM":      '${d.month}'.lpad('0', 2);
+      case "MMM":     var dt = dateTime(culture);
+                      dt.nameMonthsAbbreviated[d.month-1];
+      case "MMMM":    var dt = dateTime(culture);
+                      dt.nameMonths[d.month-1];
+      case "s":       '${d.second}';
+      case "ss":      '${d.second}'.lpad('0', 2);
+      case "f":       getDecimalsPaddedUpTo(d.tickInSecond, 1);
+      case "ff":      getDecimalsPaddedUpTo(d.tickInSecond, 2);
+      case "fff":     getDecimalsPaddedUpTo(d.tickInSecond, 3);
+      case "ffff":    getDecimalsPaddedUpTo(d.tickInSecond, 4);
+      case "fffff":   getDecimalsPaddedUpTo(d.tickInSecond, 5);
+      case "ffffff":  getDecimalsPaddedUpTo(d.tickInSecond, 6);
+      case "fffffff": getDecimalsPadded(d.tickInSecond);
+      case "F":       getDecimalsUpTo(d.tickInSecond, 1);
+      case "FF":      getDecimalsUpTo(d.tickInSecond, 2);
+      case "FFF":     getDecimalsUpTo(d.tickInSecond, 3);
+      case "FFFF":    getDecimalsUpTo(d.tickInSecond, 4);
+      case "FFFFF":   getDecimalsUpTo(d.tickInSecond, 5);
+      case "FFFFFF":  getDecimalsUpTo(d.tickInSecond, 6);
+      case "FFFFFFF": getDecimalsString(d.tickInSecond);
+      case "t":       var dt = dateTime(culture);
+                      Utf8.sub(d.hour < 12 ? dt.designatorAm : dt.designatorPm, 0, 1);
+      case "tt":      var dt = dateTime(culture);
+                      d.hour < 12 ? dt.designatorAm : dt.designatorPm;
+      case "y":       '${d.year%100}';
+      case "yy":      '${d.year%100}'.lpad('0', 2);
+      case "yyy":     '${d.year}'.lpad('0', 3);
+      case "yyyy":    '${d.year}'.lpad('0', 4);
+      case ":":       dateTime(culture).separatorTime;
+      case ".":       culture.number.separatorDecimalNumber;
+      case "/":       dateTime(culture).separatorDate;
       case q if(q.substring(0, 1) == "%"):
-                    strftime(d, pattern, culture);
+                      strftime(d, pattern, culture);
       case q if(q != null && q.length > 1 &&
         (q.substring(0, 1) == "'" && q.substring(q.length - 1) == "'") ||
         (q.substring(0, 1) == '"' && q.substring(q.length - 1) == '"')):
-                    q.substring(1, q.length - 1);
-      case rest:    rest;
+                      q.substring(1, q.length - 1);
+      case rest:      rest;
     };
 
 /**
@@ -330,8 +360,20 @@ Format for year and month.
     return customFormat(d, dateTime(culture).patternYearMonth, culture);
 
 // PRIVATE
+  static function getDecimalsPadded(decimals : Int)
+    return decimals.lpad("0", 7);
+
+  static function getDecimalsString(decimals : Int)
+    return getDecimalsPadded(decimals).trimCharsRight("0");
+
+  static function getDecimalsUpTo(decimals : Int, to : Int)
+    return getDecimalsString(decimals).substring(0, to);
+
+  static function getDecimalsPaddedUpTo(decimals : Int, to : Int)
+    return getDecimalsPadded(decimals).substring(0, to);
+
   static function dateTime(?culture : Culture)
     return null != culture && null != culture.dateTime ? culture.dateTime : Format.defaultCulture.dateTime;
 
-  static inline function getPattern() return ~/(d|M|y){1,4}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
+  static inline function getPattern() return ~/(d|M|y){1,4}|(f|F){1,7}|(h|H|m|s|t){1,2}|[:]|[\/]|'[^']*'|"[^"]*"|[%][daAIHMmbhBSpycCeDfiklnPqrRstTuYxXw%]/;
 }
