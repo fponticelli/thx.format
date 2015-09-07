@@ -4,7 +4,7 @@ import thx.culture.Culture;
 import thx.culture.Embed;
 import utest.Assert;
 import thx.Decimal;
-using thx.format.NumberFormat;
+using thx.format.DecimalFormat;
 
 class TestDecimalFormat {
   static var it : Culture = Embed.culture('it-it');

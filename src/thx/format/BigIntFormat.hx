@@ -15,14 +15,8 @@ class BigIntFormat {
 /**
 Binary format. The result is prefixed with leading `0` up to `significantDigits`. Default is one.
 **/
-  public static function binary(i : BigInt, ?significantDigits : Int = 1, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    if(Math.isNaN(f))
-      return nf.symbolNaN;
-    if(!Math.isFinite(f))
-      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
-    return significantDigits == 0 && f == 0 ? "" : toBase(Std.int(f), 2, culture).lpad('0', significantDigits);
-  }
+  public static function binary(i : BigInt, ?significantDigits : Int = 1) : String
+    return significantDigits == 0 && i.isZero() ? "" : i.toStringWithBase(2).lpad('0', significantDigits);
 
 /**
 Formats a currency value. By default the currency symbol is extracted from the applied culture but it can be optionally
@@ -48,7 +42,7 @@ format    | description
 `;`       | Section separator. There are three possible sections (positive, negative, zero). If two are specified zero numbers use the format from the first section.
 `...`     | Anything else is left untouched and put in the output as it is.
 */
-  public static function customFormat(i : BigInt, pattern : String, ?culture : Culture) : String {
+  public static function customFormat(i : BigInt, pattern : String, ?culture : Culture) : String
     return DecimalFormat.customFormat(Decimal.fromBigInt(i), pattern, culture);
 
 /**

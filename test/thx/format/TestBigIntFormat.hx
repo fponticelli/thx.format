@@ -4,7 +4,7 @@ import thx.culture.Culture;
 import thx.culture.Embed;
 import utest.Assert;
 import thx.BigInt;
-using thx.format.NumberFormat;
+using thx.format.BigIntFormat;
 
 class TestBigIntFormat {
   static var it : Culture = Embed.culture('it-it');
@@ -14,7 +14,7 @@ class TestBigIntFormat {
   public function new() {}
 
   public function testInteger() {
-    Assert.equals('12,346',  (12345 : BigInt).integer());
+    Assert.equals('12,345',  (12345 : BigInt).integer());
   }
 
   public function testFormatHex() {

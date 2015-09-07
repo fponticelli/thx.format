@@ -85,7 +85,8 @@ Formats a number using the exponential (scientific) format.
 Formats a fixed point float number with an assigned precision.
 **/
   public static function fixed(decimal : Decimal, ?precision : Null<Int>, ?culture : Culture) : String {
-    var pattern   = decimal.isNegative() ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
+    var nf = numberFormat(culture),
+        pattern   = decimal.isNegative() ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
         formatted = value(decimal, (precision).or(nf.decimalDigitsNumber), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, [0], '', nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
@@ -171,8 +172,8 @@ Formats a number with group separators (eg: thousands separators).
 **/
   public static function number(decimal : Decimal, ?precision : Null<Int>, ?culture : Culture) : String {
     var nf = numberFormat(culture);
-    var pattern   = f < 0 ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
-        formatted = value(f, (precision).or(nf.decimalDigitsNumber), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalNumber);
+    var pattern   = decimal.isNegative() ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
+        formatted = value(decimal, (precision).or(nf.decimalDigitsNumber), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
 
@@ -348,6 +349,13 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   }
 
 // PRIVATE
+  static function exponentialInfo(decimal : Decimal) {
+    var scale = decimal.scale;
+    return {
+      e : 0,
+      f :decimal
+    }
+  }
 /*
   static var BASE = "0123456789abcdefghijklmnopqrstuvwxyz";
 
@@ -410,28 +418,24 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     }
     return buf;
   }
+*/
 
-  // `f` is always positive
   static function customFormatDecimal(decimal : Decimal, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
     if(isPercent)
-      f *= hasSymbols(pattern, "‰") ? 1000 : 100;
+      decimal *= hasSymbols(pattern, "‰") ? 1000 : 100;
 
     var exp = splitPattern(pattern, "eE");
     if(exp.length > 1) {
-      var info = exponentialInfo(f),
-          symbol = pattern.substring(exp[0].length, exp[0].length + 1),
+      var symbol = pattern.substring(exp[0].length, exp[0].length + 1),
           forceSign = exp[1].startsWith("+");
       if(forceSign || exp[1].startsWith("-"))
         exp[1] = exp[1].substring(1);
-      return customIntegerAndFraction(info.f, exp[0], nf, isCurrency, isPercent) +
-             symbol +
-             (info.e < 0 ? nf.signNegative : forceSign ? nf.signPositive : "") +
-             customFormatInteger('${Math.abs(info.e)}', exp[1], nf, isCurrency, isPercent);
-      return customIntegerAndFraction(f, exp[0], nf, isCurrency, isPercent) +
-             symbol +
-             customFormatInteger('$f', exp[1], nf, isCurrency, isPercent);
+      return customIntegerAndFraction(decimal, exp[0], nf, isCurrency, isPercent) +
+             symbol; // +
+             //(info.e < 0 ? nf.signNegative : forceSign ? nf.signPositive : "") +
+             //customFormatInteger('${Math.abs(info.e)}', exp[1], nf, isCurrency, isPercent);
     } else {
-      return customIntegerAndFraction(f, pattern, nf, isCurrency, isPercent);
+      return customIntegerAndFraction(decimal, pattern, nf, isCurrency, isPercent);
     }
   }
 
@@ -528,12 +532,13 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function customIntegerAndFraction(decimal : Decimal, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) {
     var p = splitPattern(pattern, "."),
         power = p[0].length - (p[0] = p[0].trimCharsRight(",")).length;
-    f /= Math.pow(1000, power);
+    decimal /= Math.pow(1000, power);
     if(p.length == 1)
-      return customFormatInteger('${Math.round(f)}', p[0], nf, isCurrency, isPercent);
+      return customFormatInteger(decimal.toString() /*'${Math.round(f)}'*/, p[0], nf, isCurrency, isPercent);
     else {
-      f = f.roundTo(countSymbols(p[1], "#0"));
-      var np = splitOnDecimalSeparator(f);
+      // TODO
+      //decimal = decimal.roundTo(countSymbols(p[1], "#0"));
+      var np = splitOnDecimalSeparator(decimal);
       return customFormatInteger(np[0], p[0], nf, isCurrency, isPercent) +
              (isCurrency ?
                nf.separatorDecimalCurrency :
@@ -542,34 +547,6 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
                  nf.separatorDecimalNumber) +
              customFormatDecimalFraction((np[1]).or("0"), p[1], nf);
         }
-  }
-
-  static function exponentialInfo(decimal : Decimal) {
-    var s  = '${Math.abs(f)}'.toLowerCase(),
-        pose = s.indexOf('e'),
-        p,
-        e;
-    if(pose > 0) {
-      p = s.substring(0, pose).split('.');
-      e = Ints.parse(s.substring(pose+1));
-    } else {
-      p = s.split('.').concat(['']);
-      e = 0;
-      if(p[0].length > 1) {
-        e = p[0].length - 1;
-        p[1] = p[0].substring(1) + p[1];
-        p[0] = p[0].substring(0, 1);
-      } else if(p[0] == '0') {
-        e = -(1 + p[1].length - p[1].trimCharsLeft('0').length);
-        p[1] = p[1].substring(-e-1);
-        p[0] = p[1].substring(0, 1);
-        p[1] = p[1].substring(1);
-      }
-    }
-    return {
-      e : e,
-      f : Math.sign(f) * Std.parseFloat(p.slice(0, 2).join("."))
-    };
   }
 
   static function hasSymbols(pattern : String, symbols : String) {
@@ -632,30 +609,8 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function paramOrNull(param : String) : Null<Int>
     return param.length == 0 ? null : Std.parseInt(param);
 
-  static function splitOnDecimalSeparator(decimal : Decimal) {
-    var p = '$f'.split('.'),
-        i = p[0],
-        d = (p[1]).or("").toLowerCase();
-
-    if(d.contains('e')) {
-      p = d.split('e');
-      d = p[0];
-      var e = Ints.parse(p[1]);
-      if(e < 0) {
-        d = ''.rpad('0', -e-1) + i + d;
-        i = '0';
-      } else {
-        var s = i + d;
-        d = s.substring(e + 1);
-        i = pad(s, e + 1, false);
-      }
-    }
-
-    if(d.length > 0)
-      return [i, d];
-    else
-      return [i];
-  }
+  static function splitOnDecimalSeparator(decimal : Decimal)
+    return decimal.toString().split('.');
 
   static function splitPattern(pattern : String, separator : String) {
     var pos = [],
@@ -685,8 +640,8 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   }
 
   static function value(decimal : Decimal, precision : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
-    f = Math.abs(f);
-    var p = splitOnDecimalSeparator(f);
+    decimal = decimal.abs();
+    var p = splitOnDecimalSeparator(decimal);
 
     if(precision <= 0 && null != p[1]) {
       if(Std.parseFloat('0.${p[1]}') >= 0.5)
@@ -701,13 +656,10 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
 
     return buf.join(decimalSeparator);
   }
-*/
 }
 
-/*
 private enum CustomFormat {
   Literal(s : String);
   Hash(first : Bool);
   Zero(first : Bool);
 }
-*/

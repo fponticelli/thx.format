@@ -519,9 +519,6 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
              symbol +
              (info.e < 0 ? nf.signNegative : forceSign ? nf.signPositive : "") +
              customFormatInteger('${Math.abs(info.e)}', exp[1], nf, isCurrency, isPercent);
-      return customIntegerAndFraction(f, exp[0], nf, isCurrency, isPercent) +
-             symbol +
-             customFormatInteger('$f', exp[1], nf, isCurrency, isPercent);
     } else {
       return customIntegerAndFraction(f, pattern, nf, isCurrency, isPercent);
     }
