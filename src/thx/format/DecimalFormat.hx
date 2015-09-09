@@ -124,7 +124,7 @@ format     | description
     // currency
   case 'C', 'c': currency(decimal, param, culture);
       // decimal
-    case 'D', 'd': decimal(decimal, param, culture);
+    case 'D', 'd': DecimalFormat.decimal(decimal, param, culture);
       // exponential E
     case 'E':      exponential(decimal, param, culture);
       // exponential e
@@ -140,11 +140,11 @@ format     | description
       // percent
     case 'P', 'p': percent(decimal, param, culture);
       // round trip
-      case 'R', 'r': '$f';
+    case 'R', 'r': decimal.toString();
       // hexadecimal X
-    case 'X':      hex(decimal, param, culture).toUpperCase();
+    case 'X':      BigIntFormat.hex(decimal.toBigInt(), param, culture).toUpperCase();
       // hexadecimal x
-    case 'x':      hex(decimal, param, culture);
+    case 'x':      BigIntFormat.hex(decimal.toBigInt(), param, culture);
       // printf
     case "%":      printf(decimal, pattern, culture);
       // custom format
@@ -156,8 +156,8 @@ format     | description
 Formats a number using either the shortest result between `fixed` and `exponential`.
 **/
   public static function general(decimal : Decimal, ?significantDigits : Null<Int>, ?culture : Culture) : String {
-    var e = exponential(f, significantDigits, culture),
-        f = fixed(f, significantDigits, culture);
+    var e = exponential(decimal, significantDigits, culture),
+        f = fixed(decimal, significantDigits, culture);
     return e.length < f.length ? e : f;
   }
 
@@ -188,7 +188,7 @@ Formats a number as a percent value. The output result is multiplied by 100. So 
 **/
   public static function percent(decimal : Decimal, ?decimals : Null<Int>, ?culture : Culture) : String {
     var nf = numberFormat(culture);
-    return unit(f * 100, (decimals).or(nf.decimalDigitsPercent), nf.symbolPercent, culture);
+    return unit(decimal * 100, (decimals).or(nf.decimalDigitsPercent), nf.symbolPercent, culture);
   }
 
 /**
@@ -196,7 +196,7 @@ Formats a number as a percent value. The output result is multiplied by 1000. So
 **/
   public static function permille(decimal : Decimal, ?decimals : Null<Int>, ?culture : Culture) : String {
     var nf = numberFormat(culture);
-    return unit(f * 1000, (decimals).or(nf.decimalDigitsPercent), nf.symbolPermille, culture);
+    return unit(decimal * 1000, (decimals).or(nf.decimalDigitsPercent), nf.symbolPermille, culture);
   }
 
 /**
@@ -292,7 +292,7 @@ Differences with classic printf:
     function decorate(s : String, decimal : Decimal, p : String, ns : String, ps : String) {
       if(prefix)
         s = p + s;
-      if(f < 0)
+      if(decimal.isNegative())
         s = ns + s;
       else if(!negativeSignOnly)
         s = ps + s;
@@ -307,26 +307,26 @@ Differences with classic printf:
 
     var nf = numberFormat(culture);
     return switch specifier {
-      case "b": decorate(Ints.toString(Ints.abs(Std.int(f)), 2), 1, "b", "", "");
-      case "B": decorate(Ints.toString(Ints.abs(Std.int(f)), 2), 1, "B", "", "");
-      case "c": decorate(String.fromCharCode(Ints.abs(Std.int(f))), 1, "", "", "");
+      case "b": decorate(decimal.toBigInt().toStringWithBase(2), 1, "b", "", "");
+      case "B": decorate(decimal.toBigInt().toStringWithBase(2), 1, "B", "", "");
+      case "c": decorate(String.fromCharCode(decimal.toInt()), 1, "", "", "");
       case "d",
-           "i": decorate('${Math.round(f)}'.lpad('0', (precision).or(0)), f, "", nf.signNegative, nf.signPositive);
-      case "e": decorate(exponential(Math.abs(f), precision, 0, "e", culture), f, "", nf.signNegative, nf.signPositive);
-      case "E": decorate(exponential(Math.abs(f), precision, 0, "E", culture), f, "", nf.signNegative, nf.signPositive);
-      case "f": decorate(fixed(Math.abs(f), precision, culture), f, "", nf.signNegative, nf.signPositive);
+           "i": decorate(decimal.toBigInt().toString().lpad('0', (precision).or(0)), decimal, "", nf.signNegative, nf.signPositive);
+      case "e": decorate(exponential(decimal.abs(), precision, 0, "e", culture), decimal, "", nf.signNegative, nf.signPositive);
+      case "E": decorate(exponential(decimal.abs(), precision, 0, "E", culture), decimal, "", nf.signNegative, nf.signPositive);
+      case "f": decorate(fixed(decimal.abs(), precision, culture), decimal, "", nf.signNegative, nf.signPositive);
       case "g":
-        var e = printf(f, "e", culture),
-            f = printf(f, "f", culture);
+        var e = printf(decimal, "e", culture),
+            f = printf(decimal, "f", culture);
         e.length < f.length ? e : f;
       case "G":
-        var e = printf(f, "E", culture),
-            f = printf(f, "f", culture);
+        var e = printf(decimal, "E", culture),
+            f = printf(decimal, "f", culture);
         e.length < f.length ? e : f;
-      case "u": printf(Math.abs(f), "d", culture);
-      case "x": decorate(hex(Math.abs(f), precision, culture), f, "0x", nf.signNegative, nf.signPositive);
-      case "X": decorate(hex(Math.abs(f), precision, culture), f, "0X", nf.signNegative, nf.signPositive);
-      case "o": decorate(octal(Math.abs(f), precision, culture), f, "0", nf.signNegative, nf.signPositive);
+      case "u": printf(decimal.abs(), "d", culture);
+      case "x": decorate(BigIntFormat.hex(decimal.toBigInt().abs(), precision, culture), decimal, "0x", nf.signNegative, nf.signPositive);
+      case "X": decorate(BigIntFormat.hex(decimal.toBigInt().abs(), precision, culture), decimal, "0X", nf.signNegative, nf.signPositive);
+      case "o": decorate(BigIntFormat.octal(decimal.toBigInt().abs(), precision, culture), decimal, "0", nf.signNegative, nf.signPositive);
       case "%": decorate("%", 1, "", "", "");
       case _: throw 'invalid pattern "$pattern"';
     };
@@ -335,16 +335,16 @@ Differences with classic printf:
 /**
 Transform an `Int` value to a `String` using the specified `base`. A negative sign can be provided optionally.
 **/
-  public static function toBase(value : Int, base : Int, ?culture : Culture) : String
-    return BigIntFormat.toBase(decimal.toBigInt(), base, culture);
+  public static function toBase(value : Decimal, base : Int, ?culture : Culture) : String
+    return BigIntFormat.toBase(value.toBigInt(), base, culture);
 
 /**
 Formats a number with a specified `unitSymbol` and a specified number of decimals.
 **/
   public static function unit(decimal : Decimal, decimals : Int, unitSymbol : String, ?culture : Culture) : String {
     var nf = numberFormat(culture);
-    var pattern   = f < 0 ? Pattern.percentNegatives[nf.patternNegativePercent] : Pattern.percentPositives[nf.patternPositivePercent],
-        formatted = value(f, decimals, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesPercent, nf.separatorGroupPercent, nf.separatorDecimalPercent);
+    var pattern   = decimal.isNegative() ? Pattern.percentNegatives[nf.patternNegativePercent] : Pattern.percentPositives[nf.patternPositivePercent],
+        formatted = value(decimal, decimals, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesPercent, nf.separatorGroupPercent, nf.separatorDecimalPercent);
     return pattern.replace('n', formatted).replace('%', unitSymbol);
   }
 
@@ -377,7 +377,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     }
     return count;
   }
-
+*/
   static function customFormatDecimalFraction(d : String, pattern : String, nf : NumberFormatInfo) : String {
     var buf = "",
         i = 0,
@@ -418,7 +418,6 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     }
     return buf;
   }
-*/
 
   static function customFormatDecimal(decimal : Decimal, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
     if(isPercent)
