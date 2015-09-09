@@ -96,30 +96,21 @@ format     | description
 Formats a number using either the shortest result between `fixed` and `exponential`.
 **/
   public static function general(i : BigInt, ?significantDigits : Null<Int>, ?culture : Culture) : String
-    return DecimalFormat.format(Decimal.fromBigInt(i), significantDigits, culture);
+    return DecimalFormat.general(Decimal.fromBigInt(i), significantDigits, culture);
 
 /**
 Formats a number to hexadecimal format.
 **/
   public static function hex(i : BigInt, ?significantDigits : Int = 1, ?culture : Culture) : String {
     var nf = numberFormat(culture);
-    if(Math.isNaN(f))
-      return nf.symbolNaN;
-    if(!Math.isFinite(f))
-      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
-    return significantDigits == 0 && f == 0 ? "" : toBase(Std.int(f), 16, culture).lpad('0', significantDigits);
+    return significantDigits == 0 && i.isZero() ? "" : toBase(i, 16, culture).lpad('0', significantDigits);
   }
 
 /**
 Formats the integer part of a number.
 **/
   public static function integer(i : BigInt, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    if(Math.isNaN(f))
-      return nf.symbolNaN;
-    if(!Math.isFinite(f))
-      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
-    return number(f, 0, culture);
+    return number(i, 0, culture);
   }
 
 /**
@@ -131,26 +122,20 @@ Formats a number with group separators (eg: thousands separators).
 /**
 Formats a number to octals.
 **/
-  public static function octal(i : BigInt, ?significantDigits : Int = 1, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    if(Math.isNaN(f))
-      return nf.symbolNaN;
-    if(!Math.isFinite(f))
-      return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
-    return significantDigits == 0 && f == 0 ? "" : toBase(Std.int(f), 8, culture).lpad('0', significantDigits);
-  }
+  public static function octal(i : BigInt, ?significantDigits : Int = 1, ?culture : Culture) : String
+    return significantDigits == 0 && i.isZero() ? "" : toBase(i, 8, culture).lpad('0', significantDigits);
 
 /**
 Formats a number as a percent value. The output result is multiplied by 100. So `0.1` will result in `10%`.
 **/
   public static function percent(i : BigInt, ?decimals : Null<Int>, ?culture : Culture) : String
-    return DecimalFormat.precent(Decimal.fromBigInt(i), decimal, culture);
+    return DecimalFormat.percent(Decimal.fromBigInt(i), decimals, culture);
 
 /**
 Formats a number as a percent value. The output result is multiplied by 1000. So `0.1` will result in `100‰`.
 **/
   public static function permille(i : BigInt, ?decimals : Null<Int>, ?culture : Culture) : String
-    return DecimalFormat.premille(Decimal.fromBigInt(i), decimals, culture);
+    return DecimalFormat.permille(Decimal.fromBigInt(i), decimals, culture);
 
 /**
 Formats a single number in a `String` using the `printf` conventions.
@@ -214,10 +199,6 @@ Transform an `Int` value to a `String` using the specified `base`. A negative si
 **/
   public static function toBase(value : BigInt, base : Int, ?culture : Culture) : String {
     var nf = numberFormat(culture);
-    #if(js || flash)
-    return untyped value.toString(base).replace('-', nf.signNegative);
-    #else
-
     if(base < 2 || base > BASE.length)
       return throw 'invalid base $base, it must be between 2 and ${BASE.length}';
     if(base == 10 || value == 0)
@@ -231,7 +212,6 @@ Transform an `Int` value to a `String` using the specified `base`. A negative si
     }
 
     return (value < 0 ? nf.signNegative : '') + buf;
-    #end
   }
 
 /**
@@ -241,6 +221,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     return DecimalFormat.unit(Decimal.fromBigInt(i), decimals, unitSymbol, culture);
 
 // PRIVATE
+  static var BASE = "0123456789abcdefghijklmnopqrstuvwxyz";
 /*
   static var BASE = "0123456789abcdefghijklmnopqrstuvwxyz";
 
@@ -505,10 +486,10 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     }
     return buf.join(groupSeparator);
   }
-
+*/
   static function numberFormat(culture : Culture) : NumberFormatInfo
     return null != culture && null != culture.number ? culture.number : Format.defaultCulture.number;
-
+/*
   static function pad(s : String, len : Int, round : Bool) : String {
     s = (s).or('');
     if(len > 0 && s.length > len) {
