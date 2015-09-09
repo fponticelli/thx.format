@@ -27,12 +27,7 @@ class TestDecimalFormat {
     Assert.equals('-12,345.679', (-12345.6789 : Decimal).number(3));
 
     var exp = (2 : Decimal).pow(50);
-    #if (neko || cs || cpp)
-    // floats in Neko have a different precision
-    Assert.equals('1,125,899,906,842,620.00', exp.number(2));
-    #else
     Assert.equals('1,125,899,906,842,624.00', exp.number(2));
-    #end
 
     var exp = (2 : Decimal).pow(-18);
     Assert.equals('0.000003814610', exp.number(11));
@@ -231,6 +226,7 @@ class TestDecimalFormat {
 
     value = 0.086;
     Assert.equals("8.6%", value.format("#0.##%"));
+    Assert.equals("8.60%", value.format("#0.00%"));
 
     value = 86000;
     Assert.equals("8.6E+4", value.format("0.###E+0"));
