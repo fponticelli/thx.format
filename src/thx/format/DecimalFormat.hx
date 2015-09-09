@@ -525,7 +525,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
         power = p[0].length - (p[0] = p[0].trimCharsRight(",")).length;
     decimal /= Math.pow(1000, power);
     if(p.length == 1)
-      return customFormatInteger(decimal.toString() /*'${Math.round(f)}'*/, p[0], nf, isCurrency, isPercent);
+      return customFormatInteger(decimal.toBigInt().toString(), p[0], nf, isCurrency, isPercent);
     else {
       // TODO
       //decimal = decimal.roundTo(countSymbols(p[1], "#0"));
