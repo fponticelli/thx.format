@@ -19,7 +19,7 @@ provided using setting the `symbol` argument.
   public static function currency(decimal : Decimal, ?precision : Null<Int>, ?symbol : String, ?culture : Culture) : String {
     var nf = numberFormat(culture);
     var pattern   = decimal.isNegative() ? Pattern.currencyNegatives[nf.patternNegativeCurrency] : Pattern.currencyPositives[nf.patternPositiveCurrency],
-        formatted = value(decimal, (precision).or(nf.decimalDigitsCurrency), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesCurrency, nf.separatorGroupCurrency, nf.separatorDecimalCurrency);
+        formatted = value(decimal, (precision).or(nf.decimalDigitsCurrency), nf.groupSizesCurrency, nf.separatorGroupCurrency, nf.separatorDecimalCurrency);
     return pattern.replace('n', formatted).replace('$', (symbol).or(nf.symbolCurrency));
   }
 
@@ -65,7 +65,7 @@ Formats a decimal (integer) value.
 **/
   public static function decimal(dec : Decimal, ?significantDigits : Int = 1, ?culture : Culture) : String {
     var nf = numberFormat(culture);
-    var formatted = value(dec, 0, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, [0], '', '');
+    var formatted = value(dec, 0, [0], '', '');
     return (dec.isNegative() ? nf.signNegative : '') + formatted.lpad('0', significantDigits);
   }
 
@@ -87,7 +87,7 @@ Formats a fixed point float number with an assigned precision.
   public static function fixed(decimal : Decimal, ?precision : Null<Int>, ?culture : Culture) : String {
     var nf = numberFormat(culture),
         pattern   = decimal.isNegative() ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
-        formatted = value(decimal, (precision).or(nf.decimalDigitsNumber), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, [0], '', nf.separatorDecimalNumber);
+        formatted = value(decimal, (precision).or(nf.decimalDigitsNumber), [0], '', nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
 
@@ -173,7 +173,7 @@ Formats a number with group separators (eg: thousands separators).
   public static function number(decimal : Decimal, ?precision : Null<Int>, ?culture : Culture) : String {
     var nf = numberFormat(culture);
     var pattern   = decimal.isNegative() ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
-        formatted = value(decimal, (precision).or(nf.decimalDigitsNumber), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalNumber);
+        formatted = value(decimal, (precision).or(nf.decimalDigitsNumber), nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
 
@@ -344,7 +344,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   public static function unit(decimal : Decimal, decimals : Int, unitSymbol : String, ?culture : Culture) : String {
     var nf = numberFormat(culture);
     var pattern   = decimal.isNegative() ? Pattern.percentNegatives[nf.patternNegativePercent] : Pattern.percentPositives[nf.patternPositivePercent],
-        formatted = value(decimal, decimals, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesPercent, nf.separatorGroupPercent, nf.separatorDecimalPercent);
+        formatted = value(decimal, decimals, nf.groupSizesPercent, nf.separatorGroupPercent, nf.separatorDecimalPercent);
     return pattern.replace('n', formatted).replace('%', unitSymbol);
   }
 
@@ -618,7 +618,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     return buf;
   }
 
-  static function value(decimal : Decimal, precision : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
+  static function value(decimal : Decimal, precision : Int, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
     decimal = decimal.abs();
     var p = splitOnDecimalSeparator(decimal);
 

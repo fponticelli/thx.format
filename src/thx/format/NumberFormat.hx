@@ -35,7 +35,7 @@ provided using setting the `symbol` argument.
     if(!Math.isFinite(f))
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
     var pattern   = f < 0 ? Pattern.currencyNegatives[nf.patternNegativeCurrency] : Pattern.currencyPositives[nf.patternPositiveCurrency],
-        formatted = value(f, (precision).or(nf.decimalDigitsCurrency), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesCurrency, nf.separatorGroupCurrency, nf.separatorDecimalCurrency);
+        formatted = value(f, (precision).or(nf.decimalDigitsCurrency), nf.groupSizesCurrency, nf.separatorGroupCurrency, nf.separatorDecimalCurrency);
     return pattern.replace('n', formatted).replace('$', (symbol).or(nf.symbolCurrency));
   }
 
@@ -90,7 +90,7 @@ Formats a decimal (integer) value.
       return nf.symbolNaN;
     if(!Math.isFinite(f))
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
-    var formatted = value(f, 0, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, [0], '', '');
+    var formatted = value(f, 0, [0], '', '');
     return (f < 0 ? nf.signNegative : '') + formatted.lpad('0', significantDigits);
   }
 
@@ -120,7 +120,7 @@ Formats a fixed point float number with an assigned precision.
     if(!Math.isFinite(f))
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
     var pattern   = f < 0 ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
-        formatted = value(f, (precision).or(nf.decimalDigitsNumber), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, [0], '', nf.separatorDecimalNumber);
+        formatted = value(f, (precision).or(nf.decimalDigitsNumber), [0], '', nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
 
@@ -228,7 +228,7 @@ Formats a number with group separators (eg: thousands separators).
     if(!Math.isFinite(f))
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
     var pattern   = f < 0 ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
-        formatted = value(f, (precision).or(nf.decimalDigitsNumber), nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalNumber);
+        formatted = value(f, (precision).or(nf.decimalDigitsNumber), nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
 
@@ -436,7 +436,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     if(!Math.isFinite(f))
       return f < 0 ? nf.symbolNegativeInfinity : nf.symbolPositiveInfinity;
     var pattern   = f < 0 ? Pattern.percentNegatives[nf.patternNegativePercent] : Pattern.percentPositives[nf.patternPositivePercent],
-        formatted = value(f, decimals, nf.symbolNaN, nf.symbolNegativeInfinity, nf.symbolPositiveInfinity, nf.groupSizesPercent, nf.separatorGroupPercent, nf.separatorDecimalPercent);
+        formatted = value(f, decimals, nf.groupSizesPercent, nf.separatorGroupPercent, nf.separatorDecimalPercent);
     return pattern.replace('n', formatted).replace('%', unitSymbol);
   }
 
@@ -773,7 +773,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     return buf;
   }
 
-  static function value(f : Float, precision : Int, symbolNaN : String, symbolNegativeInfinity : String, symbolPositiveInfinity : String, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
+  static function value(f : Float, precision : Int, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
     f = Math.abs(f);
     var p = splitOnDecimalSeparator(f);
 
