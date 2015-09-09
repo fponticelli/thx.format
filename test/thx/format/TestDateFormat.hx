@@ -211,7 +211,6 @@ class TestDateFormat {
   }
 
   public function testy() {
-    trace(d1.year);
     Assert.equals("72", DateTime.fromString('1972-06-15 13:05:03').formatTerm('y'));
   }
 

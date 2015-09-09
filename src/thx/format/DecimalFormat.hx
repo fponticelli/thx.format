@@ -17,8 +17,8 @@ Formats a currency value. By default the currency symbol is extracted from the a
 provided using setting the `symbol` argument.
 **/
   public static function currency(decimal : Decimal, ?precision : Null<Int>, ?symbol : String, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    var pattern   = decimal.isNegative() ? Pattern.currencyNegatives[nf.patternNegativeCurrency] : Pattern.currencyPositives[nf.patternPositiveCurrency],
+    var nf = numberFormat(culture),
+        pattern = decimal.isNegative() ? Pattern.currencyNegatives[nf.patternNegativeCurrency] : Pattern.currencyPositives[nf.patternPositiveCurrency],
         formatted = value(decimal, (precision).or(nf.decimalDigitsCurrency), nf.groupSizesCurrency, nf.separatorGroupCurrency, nf.separatorDecimalCurrency);
     return pattern.replace('n', formatted).replace('$', (symbol).or(nf.symbolCurrency));
   }
@@ -171,8 +171,8 @@ Formats the integer part of a number.
 Formats a number with group separators (eg: thousands separators).
 **/
   public static function number(decimal : Decimal, ?precision : Null<Int>, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    var pattern   = decimal.isNegative() ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
+    var nf = numberFormat(culture),
+        pattern = decimal.isNegative() ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
         formatted = value(decimal, (precision).or(nf.decimalDigitsNumber), nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
