@@ -351,33 +351,13 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
 // PRIVATE
   static function exponentialInfo(decimal : Decimal) {
     var scale = decimal.scale;
+    // TODO
     return {
       e : 0,
       f :decimal
     }
   }
-/*
-  static var BASE = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-  static function countSymbols(pattern : String, symbols : String) {
-    var i = 0,
-        quote = 0, // single quote == 1, double quote == 2
-        count = 0;
-    while(i < pattern.length) {
-      switch [pattern.substring(i, i+1), quote] {
-        case ["\\", _]: i++; // skip next
-        case ["'", 1],
-             ['"', 2]: quote = 0; // close single or double quote
-        case ["'", 0]: quote = 1; // open single quote
-        case ['"', 0]: quote = 2; // open double quote
-        case [s, 0] if(symbols.contains(s)): ++count; // accept only if not in quotes
-        case [_, _]:
-      }
-      i++;
-    }
-    return count;
-  }
-*/
   static function customFormatDecimalFraction(d : String, pattern : String, nf : NumberFormatInfo) : String {
     var buf = "",
         i = 0,
@@ -657,6 +637,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   }
 }
 
+// TODO duplicate, remove
 private enum CustomFormat {
   Literal(s : String);
   Hash(first : Bool);

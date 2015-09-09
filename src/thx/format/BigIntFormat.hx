@@ -211,6 +211,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     return DecimalFormat.unit(Decimal.fromBigInt(i), decimals, unitSymbol, culture);
 
 // PRIVATE
+// TODO duplicate, remove
   static function numberFormat(culture : Culture) : NumberFormatInfo
     return null != culture && null != culture.number ? culture.number : Format.defaultCulture.number;
 }
