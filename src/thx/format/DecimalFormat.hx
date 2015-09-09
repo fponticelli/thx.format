@@ -350,12 +350,24 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
 
 // PRIVATE
   static function exponentialInfo(decimal : Decimal) {
-    var scale = decimal.scale;
-    // TODO
-    return {
-      e : 0,
-      f :decimal
+    var s = decimal.abs().toString(),
+        p = s.split('.').concat(['']),
+        e = 0;
+
+    if(p[0].length > 1) {
+      e = p[0].length - 1;
+      p[1] = p[0].substring(1) + p[1];
+      p[0] = p[0].substring(0, 1);
+    } else if(p[0] == '0') {
+      e = -(1 + p[1].length - p[1].trimCharsLeft('0').length);
+      p[1] = p[1].substring(-e-1);
+      p[0] = p[1].substring(0, 1);
+      p[1] = p[1].substring(1);
     }
+    return {
+      e : e,
+      f : Decimal.fromString(p.slice(0, 2).join(".")) * (decimal.isNegative() ? -1 : 1)
+    };
   }
 
   static function customFormatDecimalFraction(d : String, pattern : String, nf : NumberFormatInfo) : String {
