@@ -198,20 +198,10 @@ Differences with classic printf:
 Transform an `Int` value to a `String` using the specified `base`. A negative sign can be provided optionally.
 **/
   public static function toBase(value : BigInt, base : Int, ?culture : Culture) : String {
-    var nf = numberFormat(culture);
-    if(base < 2 || base > BASE.length)
-      return throw 'invalid base $base, it must be between 2 and ${BASE.length}';
-    if(base == 10 || value == 0)
-      return '$value';
-
-    var buf = "",
-        abs = Ints.abs(value);
-    while(abs > 0) {
-      buf = BASE.charAt(abs % base) + buf;
-      abs = Std.int(abs / base);
-    }
-
-    return (value < 0 ? nf.signNegative : '') + buf;
+    var s = value.toStringWithBase(base);
+    if(!value.isNegative())
+      return s;
+    return numberFormat(culture).signNegative + s.substring(1);
   }
 
 /**
@@ -221,7 +211,6 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     return DecimalFormat.unit(Decimal.fromBigInt(i), decimals, unitSymbol, culture);
 
 // PRIVATE
-  static var BASE = "0123456789abcdefghijklmnopqrstuvwxyz";
   static function numberFormat(culture : Culture) : NumberFormatInfo
     return null != culture && null != culture.number ? culture.number : Format.defaultCulture.number;
 }
