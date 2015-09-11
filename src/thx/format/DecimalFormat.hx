@@ -537,7 +537,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
                  nf.separatorDecimalPercent :
                  nf.separatorDecimalNumber) +
              customFormatDecimalFraction((np[1]).or("0"), p[1], nf);
-        }
+    }
   }
 
   static function hasSymbols(pattern : String, symbols : String) {
@@ -600,8 +600,13 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function paramOrNull(param : String) : Null<Int>
     return param.length == 0 ? null : Std.parseInt(param);
 
-  static function splitOnDecimalSeparator(decimal : Decimal)
-    return decimal.toString().split('.');
+  static function splitOnDecimalSeparator(decimal : Decimal) {
+    var parts = decimal.toString().split('.');
+    if(parts.length > 1) {
+      parts[1] = parts[1].trimCharsRight("0");
+    }
+    return parts;
+  }
 
   static function splitPattern(pattern : String, separator : String) {
     var pos = [],
