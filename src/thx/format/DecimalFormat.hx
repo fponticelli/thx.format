@@ -428,14 +428,15 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
 
     var exp = splitPattern(pattern, "eE");
     if(exp.length > 1) {
-      var symbol = pattern.substring(exp[0].length, exp[0].length + 1),
+      var info = exponentialInfo(decimal),
+          symbol = pattern.substring(exp[0].length, exp[0].length + 1),
           forceSign = exp[1].startsWith("+");
       if(forceSign || exp[1].startsWith("-"))
         exp[1] = exp[1].substring(1);
-      return customIntegerAndFraction(decimal, exp[0], nf, isCurrency, isPercent) +
-             symbol; // +
-             //(info.e < 0 ? nf.signNegative : forceSign ? nf.signPositive : "") +
-             //customFormatInteger('${Math.abs(info.e)}', exp[1], nf, isCurrency, isPercent);
+      return customIntegerAndFraction(info.f, exp[0], nf, isCurrency, isPercent) +
+             symbol +
+             (info.e < 0 ? nf.signNegative : forceSign ? nf.signPositive : "") +
+             customFormatInteger('${Math.abs(info.e)}', exp[1], nf, isCurrency, isPercent);
     } else {
       return customIntegerAndFraction(decimal, pattern, nf, isCurrency, isPercent);
     }
@@ -659,6 +660,25 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
       buf.push(pad(p[1], precision, true));
 
     return buf.join(decimalSeparator);
+  }
+
+  static function countSymbols(pattern : String, symbols : String) {
+    var i = 0,
+        quote = 0, // single quote == 1, double quote == 2
+        count = 0;
+    while(i < pattern.length) {
+      switch [pattern.substring(i, i+1), quote] {
+        case ["\\", _]: i++; // skip next
+        case ["'", 1],
+             ['"', 2]: quote = 0; // close single or double quote
+        case ["'", 0]: quote = 1; // open single quote
+        case ['"', 0]: quote = 2; // open double quote
+        case [s, 0] if(symbols.contains(s)): ++count; // accept only if not in quotes
+        case [_, _]:
+      }
+      i++;
+    }
+    return count;
   }
 }
 
