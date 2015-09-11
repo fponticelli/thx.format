@@ -613,7 +613,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     return param.length == 0 ? null : Std.parseInt(param);
 
   static function splitOnDecimalSeparator(decimal : Decimal) {
-    return decimal.trim().toString().split('.');
+    return decimal.toString().split('.');
   }
 
   static function splitPattern(pattern : String, separator : String) {
