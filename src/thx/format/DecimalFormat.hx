@@ -601,11 +601,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     return param.length == 0 ? null : Std.parseInt(param);
 
   static function splitOnDecimalSeparator(decimal : Decimal) {
-    var parts = decimal.toString().split('.');
-    if(parts.length > 1) {
-      parts[1] = parts[1].trimCharsRight("0");
-    }
-    return parts;
+    return decimal.trim().toString().split('.');
   }
 
   static function splitPattern(pattern : String, separator : String) {
