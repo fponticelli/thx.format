@@ -17,6 +17,7 @@ Formats a currency value. By default the currency symbol is extracted from the a
 provided using setting the `symbol` argument.
 **/
   public static function currency(decimal : Decimal, ?precision : Null<Int>, ?symbol : String, ?culture : Culture) : String {
+    decimal = decimal.trim();
     var nf = numberFormat(culture),
         pattern = decimal.isNegative() ? Pattern.currencyNegatives[nf.patternNegativeCurrency] : Pattern.currencyPositives[nf.patternPositiveCurrency],
         formatted = value(decimal, (precision).or(nf.decimalDigitsCurrency), nf.groupSizesCurrency, nf.separatorGroupCurrency, nf.separatorDecimalCurrency);
@@ -41,6 +42,7 @@ format    | description
 `...`     | Anything else is left untouched and put in the output as it is.
 */
   public static function customFormat(decimal : Decimal, pattern : String, ?culture : Culture) : String {
+    decimal = decimal.trim();
     var nf = numberFormat(culture);
     // split on section separator
     var isCurrency = hasSymbols(pattern, '$'),
@@ -64,6 +66,7 @@ format    | description
 Formats a decimal (integer) value.
 **/
   public static function decimal(dec : Decimal, ?significantDigits : Int = 1, ?culture : Culture) : String {
+    dec = dec.trim();
     var nf = numberFormat(culture);
     var formatted = value(dec, 0, [0], '', '');
     return (dec.isNegative() ? nf.signNegative : '') + formatted.lpad('0', significantDigits);
@@ -73,6 +76,7 @@ Formats a decimal (integer) value.
 Formats a number using the exponential (scientific) format.
 **/
   public static function exponential(decimal : Decimal, ?precision : Int = 6, ?digits : Int = 3, ?symbol : String = 'e', ?culture : Culture) : String {
+    decimal = decimal.trim();
     var nf = numberFormat(culture);
     var info = exponentialInfo(decimal);
     return number(info.f, precision, culture) +
@@ -85,8 +89,9 @@ Formats a number using the exponential (scientific) format.
 Formats a fixed point float number with an assigned precision.
 **/
   public static function fixed(decimal : Decimal, ?precision : Null<Int>, ?culture : Culture) : String {
+    decimal = decimal.trim();
     var nf = numberFormat(culture),
-        pattern   = decimal.isNegative() ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
+        pattern = decimal.isNegative() ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
         formatted = value(decimal, (precision).or(nf.decimalDigitsNumber), [0], '', nf.separatorDecimalNumber);
     return pattern.replace('n', formatted);
   }
@@ -119,36 +124,36 @@ format     | description
 **/
   public static function format(decimal : Decimal, pattern : String, ?culture : Culture) : String {
     var specifier = pattern.substring(0, 1),
-        param     = paramOrNull(pattern.substring(1));
+        param = paramOrNull(pattern.substring(1));
     return switch specifier {
-    // currency
-  case 'C', 'c': currency(decimal, param, culture);
+      // currency
+      case 'C', 'c': currency(decimal, param, culture);
       // decimal
-    case 'D', 'd': DecimalFormat.decimal(decimal, param, culture);
+      case 'D', 'd': DecimalFormat.decimal(decimal, param, culture);
       // exponential E
-    case 'E':      exponential(decimal, param, culture);
+      case 'E':      exponential(decimal, param, culture);
       // exponential e
-    case 'e':      exponential(decimal, param, culture).toLowerCase();
+      case 'e':      exponential(decimal, param, culture).toLowerCase();
       // fixed point
-    case 'F', 'f': fixed(decimal, param, culture);
+      case 'F', 'f': fixed(decimal, param, culture);
       // general
-    case 'G':      general(decimal, param, culture);
+      case 'G':      general(decimal, param, culture);
       // general lower case
-    case 'g':      general(decimal, param, culture).toLowerCase();
+      case 'g':      general(decimal, param, culture).toLowerCase();
       // number
-    case 'N', 'n': number(decimal, param, culture);
+      case 'N', 'n': number(decimal, param, culture);
       // percent
-    case 'P', 'p': percent(decimal, param, culture);
+      case 'P', 'p': percent(decimal, param, culture);
       // round trip
-    case 'R', 'r': decimal.toString();
+      case 'R', 'r': decimal.toString();
       // hexadecimal X
-    case 'X':      BigIntFormat.hex(decimal.toBigInt(), param, culture).toUpperCase();
+      case 'X':      BigIntFormat.hex(decimal.toBigInt(), param, culture).toUpperCase();
       // hexadecimal x
-    case 'x':      BigIntFormat.hex(decimal.toBigInt(), param, culture);
+      case 'x':      BigIntFormat.hex(decimal.toBigInt(), param, culture);
       // printf
-    case "%":      printf(decimal, pattern, culture);
+      case "%":      printf(decimal, pattern, culture);
       // custom format
-    case _:        customFormat(decimal, pattern, culture);
+      case _:        customFormat(decimal, pattern, culture);
     };
   }
 
@@ -156,6 +161,7 @@ format     | description
 Formats a number using either the shortest result between `fixed` and `exponential`.
 **/
   public static function general(decimal : Decimal, ?significantDigits : Null<Int>, ?culture : Culture) : String {
+    decimal = decimal.trim();
     var e = exponential(decimal, significantDigits, culture),
         f = fixed(decimal, significantDigits, culture);
     return e.length < f.length ? e : f;
@@ -171,6 +177,7 @@ Formats the integer part of a number.
 Formats a number with group separators (eg: thousands separators).
 **/
   public static function number(decimal : Decimal, ?precision : Null<Int>, ?culture : Culture) : String {
+    decimal = decimal.trim();
     var nf = numberFormat(culture),
         pattern = decimal.isNegative() ? Pattern.numberNegatives[nf.patternNegativeNumber] : 'n',
         formatted = value(decimal, (precision).or(nf.decimalDigitsNumber), nf.groupSizesNumber, nf.separatorGroupNumber, nf.separatorDecimalNumber);
@@ -187,16 +194,18 @@ Formats a number to octals.
 Formats a number as a percent value. The output result is multiplied by 100. So `0.1` will result in `10%`.
 **/
   public static function percent(decimal : Decimal, ?decimals : Null<Int>, ?culture : Culture) : String {
+    decimal = decimal.trim();
     var nf = numberFormat(culture);
-    return unit(decimal * 100, (decimals).or(nf.decimalDigitsPercent), nf.symbolPercent, culture);
+    return unit((decimal * 100).trim(), (decimals).or(nf.decimalDigitsPercent), nf.symbolPercent, culture);
   }
 
 /**
 Formats a number as a percent value. The output result is multiplied by 1000. So `0.1` will result in `100‰`.
 **/
   public static function permille(decimal : Decimal, ?decimals : Null<Int>, ?culture : Culture) : String {
+    decimal = decimal.trim();
     var nf = numberFormat(culture);
-    return unit(decimal * 1000, (decimals).or(nf.decimalDigitsPercent), nf.symbolPermille, culture);
+    return unit((decimal * 1000).trim(), (decimals).or(nf.decimalDigitsPercent), nf.symbolPermille, culture);
   }
 
 /**
@@ -256,6 +265,7 @@ Differences with classic printf:
   public static function printf(decimal : Decimal, pattern : String, ?culture) : String {
     if(!pattern.startsWith('%'))
       throw 'invalid printf term "$pattern"';
+    decimal = decimal.trim();
     var specifier = pattern.substring(pattern.length-1),
         p = pattern.substring(1, pattern.length - 1).split('.'),
         precision : Null<Int> = null == p[1] || "" == p[1] ? null : Std.parseInt(p[1]),
@@ -342,6 +352,7 @@ Transform an `Int` value to a `String` using the specified `base`. A negative si
 Formats a number with a specified `unitSymbol` and a specified number of decimals.
 **/
   public static function unit(decimal : Decimal, decimals : Int, unitSymbol : String, ?culture : Culture) : String {
+    decimal = decimal.trim();
     var nf = numberFormat(culture);
     var pattern   = decimal.isNegative() ? Pattern.percentNegatives[nf.patternNegativePercent] : Pattern.percentPositives[nf.patternPositivePercent],
         formatted = value(decimal, decimals, nf.groupSizesPercent, nf.separatorGroupPercent, nf.separatorDecimalPercent);
@@ -366,7 +377,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     }
     return {
       e : e,
-      f : Decimal.fromString(p.slice(0, 2).join(".")) * (decimal.isNegative() ? -1 : 1)
+      f : (Decimal.fromString(p.slice(0, 2).join(".")) * (decimal.isNegative() ? -1 : 1)).trim()
     };
   }
 
@@ -413,7 +424,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
 
   static function customFormatDecimal(decimal : Decimal, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) : String {
     if(isPercent)
-      decimal *= hasSymbols(pattern, "‰") ? 1000 : 100;
+      decimal = (decimal * (hasSymbols(pattern, "‰") ? 1000 : 100)).trim();
 
     var exp = splitPattern(pattern, "eE");
     if(exp.length > 1) {
@@ -523,12 +534,13 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   static function customIntegerAndFraction(decimal : Decimal, pattern : String, nf : NumberFormatInfo, isCurrency : Bool, isPercent : Bool) {
     var p = splitPattern(pattern, "."),
         power = p[0].length - (p[0] = p[0].trimCharsRight(",")).length;
-    decimal /= Math.pow(1000, power);
+    decimal = (decimal / Math.pow(1000, power)).trim();
     if(p.length == 1)
       return customFormatInteger(decimal.toBigInt().toString(), p[0], nf, isCurrency, isPercent);
     else {
       // TODO
-      //decimal = decimal.roundTo(countSymbols(p[1], "#0"));
+      // decimal = decimal.roundTo(countSymbols(p[1], "#0"));
+      decimal = decimal.roundTo(countSymbols(p[1], "#0")).trim();
       var np = splitOnDecimalSeparator(decimal);
       return customFormatInteger(np[0], p[0], nf, isCurrency, isPercent) +
              (isCurrency ?
