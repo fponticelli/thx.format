@@ -5,8 +5,8 @@
   "classPath": "src",
   "tags": ["format", "localization", "thx", "cross"],
   "description": "Formatting library (Numbers and Dates).",
-  "releasenote": "Updated to support new DateTime types in thx.core and extended features.",
-  "version": "0.4.0",
+  "releasenote": "Added support for Decimal and BigInt.",
+  "version": "0.5.0",
   "contributors": ["fponticelli"],
   "dependencies": {
     "thx.core": "",
