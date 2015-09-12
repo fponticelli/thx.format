@@ -451,7 +451,6 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
         first = true,
         useGroups = false,
         zeroes = 0;
-
     while(i < pattern.length) {
       switch [pattern.substring(i, i+1), quote] {
         case ["\\", _]:
@@ -491,6 +490,7 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     }
     if(lbuf.length > 0)
       buf.push(Literal(lbuf));
+
 
     for(i in p.length...zeroes)
       p.unshift("0");

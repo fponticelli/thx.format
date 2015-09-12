@@ -90,12 +90,10 @@ class TestDecimalFormat {
     Assert.equals('-1.234000e+050', (-1.234e50 : Decimal).exponential());
     Assert.equals('-1.234000e-050', (-1.234e-50 : Decimal).exponential());
 
-
     Assert.equals('1.23e+003', (1.234e3 : Decimal).exponential(2));
     Assert.equals('1.23e-003', (1.234e-003 : Decimal).exponential(2));
     Assert.equals('-1.23e+003', (-1.234e3 : Decimal).exponential(2));
     Assert.equals('-1.23e-003', (-1.234e-003 : Decimal).exponential(2));
-
 
     Assert.equals('1,23e+003', (1.234e3 : Decimal).exponential(2, it));
     Assert.equals('1,23e-003', (1.234e-003 : Decimal).exponential(2, it));
