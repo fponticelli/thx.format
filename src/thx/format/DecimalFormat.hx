@@ -536,11 +536,9 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
     var p = splitPattern(pattern, "."),
         power = p[0].length - (p[0] = p[0].trimCharsRight(",")).length;
     decimal = (decimal / Math.pow(1000, power)).trim();
-    if(p.length == 1)
-      return customFormatInteger(decimal.toBigInt().toString(), p[0], nf, isCurrency, isPercent);
-    else {
-      // TODO
-      // decimal = decimal.roundTo(countSymbols(p[1], "#0"));
+    if(p.length == 1) {
+      return customFormatInteger(decimal.round().toBigInt().toString(), p[0], nf, isCurrency, isPercent);
+    } else {
       decimal = decimal.roundTo(countSymbols(p[1], "#0")).trim();
       var np = splitOnDecimalSeparator(decimal);
       return customFormatInteger(np[0], p[0], nf, isCurrency, isPercent) +
