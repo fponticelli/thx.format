@@ -154,7 +154,7 @@ class TestDecimalFormat {
 
     value = 1234.567890;
     Assert.equals('1,234.57', value.format('0,0.00'));
-    value = 1234567890.12345;
+    value = "1234567890.12345";
     Assert.equals("(1,234,567,8) 90.123", value.format("(000) 0,0.000"));
     Assert.equals("(12345678) 90.123", value.format("(000) 00.000"));
     Assert.equals("(123456789) 0.123", value.format("(000) 0.000"));
@@ -187,7 +187,7 @@ class TestDecimalFormat {
     Assert.equals('1234567890', value.format('#'));
     Assert.equals('(123) 456-7890', value.format('(###) ###-####"'));
 
-    value = 1234567890.12345;
+    value = "1234567890.12345";
     Assert.equals("(1,234,567,8) 90.123", value.format("(###) #,#.###"));
     Assert.equals("(12345678) 90.123", value.format("(###) ##.###"));
     Assert.equals("(123456789) 0.123", value.format("(###) #.###"));
