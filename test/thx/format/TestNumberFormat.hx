@@ -12,6 +12,13 @@ class TestNumberFormat {
   static var baRu : Culture = Embed.culture('ba-ru');
   public function new() {}
 
+  public function testIssues() {
+    Assert.equals("1,081,072,410", 1081072409.99914.number(0));
+    Assert.equals("1,081,072,410.0", 1081072409.99914.number(1));
+    Assert.equals("1,081,072,410.00", 1081072409.99914.number(2));
+    Assert.equals("1,081,072,410", 1081072409.99914.format("#,##0"));
+  }
+
   public function testNumber() {
     Assert.equals('1.00',        1.0.number(2));
     Assert.equals('1.2',         1.2.number(1));
@@ -34,7 +41,7 @@ class TestNumberFormat {
     #end
 
     var exp = Math.pow(2, -18);
-    Assert.equals('0.000003814610', exp.number(11));
+    Assert.equals('0.00000381470', exp.number(11));
   }
 
   public function testCurrency() {

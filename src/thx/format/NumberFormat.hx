@@ -774,15 +774,9 @@ Formats a number with a specified `unitSymbol` and a specified number of decimal
   }
 
   static function value(f : Float, precision : Int, groupSizes : Array<Int>, groupSeparator : String, decimalSeparator : String) : String {
-    f = Math.abs(f);
-    var p = splitOnDecimalSeparator(f);
-
-    if(precision <= 0 && null != p[1]) {
-      if(Std.parseFloat('0.${p[1]}') >= 0.5)
-        p[0] = p[0].substring(0, p[0].length-1) + (Std.parseFloat(p[0].substring(p[0].length-1)) + 1);
-    }
-
-    var buf = [];
+    f = Math.abs(f.roundTo(precision));
+    var p = splitOnDecimalSeparator(f),
+        buf = [];
     buf.push(intPart(p[0], groupSizes, groupSeparator));
 
     if(precision > 0)
