@@ -33,7 +33,9 @@ class TestNumberFormat {
     Assert.equals('-12,345.679', (-12345.6789).number(3));
 
     var exp = Math.pow(2, 50);
-    #if (neko || cs || cpp)
+    #if php
+    Assert.equals("1,125,899,906,842,600.00", exp.number(2));
+    #elseif (neko || cs || cpp || php)
     // floats in Neko have a different precision
     Assert.equals('1,125,899,906,842,620.00', exp.number(2));
     #else
