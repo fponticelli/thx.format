@@ -336,6 +336,8 @@ Differences with classic printf:
         width = 0,
         flags = p[0];
 
+    trace(pattern, flags, specifier);
+
     while(flags.length > 0) {
       switch flags.substring(0, 1) {
         case "-":
@@ -396,7 +398,7 @@ Differences with classic printf:
       case "x": decorate(hex(Math.abs(f), precision, culture), f, "0x", nf.signNegative, nf.signPositive);
       case "X": decorate(hex(Math.abs(f), precision, culture), f, "0X", nf.signNegative, nf.signPositive);
       case "o": decorate(octal(Math.abs(f), precision, culture), f, "0", nf.signNegative, nf.signPositive);
-      case "%": decorate("%", 1, "", "", "");
+      case "%": decorate(fixed(Math.abs(f), precision, culture) + "%", f, "", nf.signNegative, nf.signPositive);
       case _: throw 'invalid pattern "$pattern"';
     };
   }
