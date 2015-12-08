@@ -336,8 +336,6 @@ Differences with classic printf:
         width = 0,
         flags = p[0];
 
-    trace(pattern, flags, specifier);
-
     while(flags.length > 0) {
       switch flags.substring(0, 1) {
         case "-":
