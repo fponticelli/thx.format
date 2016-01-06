@@ -339,7 +339,7 @@ Month/Day format.
 Rfc1123 date/time format.
 */
   public static function rfc1123(d : DateTime, ?culture : Culture)
-    return customFormat(d.utc, dateTime(culture).patternRfc1123, culture);
+    return customFormat(d.utc.toDateTime(), dateTime(culture).patternRfc1123, culture);
 
 /**
 Long time format.
@@ -357,7 +357,7 @@ Sort time format.
 Format a date in way that it can be correctly ordered alphabetically.
 */
   public static function universalSortable(d : DateTime, ?culture : Culture)
-    return customFormat(d.utc, dateTime(culture).patternUniversalSortable, culture);
+    return customFormat(d.utc.toDateTime(), dateTime(culture).patternUniversalSortable, culture);
 
 /**
 Format a date in way that is compatible with the iso8601 specification.
