@@ -1,0 +1,2 @@
+-cmd haxe tests.hxml -js bin/thx.format.js
+-cmd node bin/thx.format.js
