@@ -26,6 +26,8 @@ Date.now().f("D"); // returns the date in long format
 */
   macro public static function f(subject : Expr, pattern : ExprOf<String>, ?culture : ExprOf<thx.culture.Culture>)
     return switch TypeTools.toString(Context.follow(Context.typeof(subject))) {
+      case "thx.LocalDateTime":
+        macro thx.format.LocalDateFormat.format($e{subject}, $e{pattern}, $e{culture});
       case "thx.DateTime", "thx.DateTimeUtc":
         macro thx.format.DateFormat.format($e{subject}, $e{pattern}, $e{culture});
       case "Date":
