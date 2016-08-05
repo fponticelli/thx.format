@@ -7,6 +7,7 @@ class TestAll {
     runner.addCase(new thx.format.TestDateFormat());
     runner.addCase(new thx.format.TestDecimalFormat());
     runner.addCase(new thx.format.TestFormat());
+    runner.addCase(new thx.format.TestLocalDateFormat());
     runner.addCase(new thx.format.TestNumberFormat());
     runner.addCase(new thx.format.TestTimeFormat());
   }
