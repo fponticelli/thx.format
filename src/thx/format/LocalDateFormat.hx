@@ -33,15 +33,7 @@ Custom date format.
         }
         buf.push(left);
         var term = ereg.matched(0);
-        // trace(term);
         pattern = ereg.matchedRight();
-        // if(term == "." && right.substring(0, 1).toLowerCase() == "f") {
-        //   if(d.tickInSecond == thx.Int64s.zero) {
-        //     ereg.match(pattern);
-        //     pattern = ereg.matchedRight();
-        //     continue;
-        //   }
-        // }
         buf.push(formatTerm(d, term, culture));
       } else {
         buf.push(pattern);
