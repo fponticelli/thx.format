@@ -5,8 +5,8 @@
   "classPath": "src",
   "tags": ["format", "localization", "thx", "cross"],
   "description": "Formatting library (Numbers and Dates).",
-  "releasenote": "Fixed issue with rounding.",
-  "version": "0.5.1",
+  "releasenote": "Add formats for LocalDate and general fixes.",
+  "version": "0.6.0",
   "contributors": ["fponticelli"],
   "dependencies": {
     "thx.core": "",
