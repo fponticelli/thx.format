@@ -190,8 +190,13 @@ zzz      | Time zone offset with hours and minutes                              
       case "FFFFF":   getDecimalsUpTo(d.tickInSecond, 5);
       case "FFFFFF":  getDecimalsUpTo(d.tickInSecond, 6);
       case "FFFFFFF": getDecimalsString(d.tickInSecond);
-      case "t":       var dt = dateTime(culture);
-                      Utf8.sub(d.hour < 12 ? dt.designatorAm : dt.designatorPm, 0, 1);
+      case "t":
+        var dt = dateTime(culture),
+            des = d.hour < 12 ? dt.designatorAm : dt.designatorPm;
+        if(des.length == 0)
+          "";
+        else
+          Utf8.sub(des, 0, 1);
       case "tt":      var dt = dateTime(culture);
                       d.hour < 12 ? dt.designatorAm : dt.designatorPm;
       case "y":       '${d.year % 100}';
