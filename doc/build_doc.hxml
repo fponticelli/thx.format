@@ -40,10 +40,10 @@ ImportFormat
 -cs _
 -D xmldoc
 
-#--next
-#-xml xml/python.xml
-#-python _
-#-D xmldoc
+--next
+-xml xml/python.xml
+-python _
+-D xmldoc
 
 #--next
 #-xml xml/cross.xml
