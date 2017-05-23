@@ -83,7 +83,7 @@ MS      | strftime   | description                                              
 `-`     | `%i`       | The minute. Single-digit minutes may be prefixed by leadingspace.\*          | " 8"
 `hh`    | `%I`       | The hour as a decimal number using a 12-hour clock (range 01 to 12).         | 07
 `-`     | `%k`       | The hour (24-hour clock) as a decimal number (range 0 to 23); single-digits are optionally prefixed by leadingspace. (See also %H). | 7
-        | `%l`       | The hour (12-hour clock) as a decimal number (range 1 to 12); single-digits are optionally prefixed by leadingspace. (See also %I). | 7
+`-`     | `%l`       | The hour (12-hour clock) as a decimal number (range 1 to 12); single-digits are optionally prefixed by leadingspace. (See also %I). | 7
 `MM`    | `%m`       | The month as a decimal number (range 01 to 12).                              | 04
 `mm`    | `%M`       | The minute as a decimal number (range 00 to 59).                             | 08
 `-`     | `%n`       | A newline character.                                                         | -
